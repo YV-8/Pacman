@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PacmanSolution", "PacmanSolution\PacmanSolution.csproj", "{2C000050-8929-4F5A-903D-56AA7A73DCDA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2C000050-8929-4F5A-903D-56AA7A73DCDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C000050-8929-4F5A-903D-56AA7A73DCDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C000050-8929-4F5A-903D-56AA7A73DCDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C000050-8929-4F5A-903D-56AA7A73DCDA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

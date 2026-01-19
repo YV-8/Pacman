@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="PacmanSolution/App.axaml" value="PacmanSolution/PacmanSolution.csproj" />
+        <entry key="PacmanSolution/Views/MainWindow.axaml" value="PacmanSolution/PacmanSolution.csproj" />
+      </map>
+    </option>
+  </component>
+</project>
