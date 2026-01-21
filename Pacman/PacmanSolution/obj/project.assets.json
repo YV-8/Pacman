@@ -1470,11 +1470,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/monic/Documents/Progra3/PACMAN/Pacman/PacmanSolution/PacmanSolution.csproj",
+      "projectUniqueName": "/home/monic/Documents/Progra3/PacmanP/Pacman/PacmanSolution/PacmanSolution.csproj",
       "projectName": "PacmanSolution",
-      "projectPath": "/home/monic/Documents/Progra3/PACMAN/Pacman/PacmanSolution/PacmanSolution.csproj",
+      "projectPath": "/home/monic/Documents/Progra3/PacmanP/Pacman/PacmanSolution/PacmanSolution.csproj",
       "packagesPath": "/home/monic/.nuget/packages/",
-      "outputPath": "/home/monic/Documents/Progra3/PACMAN/Pacman/PacmanSolution/obj/",
+      "outputPath": "/home/monic/Documents/Progra3/PacmanP/Pacman/PacmanSolution/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/monic/.nuget/NuGet/NuGet.Config"

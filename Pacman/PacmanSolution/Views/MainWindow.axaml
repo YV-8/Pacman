@@ -46,7 +46,7 @@
 
                     <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
                         <StackPanel Orientation="Horizontal" Spacing="15">
-                            <TextBlock Text="🍒" VerticalAlignment="Center"/> <TextBlock Text="MENU" VerticalAlignment="Center" Foreground="White" FontSize="28"/>
+                            <TextBlock Text="🍒" VerticalAlignment="Center"/> <TextBlock Text="Menu" VerticalAlignment="Center" Foreground="White" FontSize="28"/>
                         </StackPanel>
                     </Button>
                 
@@ -54,6 +54,6 @@
             
             </StackPanel>
         
-            <Border Height="2" Background="#2222FF" VerticalAlignment="Bottom" Margin="0,0,0,20" BoxShadow="0 0 10 2 #2222FF"/>
+            <!-- <Border Height="2" Background="#2222FF" VerticalAlignment="Bottom" Margin="0,0,0,20" BoxShadow="0 0 10 2 #2222FF"/> -->
         </Panel>
 </Window>
