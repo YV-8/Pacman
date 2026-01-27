@@ -3,6 +3,7 @@
         xmlns:vm="using:PacmanSolution.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:PacmanSolution.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PacmanSolution.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -11,49 +12,17 @@
         Background="Black">
     <!-- Background="Transparent"
         TransparencyLevelHint="AcrylicBlur"> -->
-
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
-        <Panel>
-            <Canvas Opacity="0.3">
-                <Ellipse Fill="White" Width="4" Height="4" Canvas.Left="100" Canvas.Top="100"/>
-                <Ellipse Fill="White" Width="4" Height="4" Canvas.Left="200" Canvas.Top="200"/>
-            </Canvas>
-
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="40">
-            
-                <Viewbox Height="100">
-                    <TextBlock Text="PAC-MAN" 
-                               Foreground="#FFFF00" 
-                               FontWeight="Black"
-                               LetterSpacing="5">
-                        <TextBlock.Effect>
-                            <DropShadowEffect BlurRadius="10" Color="Yellow" Opacity="0.5"/>
-                        </TextBlock.Effect>
-                    </TextBlock>
-                </Viewbox>
-
-                <StackPanel Spacing="20">
-                
-                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Spacing="15">
-                            <TextBlock Text="🍒" VerticalAlignment="Center"/> <TextBlock Text="Play" VerticalAlignment="Center" Foreground="White" FontSize="28"/>
-                        </StackPanel>
-                    </Button>
-
-                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Spacing="15">
-                            <TextBlock Text="🍒" VerticalAlignment="Center"/> <TextBlock Text="Menu" VerticalAlignment="Center" Foreground="White" FontSize="28"/>
-                        </StackPanel>
-                    </Button>
-                
-                </StackPanel>
-            
-            </StackPanel>
-        
-            <!-- <Border Height="2" Background="#2222FF" VerticalAlignment="Bottom" Margin="0,0,0,20" BoxShadow="0 0 10 2 #2222FF"/> -->
-        </Panel>
+    <ContentControl Content="{Binding CurrentPage}">
+        <ContentControl.DataTemplates>
+            <DataTemplate DataType="vm:MainPageViewM">
+                <views:MainPageView />
+            </DataTemplate>
+            <DataTemplate DataType="vm:GamePageViewModel">
+                <views:GamePageView />
+            </DataTemplate>
+            <DataTemplate DataType="vm:MenuPageViewModel">
+                <views:MenuPageView />
+            </DataTemplate>
+        </ContentControl.DataTemplates>
+    </ContentControl>
 </Window>

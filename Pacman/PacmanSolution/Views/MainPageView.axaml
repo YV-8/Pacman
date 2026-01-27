@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:PacmanSolution.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="PacmanSolution.Views.MenuView"
-             x:DataType="viewModels:MainPage"
+             x:Class="PacmanSolution.Views.MainPageView"
+             x:DataType="viewModels:MainPageViewM"
              Background="Black">
     
      <Panel>
@@ -29,15 +29,19 @@
 
                 <StackPanel Spacing="20">
                 
-                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Command="{Binding GoGame}">
-                        <StackPanel Orientation="Horizontal" Spacing="15">
-                            <TextBlock Text="🍒" VerticalAlignment="Center"/> <TextBlock Text="Play" VerticalAlignment="Center" Foreground="White" FontSize="28"/>
+                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" 
+                            Command="{Binding GoGame}">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🍒 Play" VerticalAlignment="Center"
+                                       Foreground="White" FontSize="28"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Spacing="15">
-                            <TextBlock Text="🍒" VerticalAlignment="Center"/> <TextBlock Text="Menu" VerticalAlignment="Center" Foreground="White" FontSize="28"/>
+                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            Command="{Binding GoMainMenu}">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🍒 Menu" VerticalAlignment="Center" 
+                                       Foreground="White" FontSize="28"/>
                         </StackPanel>
                     </Button>
                 
