@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace PacmanSolution.ViewModels;
 
-public class PagGameViewModel: INotifyPropertyChanged
+public class GamePageViewModel: INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 

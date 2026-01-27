@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace PacmanSolution.ViewModels;
 
-public class MenuPageViewM:INotifyPropertyChanged
+public class MenuPageViewModel:INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
