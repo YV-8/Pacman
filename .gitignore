@@ -3,7 +3,12 @@ obj/
 
 # Archivos de configuración de Rider / JetBrains
 .idea/
+*.sln.DotSettings.user
+.vs/
 *.user
+*.userosscache
+*.sln.docstates
 
 # Archivos de sistema
 .DS_Store
+Thumbs.db
