@@ -1,0 +1,9 @@
+bin/
+obj/
+
+# Archivos de configuración de Rider / JetBrains
+.idea/
+*.user
+
+# Archivos de sistema
+.DS_Store
