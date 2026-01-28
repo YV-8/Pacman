@@ -23,7 +23,7 @@ public partial class MainWindowViewModel:INotifyPropertyChanged
 
     public MainWindowViewModel()
     {
-        CurrentPage = new MainPageViewM(this);
+        CurrentPage = new MenuPageViewModel(this);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
