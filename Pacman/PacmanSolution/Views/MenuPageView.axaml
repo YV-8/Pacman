@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:PacmanSolution.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="PacmanSolution.Views.MainPageView"
-             x:DataType="viewModels:MainPageViewM"
+             x:Class="PacmanSolution.Views.MenuPageView"
+             x:DataType="viewModels:MenuPageViewModel"
              Background="Black">
     
      <Panel>
@@ -38,9 +38,25 @@
                     </Button>
 
                     <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                            Command="{Binding GoMainMenu}">
+                            Command="{Binding GoScoreBoard}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="🍒 Menu" VerticalAlignment="Center" 
+                            <TextBlock Text="🍒 Score Board" VerticalAlignment="Center" 
+                                       Foreground="White" FontSize="28"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            Command="{Binding ExitGame}">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🍒 Exit" VerticalAlignment="Center" 
+                                       Foreground="White" FontSize="28"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            Command="{Binding GoSettingsMenu}">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🍒 Setting's music" VerticalAlignment="Center" 
                                        Foreground="White" FontSize="28"/>
                         </StackPanel>
                     </Button>

@@ -14,14 +14,14 @@
         TransparencyLevelHint="AcrylicBlur"> -->
     <ContentControl Content="{Binding CurrentPage}">
         <ContentControl.DataTemplates>
-            <DataTemplate DataType="vm:MainPageViewM">
-                <views:MainPageView />
+            <DataTemplate DataType="vm:MenuPageViewModel">
+                <views:MenuPageView />
             </DataTemplate>
             <DataTemplate DataType="vm:GamePageViewModel">
                 <views:GamePageView />
             </DataTemplate>
-            <DataTemplate DataType="vm:MenuPageViewModel">
-                <views:MenuPageView />
+            <DataTemplate DataType="vm:ScoreBoardPageViewModel">
+                <views:ScoreBoardPageView />
             </DataTemplate>
         </ContentControl.DataTemplates>
     </ContentControl>
