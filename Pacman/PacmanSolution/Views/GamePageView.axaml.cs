@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace PacmanSolution.Views;
 
-public partial class PagGameView : UserControl
+public partial class GamePageView : UserControl
 {
-    public PagGameView()
+    public GamePageView()
     {
         InitializeComponent();
     }
