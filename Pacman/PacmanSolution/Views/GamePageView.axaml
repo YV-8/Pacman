@@ -2,8 +2,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:PacmanSolution.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="PacmanSolution.Views.GamePageView"
+             x:DataType="vm:GamePageViewModel"
              Background="Black">
-    Welcome to Pacman game!
+    <ItemsControl ItemsSource="{Binding GameBoard}"> <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <Canvas Width="400" Height="400" Background="Turquoise"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Rectangle Width="38" Height="38" Fill="Blue">
+                    <Rectangle.RenderTransform>
+                    </Rectangle.RenderTransform>
+                </Rectangle>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
 </UserControl>
