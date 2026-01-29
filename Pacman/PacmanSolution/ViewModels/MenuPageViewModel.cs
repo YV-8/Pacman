@@ -1,23 +1,42 @@
-using System.Collections.Generic;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace PacmanSolution.ViewModels;
 
-public class MenuPageViewModel:INotifyPropertyChanged
+public class MenuPageViewModel: INotifyPropertyChanged
 {
-    public event PropertyChangedEventHandler? PropertyChanged;
+    private readonly MainWindowViewModel _mainWindowViewModel;
+    public event PropertyChangedEventHandler PropertyChanged;
 
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    public MenuPageViewModel(MainWindowViewModel mainWVM)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        _mainWindowViewModel = mainWVM;
+    }
+    public void GoGame()
+    {
+        _mainWindowViewModel.CurrentPage = new GamePageViewModel();
     }
 
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    public void GoScoreBoard()
     {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
+        _mainWindowViewModel.CurrentPage = new ScoreBoardPageViewModel();
     }
+
+    public void GoSettingsMenu()
+    {
+        //cambair por una ventana emergente
+        _mainWindowViewModel.CurrentPage = new GoSettingsViewModel();
+    }
+
+    public void ExitGame()
+    {
+        Console.WriteLine("Exit...Game...");
+    }
+    protected void OnPropertyChanged([CallerMemberName] string? name = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+
+
 }

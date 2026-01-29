@@ -12,7 +12,7 @@ public partial class MainWindowViewModel:ViewModelBase
 
     public MainWindowViewModel()
     {
-        CurrentPage = new MainPageViewM(this);
+        CurrentPage = new MenuPageViewModel(this);
     }
     
 }
