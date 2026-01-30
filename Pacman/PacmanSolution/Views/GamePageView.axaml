@@ -7,19 +7,14 @@
              x:Class="PacmanSolution.Views.GamePageView"
              x:DataType="vm:GamePageViewModel"
              Background="Black">
-    <ItemsControl ItemsSource="{Binding GameBoard}"> <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-                <Canvas Width="400" Height="400" Background="Turquoise"/>
-            </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        
-        <ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <Rectangle Width="38" Height="38" Fill="Blue">
-                    <Rectangle.RenderTransform>
-                    </Rectangle.RenderTransform>
-                </Rectangle>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+    <Panel>
+        <Button Content="Pause" Foreground="Yellow" BorderBrush="Yellow"
+                HorizontalAlignment="Right" VerticalAlignment="Top"/>
+        <Grid Width="600" Height="500">
+            <Grid.Background> LightBlue</Grid.Background>
+            <TextBox Text="Pacman"  FontSize="30" 
+                     HorizontalAlignment="Center" VerticalAlignment="Center" 
+                     Foreground="BlueViolet"/>
+        </Grid>
+    </Panel>
 </UserControl>

@@ -7,8 +7,34 @@
              x:Class="PacmanSolution.Views.MenuPageView"
              x:DataType="viewModels:MenuPageViewModel"
              Background="Black">
+    <UserControl.Styles>
+        <Style Selector="Button.PacmanRetro">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Yellow"/>
+            <Setter Property="BorderThickness" Value="5"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="RenderTransform" Value="none"/>
+            <Setter Property="Width" Value="350"/>
+            <Setter Property="Height" Value="80"/>
+            <!--<Setter/> -->
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="TextBlock.ButtonOpt">
+            <Setter Property="Foreground" Value="Yellow"/>
+            <Setter Property="FontFamily" Value="Roboto Mono"/>
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </UserControl.Styles>
     
-     <Panel>
+    <Panel>
             <Canvas Opacity="0.3">
                 <Ellipse Fill="White" Width="4" Height="4" Canvas.Left="100" Canvas.Top="100"/>
                 <Ellipse Fill="White" Width="4" Height="4" Canvas.Left="200" Canvas.Top="100"/>
@@ -29,32 +55,30 @@
 
                 <StackPanel Spacing="20">
                 
-                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" 
-                            Command="{Binding GoGame}">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="🍒 Play" VerticalAlignment="Center"
-                                       Foreground="White" FontSize="28"/>
+                    <Button Classes="PacmanRetro" Command="{Binding GoGame}">
+                        <StackPanel  Spacing="10,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Classes="ButtonOpt" Text="🍒 Play" Margin="10,0,0,10"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                            Command="{Binding GoScoreBoard}">
+                    <Button Classes="PacmanRetro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            Command="{Binding GoScoreBoard}" BorderBrush="Yellow">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="🍒 Score Board" VerticalAlignment="Center" 
                                        Foreground="White" FontSize="28"/>
                         </StackPanel>
                     </Button>
                     
-                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                            Command="{Binding ExitGame}">
+                    <Button Classes="PacmanRetro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            Command="{Binding ExitGame}" BorderBrush="Yellow">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="🍒 Exit" VerticalAlignment="Center" 
                                        Foreground="White" FontSize="28"/>
                         </StackPanel>
                     </Button>
                     
-                    <Button Classes="retro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                            Command="{Binding GoSettingsMenu}">
+                    <Button Classes="PacmanRetro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            Command="{Binding GoSettingsMenu}" BorderBrush="Yellow">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="🍒 Setting's music" VerticalAlignment="Center" 
                                        Foreground="White" FontSize="28"/>
