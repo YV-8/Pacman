@@ -7,14 +7,44 @@
              x:Class="PacmanSolution.Views.GamePageView"
              x:DataType="vm:GamePageViewModel"
              Background="Black">
+    <UserControl.Styles>
+        <Style Selector="Button.PacmanRetro">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Yellow"/>
+            <Setter Property="BorderThickness" Value="5"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="RenderTransform" Value="none"/>
+            <Setter Property="Width" Value="350"/>
+            <Setter Property="Height" Value="80"/>
+            <!--<Setter/> -->
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="TextBlock.ButtonOpt">
+            <Setter Property="Foreground" Value="Yellow"/>
+            <Setter Property="FontFamily" Value="Roboto Mono"/>
+            <Setter Property="FontSize" Value="50"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </UserControl.Styles>
     <Panel>
-        <Button Content="Pause" Foreground="Yellow" BorderBrush="Yellow"
-                HorizontalAlignment="Right" VerticalAlignment="Top"/>
-        <Grid Width="600" Height="500">
-            <Grid.Background> LightBlue</Grid.Background>
-            <TextBox Text="Pacman"  FontSize="30" 
-                     HorizontalAlignment="Center" VerticalAlignment="Center" 
-                     Foreground="BlueViolet"/>
-        </Grid>
+        <StackPanel Spacing="15">
+            <Grid ColumnDefinitions="*,*,*">
+                <Button Grid.Column="3" Content="Pause" Foreground="Yellow" BorderBrush="Yellow"
+                        HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                <TextBlock Classes="ButtonOpt" Text="Pacman Game" Grid.Column="1"/>
+            </Grid>
+            <Canvas x:Name="GameCanvas" 
+                    Width="500" Height="500"
+                    Background="Black">
+            </Canvas>
+        </StackPanel>
+        
     </Panel>
 </UserControl>
