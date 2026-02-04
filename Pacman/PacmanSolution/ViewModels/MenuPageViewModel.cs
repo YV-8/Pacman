@@ -4,11 +4,10 @@ using System.Runtime.CompilerServices;
 
 namespace PacmanSolution.ViewModels;
 
-public class MenuPageViewModel: INotifyPropertyChanged
+public partial class MenuPageViewModel
 {
     private readonly MainWindowViewModel _mainWindowViewModel;
-    public event PropertyChangedEventHandler PropertyChanged;
-
+    
     public MenuPageViewModel(MainWindowViewModel mainWVM)
     {
         _mainWindowViewModel = mainWVM;
@@ -33,10 +32,7 @@ public class MenuPageViewModel: INotifyPropertyChanged
     {
         Console.WriteLine("Exit...Game...");
     }
-    protected void OnPropertyChanged([CallerMemberName] string? name = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    }
+    
 
 
 }

@@ -1,20 +1,27 @@
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
 using PacmanSolution.Models;
 
 namespace PacmanSolution.ViewModels;
 
-public partial class GamePageViewModel: ViewModelBase
+public class GamePageViewModel: ViewModelBase
 {
-    [ObservableProperty]
-    private Board _gameBoard;
+    //[ObservableProperty]
+    //private Board _gameBoard;
+    private ManageBoard _manageBoard;
+    private ObservableCollection<Cell> _board = new();
+
+    public ObservableCollection<Cell> Board
+    {
+        get => _board;
+        set => _board = value;
+    }
 
     public GamePageViewModel()
     {
-        // Inicializamos el tablero (ej. 10x10)
-        GameBoard = new Board(10, 10);
-        GameBoard.CreateBoard();
+        Board.Clear();
+        _manageBoard = new ManageBoard(12,12);
+        // Inicializamos el tablero ( 10x10)
+        
+        _manageBoard.BuildGameBoard(Board);
     }
 }

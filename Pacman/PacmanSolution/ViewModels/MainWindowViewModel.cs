@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace PacmanSolution.ViewModels;
 
-public partial class MainWindowViewModel:ViewModelBase
+public partial class MainWindowViewModel:ObservableObject
 {
     [ObservableProperty]
     private object _currentPage;
@@ -13,6 +10,7 @@ public partial class MainWindowViewModel:ViewModelBase
     public MainWindowViewModel()
     {
         CurrentPage = new MenuPageViewModel(this);
+        
     }
     
 }
