@@ -2,9 +2,9 @@ namespace PacmanSolution.Models;
 
 public enum CellType
 {
-    Wall,
-    Empty,
-    WallLeft,
+    WALL,
+    EMPTY,
+    INSIDEWALL,
     WallRight,
     Cherry,
     Energize,
