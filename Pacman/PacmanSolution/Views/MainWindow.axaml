@@ -9,20 +9,111 @@
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="PacmanSolution"
-        Background="Black">
+        Background="Black"
+        Width="1000" Height="700">
     <!-- Background="Transparent"
         TransparencyLevelHint="AcrylicBlur"> -->
-    <ContentControl Content="{Binding CurrentPage}">
-        <ContentControl.DataTemplates>
-            <DataTemplate DataType="vm:MenuPageViewModel">
-                <views:MenuPageView />
-            </DataTemplate>
-            <DataTemplate DataType="vm:GamePageViewModel">
-                <views:GamePageView />
-            </DataTemplate>
-            <DataTemplate DataType="vm:ScoreBoardPageViewModel">
-                <views:ScoreBoardPageView />
-            </DataTemplate>
-        </ContentControl.DataTemplates>
-    </ContentControl>
+    <Window.Styles>
+        <Style Selector="Button.PacmanRetro">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Yellow"/>
+            <Setter Property="BorderThickness" Value="5"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="RenderTransform" Value="none"/>
+            <Setter Property="Width" Value="350"/>
+            <Setter Property="Height" Value="80"/>
+            <!--<Setter/> 
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+                </Transitions>
+            </Setter> -->
+            
+        </Style>
+        <Style Selector="TextBlock.ButtonOpt">
+            <Setter Property="Foreground" Value="Yellow"/>
+            <Setter Property="FontFamily" Value="Roboto Mono"/>
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Window.Styles>
+    
+    <Panel>
+        <Canvas Opacity="0.3">
+                <Ellipse Fill="White" Width="4" Height="4" Canvas.Left="200" Canvas.Top="200"/>
+                <Ellipse Fill="White" Width="4" Height="4" Canvas.Left="280" Canvas.Top="200"/>
+                <Ellipse Fill="White" Width="4" Height="4" Canvas.Left="380" Canvas.Top="200"/>
+                <Ellipse Fill="White" Width="4" Height="4" Canvas.Left="550" Canvas.Top="200"/>
+                <Ellipse Fill="White" Width="4" Height="4" Canvas.Left="650" Canvas.Top="200"/>
+                <Ellipse Fill="White" Width="4" Height="4" Canvas.Left="740" Canvas.Top="200"/>
+            </Canvas>
+
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="40">
+            
+                <Viewbox Height="100">
+                    <TextBlock Text="PAC-MAN" 
+                               Foreground="#FFFF00" 
+                               FontWeight="Black"
+                               LetterSpacing="5">
+                        <TextBlock.Effect>
+                            <DropShadowEffect BlurRadius="10" Color="Yellow" Opacity="0.5"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                </Viewbox>
+
+                <StackPanel Spacing="20">
+                
+                    <Button Classes="PacmanRetro" Command="{Binding NavigateCommand}" 
+                            CommandParameter ="GoGame">
+                        <StackPanel  Spacing="10,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Classes="ButtonOpt" Text="🍒  Play    " Margin="10,0,0,10"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Classes="PacmanRetro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            Command="{Binding NavigateCommand}" 
+                            CommandParameter ="GoScoreBoard" BorderBrush="Yellow">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🍒 Score Board  " VerticalAlignment="Center" 
+                                       Foreground="White" FontSize="28"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Classes="PacmanRetro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            Command="{Binding NavigateCommand}" 
+                            CommandParameter ="GoSettingsMenu" BorderBrush="Yellow">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🍒  Setting      " VerticalAlignment="Center" 
+                                       Foreground="White" FontSize="28"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Classes="PacmanRetro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            Command="{Binding NavigateCommand}" 
+                            CommandParameter ="ExitGame" BorderBrush="Yellow">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🍒  Exit          " VerticalAlignment="Center" 
+                                       Foreground="White" FontSize="28"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    
+                </StackPanel>
+            
+            </StackPanel>
+            <!-- <Border Height="2" Background="#2222FF" VerticalAlignment="Bottom" Margin="0,0,0,20" BoxShadow="0 0 10 2 #2222FF"/> -->
+            <ContentControl Content="{Binding Navigation.CurrentPage}">
+                <ContentControl.DataTemplates>
+                    <DataTemplate DataType="vm:GamePageViewModel">
+                        <views:GamePageView />
+                    </DataTemplate>
+                    <DataTemplate DataType="vm:ScoreBoardPageViewModel">
+                        <views:ScoreBoardPageView />
+                    </DataTemplate>
+                </ContentControl.DataTemplates>
+            </ContentControl>
+    </Panel>
 </Window>

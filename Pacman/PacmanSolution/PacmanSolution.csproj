@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Assets\Board\" />
-      <Folder Include="Assets\Pacman\" />
+      <Folder Include="Assets\Imagen\Board\" />
+      <Folder Include="Assets\Imagen\Pacman\" />
     </ItemGroup>
 </Project>

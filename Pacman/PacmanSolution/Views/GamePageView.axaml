@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:PacmanSolution.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
              x:Class="PacmanSolution.Views.GamePageView"
              x:DataType="vm:GamePageViewModel"
              Background="Black">
@@ -11,12 +11,16 @@
         <Style Selector="Button.PacmanRetro">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Yellow"/>
-            <Setter Property="BorderThickness" Value="5"/>
-            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="BorderThickness" Value="4"/>
+            <Setter Property="Padding" Value="10,10"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="RenderTransform" Value="none"/>
-            <Setter Property="Width" Value="350"/>
-            <Setter Property="Height" Value="80"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="FontFamily" Value="Courier New"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="Yellow"/>
+            <Setter Property="FontSize" Value="18"/>
             <!--<Setter/> -->
             <Setter Property="Transitions">
                 <Transitions>
@@ -26,25 +30,62 @@
         </Style>
         <Style Selector="TextBlock.ButtonOpt">
             <Setter Property="Foreground" Value="Yellow"/>
-            <Setter Property="FontFamily" Value="Roboto Mono"/>
+            <Setter Property="FontFamily" Value="Courier New"/>
             <Setter Property="FontSize" Value="50"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
     </UserControl.Styles>
-    <Panel>
-        <StackPanel Spacing="15">
-            <Grid ColumnDefinitions="*,*,*">
-                <Button Grid.Column="3" Content="Pause" Foreground="Yellow" BorderBrush="Yellow"
-                        HorizontalAlignment="Right" VerticalAlignment="Top"/>
-                <TextBlock Classes="ButtonOpt" Text="Pacman Game" Grid.Column="1"/>
-            </Grid>
-            <Canvas x:Name="GameCanvas" 
-                    Width="500" Height="500"
-                    Background="Black">
-            </Canvas>
-        </StackPanel>
+    
+    <DockPanel LastChildFill="True">
         
-    </Panel>
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *, Auto, *, Auto" Margin="10">
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock Classes="ButtonOpt" Text="{Binding Score, 
+                StringFormat='SCORE: {0}'}" FontSize="18"/>
+                <TextBlock Classes="ButtonOpt" Text="{Binding HighScore, 
+                StringFormat='HI-SCORE: {0}'}" FontSize="14" Foreground="White"/>
+            </StackPanel>
+
+            <TextBlock Classes="ButtonOpt" Text="PACMAN" FontSize="45"
+                       Grid.Column="2"  HorizontalAlignment="Center"/>
+            <Button Classes="PacmanRetro" Content="PAUSE" Padding="20,5"
+                    Grid.Column="3"  HorizontalAlignment="Center"/>
+            
+            <Button Grid.Column="4" Classes="PacmanRetro" Content="Menu" 
+                    Padding="20,5" VerticalAlignment="Center"
+                    HorizontalAlignment="Center"/>
+                <!-- <Button.Flyout>
+                    <MenuFlyout Placement="Bottom">
+                        <MenuItem Header="Music" Command="{Binding ToggleMusicCommand}"/>
+                        <MenuItem Header="Settings" Command="{Binding OpenSettingsCommand}"/>
+                        <MenuItem Header="Score" Command="{Binding ViewScoresCommand}"/>
+                    </MenuFlyout>
+                </Button.Flyout> -->
+        </Grid>
+
+        <Panel DockPanel.Dock="Bottom" Margin="10">
+            <Button HorizontalAlignment="Right" Classes="RetroBtn" Width="50" Height="50" CornerRadius="25">
+                <PathIcon Data="M12,3V13.55C11.41,13.21 10.73,13 10,13C7.79,13 6,14.79 6,17C6,19.21 7.79,21 10,21C12.21,21 14,19.21 14,17V7H18V3H12Z" 
+                          Foreground="SkyBlue"/>
+            </Button>
+        </Panel>
+
+        <Viewbox Stretch="Uniform">
+            <Canvas x:Name="GameCanvas" 
+                    Width="1600" Height="1400"
+                    Background="Black">
+                <Image Source="avares://PacmanSolution/Assets/Imagen/Board/Board.png" 
+                       Width="1900" Height="1300"
+                       ZIndex="1"
+                       Opacity="0.8"
+                       IsHitTestVisible="False"/>
+                <Ellipse x:Name="PacmanImage"
+                         Width="38" Height="38"
+                         Fill="Yellow" ZIndex="5"
+                         Canvas.Top="360" Canvas.Left="400"/>
+            </Canvas>
+        </Viewbox>
+    </DockPanel>
 </UserControl>
