@@ -16,7 +16,7 @@ public partial class GamePageViewModel: ObservableObject
     [ObservableProperty]
     private ManagePageChange _navigation;
 
-    private ManageBoard _manageBoard;
+    private BoardManager _boardManager;
     private ObservableCollection<Cell> _board = new();
 
     public ObservableCollection<Cell> Board
@@ -28,13 +28,13 @@ public partial class GamePageViewModel: ObservableObject
     public GamePageViewModel()
     {
         Board.Clear();
-        _manageBoard = new ManageBoard(31,28);
+        _boardManager = new BoardManager(31,31);
         Score = 0;
         HighScore = 0;
         Navigation = new ManagePageChange();
         // Inicializamos el tablero ( 10x10)
         
-        _manageBoard.BuildGameBoard(Board);
+        _boardManager.BuildGameBoard(Board);
     }
     [RelayCommand]
     private void ToggleMusic() { /* Lógica aquí */ }

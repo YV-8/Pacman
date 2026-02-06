@@ -9,6 +9,7 @@ public partial class MainWindowViewModel:ObservableObject
 {
     [ObservableProperty]
     private ManagePageChange _navigation;
+    private SoundManager soundManager = new();
 
     public MainWindowViewModel()
     {
@@ -26,6 +27,22 @@ public partial class MainWindowViewModel:ObservableObject
         if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.Shutdown();
+        }
+    }
+    /// <summary>
+    /// audio
+    /// </summary>
+    [RelayCommand]
+    public void ToggleAudioCommand( bool isChecked)
+    {
+        string path = "PacmanTheme";
+        if (isChecked)
+        {
+            soundManager.PlaySound(path,true);
+        }
+        else
+        {
+            soundManager.StopSound();
         }
     }
 }
