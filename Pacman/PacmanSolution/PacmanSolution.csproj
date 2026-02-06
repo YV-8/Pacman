@@ -22,10 +22,14 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
+        <PackageReference Include="ManagedBass" Version="4.0.2" />
+        <PackageReference Include="NAudio" Version="2.2.1" />
+        <PackageReference Include="OpenTK.OpenAL" Version="5.0.0-pre.8" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Assets\Imagen\Board\" />
       <Folder Include="Assets\Imagen\Pacman\" />
     </ItemGroup>
+    
 </Project>
