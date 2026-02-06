@@ -100,11 +100,43 @@
                         </StackPanel>
                     </Button>
                     
-                    
                 </StackPanel>
             
             </StackPanel>
-            <!-- <Border Height="2" Background="#2222FF" VerticalAlignment="Bottom" Margin="0,0,0,20" BoxShadow="0 0 10 2 #2222FF"/> -->
+        <ToggleButton IsChecked="False"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Bottom"
+                      Margin="16"
+                      Width="44"
+                      Height="44"
+                      Background="#A8444141"
+                      BorderBrush="White"
+                      BorderThickness="1"
+                      Command="{Binding ToggleAudioCommand}" 
+                      CommandParameter="{Binding $self.IsChecked}" 
+                      >
+
+            <Grid>
+                <PathIcon Classes="audio-on"
+                          Data="{StaticResource speaker_regular}"
+                          Width="24"
+                          Height="24"
+                          Foreground="White"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"/>
+
+                <PathIcon Classes="audio-mute"
+                          Data="{StaticResource speaker_off_regular}"
+                          Width="24"
+                          Height="24"
+                          Foreground="White"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"/>
+            </Grid>
+
+        </ToggleButton>
+        
+        <!-- <Border Height="2" Background="#2222FF" VerticalAlignment="Bottom" Margin="0,0,0,20" BoxShadow="0 0 10 2 #2222FF"/> -->
             <ContentControl Content="{Binding Navigation.CurrentPage}">
                 <ContentControl.DataTemplates>
                     <DataTemplate DataType="vm:GamePageViewModel">

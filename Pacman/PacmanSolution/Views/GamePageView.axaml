@@ -74,17 +74,17 @@
 
         <Viewbox Stretch="Uniform">
             <Canvas x:Name="GameCanvas" 
-                    Width="1600" Height="1400"
+                    Width="1700" Height="1500"
                     Background="Black">
                 <Image Source="avares://PacmanSolution/Assets/Imagen/Board/Board.png" 
-                       Width="1900" Height="1300"
+                       Width="1800" Height="1500"
                        ZIndex="1"
                        Opacity="0.8"
                        IsHitTestVisible="False"/>
                 <Ellipse x:Name="PacmanImage"
                          Width="38" Height="38"
                          Fill="Yellow" ZIndex="5"
-                         Canvas.Top="360" Canvas.Left="400"/>
+                         Canvas.Top="400" Canvas.Left="400"/>
             </Canvas>
         </Viewbox>
     </DockPanel>
