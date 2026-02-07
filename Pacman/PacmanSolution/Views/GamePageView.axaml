@@ -51,11 +51,13 @@
             <TextBlock Classes="ButtonOpt" Text="PACMAN" FontSize="45"
                        Grid.Column="2"  HorizontalAlignment="Center"/>
             <Button Classes="PacmanRetro" Content="PAUSE" Padding="20,5"
-                    Grid.Column="3"  HorizontalAlignment="Center"/>
+                    Grid.Column="3"  HorizontalAlignment="Center" />
             
             <Button Grid.Column="4" Classes="PacmanRetro" Content="Menu" 
                     Padding="20,5" VerticalAlignment="Center"
-                    HorizontalAlignment="Center"/>
+                    HorizontalAlignment="Center"
+                    Command="{Binding NavigateCommand}" 
+                    CommandParameter ="Menu"/>
                 <!-- <Button.Flyout>
                     <MenuFlyout Placement="Bottom">
                         <MenuItem Header="Music" Command="{Binding ToggleMusicCommand}"/>
@@ -66,7 +68,7 @@
         </Grid>
 
         <Panel DockPanel.Dock="Bottom" Margin="10">
-            <Button HorizontalAlignment="Right" Classes="RetroBtn" Width="50" Height="50" CornerRadius="25">
+            <Button HorizontalAlignment="Right" Classes="PacmanRetro" Width="50" Height="50" CornerRadius="25">
                 <PathIcon Data="M12,3V13.55C11.41,13.21 10.73,13 10,13C7.79,13 6,14.79 6,17C6,19.21 7.79,21 10,21C12.21,21 14,19.21 14,17V7H18V3H12Z" 
                           Foreground="SkyBlue"/>
             </Button>

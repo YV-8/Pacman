@@ -145,6 +145,9 @@
                     <DataTemplate DataType="vm:ScoreBoardPageViewModel">
                         <views:ScoreBoardPageView />
                     </DataTemplate>
+                    <DataTemplate DataType="vm:MainWindowViewModel">
+                        <views:MainWindow />
+                    </DataTemplate>
                 </ContentControl.DataTemplates>
             </ContentControl>
     </Panel>

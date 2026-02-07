@@ -25,13 +25,13 @@ public partial class GamePageViewModel: ObservableObject
         set => _board = value;
     }
 
-    public GamePageViewModel()
+    public GamePageViewModel(ManagePageChange navigation)
     {
+        _navigation = navigation;
         Board.Clear();
         _boardManager = new BoardManager(31,31);
         Score = 0;
         HighScore = 0;
-        Navigation = new ManagePageChange();
         // Inicializamos el tablero ( 10x10)
         
         _boardManager.BuildGameBoard(Board);
@@ -48,7 +48,7 @@ public partial class GamePageViewModel: ObservableObject
         
     }
     [RelayCommand]
-    public void Navigate(string target)
+    private void Navigate(string target)
     {
         Navigation.ChangePage(target);
     }

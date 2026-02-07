@@ -18,7 +18,6 @@ public partial class GamePageView : UserControl
     public GamePageView()
     {
         InitializeComponent();
-        DataContext = new  GamePageViewModel();
         KeyDown += OnKeyDown;
         this.Loaded += OnLoaded;
         OnPelletEaten();

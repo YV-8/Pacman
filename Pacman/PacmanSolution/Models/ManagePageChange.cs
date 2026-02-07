@@ -14,13 +14,16 @@ public partial class ManagePageChange: ObservableObject
         switch (initialsPage)
         {
             case"GoGame":
-                CurrentPage = new GamePageViewModel();
+                CurrentPage = new GamePageViewModel(this);
                 break;
             case"GoScoreBoard":
                 CurrentPage = new ScoreBoardPageViewModel();
                 break;
             case"GoSettingsMenu":
                 CurrentPage = new GoSettingsViewModel();
+                break;
+            case"Menu":
+                CurrentPage = new MainWindowViewModel();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(initialsPage), initialsPage, null);
