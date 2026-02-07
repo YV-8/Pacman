@@ -148,7 +148,7 @@
                     <DataTemplate DataType="vm:MainWindowViewModel">
                         <views:MainWindow />
                     </DataTemplate>
-                </ContentControl.DataTemplates>
+                 </ContentControl.DataTemplates>
             </ContentControl>
     </Panel>
 </Window>

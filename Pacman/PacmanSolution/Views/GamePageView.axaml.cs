@@ -12,7 +12,7 @@ namespace PacmanSolution.Views;
 
 public partial class GamePageView : UserControl
 {
-    private ObservableCollection<Cell> _cells;
+    private ObservableCollection<Entity> _entity;
     
     
     public GamePageView()
@@ -39,25 +39,37 @@ public partial class GamePageView : UserControl
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Space)
+        if (DataContext is GamePageViewModel vm)
         {
-            throw new System.NotImplementedException();
+            switch (e.Key)
+            {
+                case Key.Up:  
+                    vm.ChangeDirection("up");
+                    break;
+                case Key.Down:  
+                    vm.ChangeDirection("down"); 
+                    break;
+                case Key.Left: 
+                    vm.ChangeDirection("left"); 
+                    break;
+                case Key.Right: 
+                    vm.ChangeDirection("right"); 
+                    break;
+            }
         }
     }
-    
+
     /// <summary>
     ///  DrawBoard is who generate the inside board
     /// cellsize is the size each cell in the board
     /// </summary>
     /// <param name="board"></param>
-    public void DrawBoard(ObservableCollection<Cell> board)
+    public void DrawBoard(ObservableCollection<Entity> board)
     {
         if (GameCanvas == null || board == null) return;
-        double cellSize =46.6; 
-    
-        // Márgenes para centrar la rejilla sobre el dibujo del Board.png
-        double offsetX = 159.5;
-        double offsetY = 1.5;
+        double cellSize = 35;
+
+
         //GameCanvas.Children.Clear();
         var elementsToRemove = GameCanvas.Children
             .Where(x => x != PacmanImage && !(x is Image))
@@ -66,48 +78,127 @@ public partial class GamePageView : UserControl
         {
             GameCanvas.Children.Remove(child);
         }
+
         foreach (var cell in board)
         {
-            double cellLeft = offsetX + (cell.Column * cellSize);
-            double cellTop = offsetY + (cell.Row * cellSize);
             if (cell.Type == CellType.WALL)
             {
-                var wall = new Rectangle { Width = 40, Height =40, Fill = Brushes.Blue };
+                DrawOuterWalls(cell);
+                /*var wall = new Rectangle { Width = outerWallSize, Height =outerWallSize, Fill = Brushes.Blue };
                 wall.ZIndex = 2;
-                Canvas.SetLeft(wall, offsetX + (cell.Column * cellSize));
-                Canvas.SetTop(wall, offsetY + (cell.Row * cellSize));
-                GameCanvas.Children.Add(wall);
+                Canvas.SetLeft(wall, cellCenterX + (cellSize - outerWallSize) / 2);
+                Canvas.SetTop(wall, cellCenterY + (cellSize - outerWallSize) / 2);
+                GameCanvas.Children.Add(wall);*/
             }
-            if (cell.Type == CellType.INSIDEWALL)
+            else
             {
-                var wall = new Rectangle { Width = 20, Height =20, Fill = Brushes.Blue };
-                wall.ZIndex = 2;
-                Canvas.SetLeft(wall, offsetX + (cell.Column * cellSize));
-                Canvas.SetTop(wall, offsetY + (cell.Row * cellSize));
-                GameCanvas.Children.Add(wall);
+                DrawInnerElements(cell, cell.Type);
             }
-            if (cell.Type == CellType.Energize)
+            /*if (cell.Type == CellType.INSIDEWALL)
             {
-                var powerPellet = new Ellipse { Width = 35, Height = 35, Fill = Brushes.White };
-                ZIndex = 2;
-                //double xPos = offsetX + (cell.Column * cellSize) + (cellSize - 16) / 2;
-                //double yPos = offsetY + (cell.Row * cellSize) + (cellSize - 16) / 2;
-                Canvas.SetLeft(powerPellet, cellLeft + (cellSize / 2) - 7.5); 
-                Canvas.SetTop(powerPellet, cellTop + (cellSize / 2) - 7.5);
-                GameCanvas.Children.Add(powerPellet);
-            }
-            if (cell.HasPellet)
-            {
-                var dot = new Rectangle { Width = 12, Height = 12, Fill = Brushes.White };
-                ZIndex = 4;
-                double xPos = offsetX + (cell.Column * cellSize) + (cellSize/ 2) -3;
-                double yPos = offsetY + (cell.Row * cellSize) + (cellSize / 2) -3;
-                Canvas.SetLeft(dot, xPos); 
-                Canvas.SetTop(dot, yPos);
-                GameCanvas.Children.Add(dot);
-            }
+                /*var wall = new Rectangle { Width = innerSize, Height = innerSize, Fill = Brushes.Blue };
+
+                Canvas.SetLeft(wall, cellCenterX + (cellSize - innerSize) / 2);
+                Canvas.SetTop(wall, cellCenterY + (cellSize - innerSize) / 2);
+                GameCanvas.Children.Add(wall);*/
         }
     }
+
+    private void DrawOuterWalls(Entity cell)
+    {
+        double cellSizeOuter = 46.6; 
+        double outerWallSize = 25;
+        
+        // Márgenes para centrar la rejilla sobre el dibujo del Board
+        double offsetX = 160.5;
+        double offsetY = 1.5;
+        var cellCenterX = offsetX + (cell.Col * cellSizeOuter) + (cellSizeOuter / 2);
+        var cellCenterY = offsetY + (cell.Row * cellSizeOuter) + (cellSizeOuter / 2);
+            
+        var wall = new Rectangle 
+        { 
+            Width = outerWallSize, 
+            Height = outerWallSize, 
+            Fill = Brushes.Blue 
+        };
+        wall.ZIndex = 2;
+        //wall.SetValue(Canvas.ZIndexProperty, 2);
+        Canvas.SetLeft(wall, cellCenterX - (outerWallSize / 2));
+        Canvas.SetTop(wall, cellCenterY - (outerWallSize / 2));
+        GameCanvas.Children.Add(wall);
+            
+    }
+
+    public void DrawInnerElements(Entity cell, CellType cellType)
+    {
+        double cellSizeInner = 46.6;    // Tamaño de celda para elementos internos (más pequeño)
+        double innerWallSize = 16;    // Tamaño de paredes internas (más pequeñas)
+        double dotSize = 6;           // Tamaño de los pellets
+        double energizerSize = 15;     // Tamaño de los energizadores
+    
+        double offsetX = 160.5;
+        double offsetY = 1.5;
+        double cellCenterX = offsetX + (cell.Col * cellSizeInner) + (cellSizeInner / 2);
+        double cellCenterY = offsetY + (cell.Row * cellSizeInner) + (cellSizeInner / 2);
+        if (cell.Type == CellType.INSIDEWALL)
+        {
+            var wall = new Rectangle 
+            { 
+                Width = innerWallSize, 
+                Height = innerWallSize, 
+                Fill = Brushes.Transparent
+            };
+            wall.SetValue(Canvas.ZIndexProperty, 2);
+            Canvas.SetLeft(wall, cellCenterX - (innerWallSize / 2));
+            Canvas.SetTop(wall, cellCenterY - (innerWallSize / 2));
+            GameCanvas.Children.Add(wall);
+        }
+        
+        // Energizadores
+        if (cell.Type == CellType.ENERGIZE)
+        {
+            var powerPellet = new Ellipse 
+            { 
+                Width = energizerSize, 
+                Height = energizerSize, 
+                Fill = Brushes.White 
+            };
+            powerPellet.SetValue(Canvas.ZIndexProperty, 3);
+            Canvas.SetLeft(powerPellet, cellCenterX - (energizerSize / 2)); 
+            Canvas.SetTop(powerPellet, cellCenterY - (energizerSize / 2));
+            GameCanvas.Children.Add(powerPellet);
+        }
+        // Pellets (puntos pequeños)
+        if (cell.HasPellet)
+        {
+            var dot = new Ellipse 
+            { 
+                Width = dotSize, 
+                Height = dotSize, 
+                Fill = Brushes.White 
+            };
+            dot.SetValue(Canvas.ZIndexProperty, 4);
+            Canvas.SetLeft(dot, cellCenterX - (dotSize / 2)); 
+            Canvas.SetTop(dot, cellCenterY - (dotSize / 2));
+            GameCanvas.Children.Add(dot);
+        }
+        if (cell.Type == CellType.PACMAN)
+        {
+            var pacmanImg = new Image
+            {
+                Width = 40,
+                Height = 40,
+                ZIndex = 10
+            };
+            
+            pacmanImg.Bind(Image.SourceProperty, new Avalonia.Data.Binding("CurrentDisplaySprite") { Source = cell });
+
+            Canvas.SetLeft(pacmanImg, cellCenterX - 20);
+            Canvas.SetTop(pacmanImg, cellCenterY - 20);
+            GameCanvas.Children.Add(pacmanImg);
+        }
+    }
+    
     private void OnPelletEaten()
     {
         if (DataContext is GamePageViewModel vm)

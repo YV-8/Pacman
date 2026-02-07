@@ -1,30 +1,47 @@
+using Avalonia;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace PacmanSolution.Models;
 
-public abstract class Entity
+public abstract partial class Entity:ObservableObject
 {
-    private int _x;
-    private int _y;
-    public int X
+    [ObservableProperty] 
+    private IImage? _currentDisplaySprite;
+    [ObservableProperty] 
+    private int _row;
+    [ObservableProperty] 
+    private int _col;
+    [ObservableProperty] 
+    private double _width;
+    [ObservableProperty] 
+    private double _height;
+    [ObservableProperty] 
+    private int _zIndex;
+    [ObservableProperty] 
+    private bool _isActive = true;
+    [ObservableProperty] 
+    private CellType _type;
+    [ObservableProperty] 
+    private bool _hasPellet;
+    public Bitmap? Sprite { get; set; }
+    public Rect? SourceRect { get; set; }
+    public Entity(int row, int col, CellType cellType, double width, double height, int zIndex)
     {
-        get { return _x; }
-        set { _x = value; }
+        Row = row;
+        Col = col;
+        Type = cellType;
+        Width = width;
+        Height = height;
+        ZIndex = zIndex;
     }
 
-    public int Y
-    {
-        get { return _y; }
-        set { _y = value; }
-    }
-    
-    public Entity(int x, int y)
-    {
-        _x = x;
-        _y = y;
-    }
+    public abstract void Update(double deltaTime);
 
-    public virtual void Move(int dx, int dy)
+    public virtual void Move(int dr, int dc)
     {
-        _x += dx;
-        _y += dy;
+        Row += dr;
+        Col += dc;
     }
 }

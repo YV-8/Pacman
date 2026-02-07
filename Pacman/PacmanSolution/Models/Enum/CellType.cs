@@ -5,7 +5,7 @@ public enum CellType
     WALL,
     EMPTY,
     INSIDEWALL,
-    WallRight,
+    PACMAN,
     Cherry,
-    Energize,
+    ENERGIZE,
 }

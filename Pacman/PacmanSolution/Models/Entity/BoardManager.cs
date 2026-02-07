@@ -41,23 +41,23 @@ public class BoardManager
         _boardRow = boardRow;
     }
     
-    public void BuildGameBoard(ObservableCollection<Cell> Board)
+    public void BuildGameBoard(ObservableCollection<Entity> Board)
     {
         // crear borders
         for (int row = 0; row < BoardRow; row++)
         {
             for (int col = 0; col < BoardCol; col++)
             {
-                var cell = new Cell { Row = row, Column = col };
-                BuildWallBoard(cell,row,col);
+                var cell = new BoardCell(row, col, CellType.EMPTY);
+                BuildWallBoard(cell, row, col);
                 Board.Add(cell);
             }
         }
     }
-    private void BuildWallBoard(Cell cell, int Row, int Col)
+    private void BuildWallBoard(Entity cell, int Row, int Col)
     {
         var row = cell.Row;
-        var col = cell.Column;
+        var col = cell.Col;
         if (row == 0 || row == BoardRow - 1 || col == 0 || col == BoardCol - 1)
         {
             cell.Type = CellType.WALL;
@@ -71,7 +71,7 @@ public class BoardManager
         BuildInsidewallBoard(cell, row, col);
     }
 
-    private void BuildInsidewallBoard(Cell cell, int row, int col)
+    private void BuildInsidewallBoard(Entity cell, int row, int col)
     {
         var rowInverse = BoardRow - 3;
         var colInverse = BoardCol - 3;
@@ -248,7 +248,7 @@ public class BoardManager
         if ((row == 3 && col == 1) || (row == 3 && col == 29) ||
             (row == 23 && col == 1) || (row == 23 && col == 26))
         {
-            cell.Type = CellType.Energize;
+            cell.Type = CellType.ENERGIZE;
             cell.HasPellet = false; // No es pellet normal
         }
     }
