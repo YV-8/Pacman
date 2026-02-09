@@ -1,6 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
-using Avalonia;
+
 using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -43,17 +43,7 @@ public partial class GamePageViewModel: ObservableObject
         _boardManager.BuildGameBoard(Board);
         StartGameLoop();
     }
-    [RelayCommand]
-    private void ToggleMusic() { /* Lógica aquí */ }
-
-    //[RelayCommand]
-    //private void OpenSettings() { /* Lógica aquí */ }
-
-    [RelayCommand]
-    private void ViewScoresCommand()
-    {
-        
-    }
+    
     [RelayCommand]
     private void Navigate(string target)
     {
@@ -71,16 +61,6 @@ public partial class GamePageViewModel: ObservableObject
         {
             _soundManager.StopSound();
         }
-    }
-
-    private void StartGameLoop()
-    {
-        _gameTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(150) // Velocidad de la animación
-        };
-        _gameTimer.Tick += (s, e) => UpdateSprites();
-        _gameTimer.Start();
     }
     
 }
