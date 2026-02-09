@@ -41,215 +41,79 @@ public class BoardManager
         _boardRow = boardRow;
     }
     
+    private readonly string[] _layout = {
+        "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+        "W............WW............W",
+        "W.WWWW.WWWWW.WW.WWWWW.WWWW.W",
+        "WoWWWW.WWWWW.WW.WWWWW.WWWWoW",
+        "W.WWWW.WWWWW.WW.WWWWW.WWWW.W",
+        "W..........................W",
+        "W.WWWW.WW.WWWWWWWW.WW.WWWW.W",
+        "W.WWWW.WW.WWWWWWWW.WW.WWWW.W",
+        "W......WW....WW....WW......W",
+        "WWWWWW.WWWWW EE WWWWW.WWWWWW",
+        "EEEEEW.WWWWW EE WWWWW.WEEEEE",
+        "EEEEEW.WW          WW.WEEEEE",
+        "EEEEEW.WW WWW--WWW WW.WEEEEE",
+        "WWWWWW.WW WEEEEEEW WW.WWWWWW",
+        "E      EE WEEEEEEW EE      E",
+        "WWWWWW.WW WEEEEEEW WW.WWWWWW",
+        "EEEEEW.WW WWWWWWWW WW.WEEEEE",
+        "EEEEEW.WW          WW.WEEEEE",
+        "EEEEEW.WW WWWWWWWW WW.WEEEEE",
+        "WWWWWW.WW WWWWWWWW WW.WWWWWW",
+        "W............WW............W",
+        "W.WWWW.WWWWW.WW.WWWWW.WWWW.W",
+        "W.WWWW.WWWWW.WW.WWWWW.WWWW.W",
+        "Wo..WW................WW..oW",
+        "WWW.WW.WW.WWWWWWWW.WW.WW.WWW",
+        "WWW.WW.WW.WWWWWWWW.WW.WW.WWW",
+        "W......WW....WW....WW......W",
+        "W.WWWWWWWWWW.WW.WWWWWWWWWW.W",
+        "W.WWWWWWWWWW.WW.WWWWWWWWWW.W",
+        "W..........................W",
+        "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+    };
+
     public void BuildGameBoard(ObservableCollection<Entity> Board)
     {
-        // crear borders
-        for (int row = 0; row < BoardRow; row++)
+        for (int row = 0; row < _boardRow; row++)
         {
-            for (int col = 0; col < BoardCol; col++)
+            for (int col = 0; col < _boardCol; col++)
             {
-                var cell = new BoardCell(row, col, CellType.EMPTY);
-                BuildWallBoard(cell, row, col);
+                char cellChar = _layout[row][col];
+                var cell = CreateCellFromChar(row, col, cellChar);
                 Board.Add(cell);
             }
         }
     }
-    private void BuildWallBoard(Entity cell, int Row, int Col)
-    {
-        var row = cell.Row;
-        var col = cell.Col;
-        if (row == 0 || row == BoardRow - 1 || col == 0 || col == BoardCol - 1)
-        {
-            cell.Type = CellType.WALL;
-            cell.HasPellet = false;
-        }
-        else
-        {
-            cell.Type = CellType.EMPTY;
-            cell.HasPellet = true;
-        }
-        BuildInsidewallBoard(cell, row, col);
-    }
 
-    private void BuildInsidewallBoard(Entity cell, int row, int col)
+    private BoardCell CreateCellFromChar(int row, int col, char symbol)
     {
-        var rowInverse = BoardRow - 3;
-        var colInverse = BoardCol - 3;
-        if (row >= 2 && row <= 5)
-        {
-            if ((col >= 2 && col <= 5) || ( col >= 7 && col <= 11))
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if ((col >= 16 && col <= 22) || (col >= 24 && col <= colInverse))
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-        }
+        var cell = new BoardCell(row, col, CellType.EMPTY);
+        cell.HasPellet = false;
 
-        if (row is >= 7 and <= 8)
+        switch (symbol)
         {
-            if (col is >= 2 and <= 5 || (col >= 24 && col <= colInverse))
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col is >=10 and <=17)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-        }
-        if (row >= 10 && row <= 14)
-        {
-            // Pilares laterales
-            if (col >= 7 && col <= 8)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 19 && col <= 20)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            // Casa de fantasmas - entrada especial
-            else if (row >= 10 && row <= 11 && col >= 10 && col <= 17)
-            {
-                if (col >= 13 && col <= 14 && row == 10)
-                {
-                    // Entrada (sin pared, sin pellet)
-                    cell.Type = CellType.EMPTY;
-                    cell.HasPellet = false;
-                }
-                else
-                {
-                    cell.Type = CellType.INSIDEWALL;
-                    cell.HasPellet = false;
-                }
-            }
-            // Casa de fantasmas interior
-            else if (row >= 12 && row <= 14 && col >= 10 && col <= 17)
-            {
+            case 'W':
+                cell.Type = CellType.WALL;
+                break;
+            case '-':
+                cell.Type = CellType.DOOR;
+                break;
+            case '.':
                 cell.Type = CellType.EMPTY;
-                cell.HasPellet = false; // Dentro de la casa no hay pellets
-            }
+                cell.HasPellet = true;
+                break;
+            case 'o':
+                cell.Type = CellType.ENERGIZE;
+                break;
+            case 'E':
+                break;
+            case ' ':
+                cell.Type = CellType.EMPTY;
+                break;
         }
-        if (row >= 16 && row <= 17)
-        {
-            // Bloques horizontales largos
-            if (col >= 2 && col <= 8)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 10 && col <= 11)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 13 && col <= 14)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 16 && col <= 17)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 19 && col <= 25)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-        }
-        if (row >= 19 && row <= 20)
-        {
-            if (col >= 2 && col <= 5)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 7 && col <= 8)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 10 && col <= 17)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 19 && col <= 20)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 22 && col <= 25)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-        }
-        if (row >= 22 && row <= 23)
-        {
-            if (col >= 7 && col <= 8)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 13 && col <= 14)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 19 && col <= 20)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-        }
-
-        // ===== FILA 25-28: Bloques inferiores finales =====
-        /*if (row >= 25 && row <= 28)
-        {
-            if (col >= 2 && col <= 5)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 7 && col <= 11)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 13 && col <= 14)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 16 && col <= 20)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-            else if (col >= 22 && col <= 25)
-            {
-                cell.Type = CellType.INSIDEWALL;
-                cell.HasPellet = false;
-            }
-        }*/
-
-        // ===== POWER PELLETS (esquinas) =====
-        // Puedes agregar lógica especial para los power pellets grandes
-        if ((row == 3 && col == 1) || (row == 3 && col == 29) ||
-            (row == 23 && col == 1) || (row == 23 && col == 26))
-        {
-            cell.Type = CellType.ENERGIZE;
-            cell.HasPellet = false; // No es pellet normal
-        }
+        return cell;
     }
 }

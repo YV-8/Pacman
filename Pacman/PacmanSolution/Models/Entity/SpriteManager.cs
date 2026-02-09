@@ -10,25 +10,24 @@ public class SpriteManager
 {
     private readonly Dictionary<string, Bitmap> _spriteCache = new();
     /// <summary>
-    /// Se obtiene el bitmap devolviendolo y lo almacena
+    /// Get the bitmap return and store
     /// </summary>
     /// <param name="imagenPath"></param>
     /// <returns></returns>
-    public Bitmap? LoadSprite(string imagenPath)
+    private Bitmap? LoadSprite(string imagenPath)
      {
-         if (_spriteCache.ContainsKey(imagenPath))
+         if (_spriteCache.TryGetValue(imagenPath, out var sprite))
          {
-            return _spriteCache[imagenPath];
+            return sprite;
          }
          try
          {
-             Uri uri = new Uri($"avares://PacmanSolution/Assets/Imagen/SpritesPacman{imagenPath}");
+             Uri uri = new Uri($"avares://PacmanSolution/Assets/Imagen/SpritesPacman/{imagenPath}");
              var asset = AssetLoader.Open(uri);
              var bitmap = new Bitmap(asset);
  
              _spriteCache[imagenPath] = bitmap;
              return bitmap;
- 
          }
          catch
          {
@@ -44,6 +43,7 @@ public class SpriteManager
      /// <summary>
      ///  verificamos si el bitmap cargado con el path es nulo o no
      /// si no lo es retoramos un croppedBitmap y la region que necesitamos
+     /// para heredarlo
      /// </summary>
      /// <param name="path"></param>
      /// <param name="region"></param>
@@ -52,8 +52,6 @@ public class SpriteManager
      {
          var fullBitmap = LoadSprite(path);
          if (fullBitmap == null) return null;
-
-         // CroppedBitmap hereda de IImage, que es lo que Image de Avalonia necesita
          return new CroppedBitmap(fullBitmap, region);
      }
      
@@ -66,7 +64,6 @@ public class SpriteManager
          {
              bitmap.Dispose();
          }
- 
          _spriteCache.Clear(); 
      }
 }

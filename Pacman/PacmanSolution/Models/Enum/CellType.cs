@@ -7,5 +7,7 @@ public enum CellType
     INSIDEWALL,
     PACMAN,
     Cherry,
+    DOT,
+    DOOR,
     ENERGIZE,
 }
