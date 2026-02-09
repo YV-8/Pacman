@@ -140,7 +140,7 @@
             <ContentControl Content="{Binding Navigation.CurrentPage}">
                 <ContentControl.DataTemplates>
                     <DataTemplate DataType="vm:GamePageViewModel">
-                        <views:GamePageView />
+                        <views:PacmanGameView />
                     </DataTemplate>
                     <DataTemplate DataType="vm:ScoreBoardPageViewModel">
                         <views:ScoreBoardPageView />

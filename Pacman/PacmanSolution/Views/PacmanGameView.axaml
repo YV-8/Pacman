@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:PacmanSolution.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
-             x:Class="PacmanSolution.Views.GamePageView"
+             x:Class="PacmanSolution.Views.PacmanGameView"
              x:DataType="vm:GamePageViewModel"
              Background="Black">
     <UserControl.Styles>
@@ -76,7 +76,7 @@
         <!--684*753 
         700*800 seria mejor-->
         <Viewbox Stretch="Uniform">
-            <Canvas x:Name="GameCanvas" 
+            <Canvas x:Name="PacmanCanvas" 
                     Width="2000" Height="1700"
                     Background="Black">
                 <Image Source="avares://PacmanSolution/Assets/Imagen/Board/Board.png"

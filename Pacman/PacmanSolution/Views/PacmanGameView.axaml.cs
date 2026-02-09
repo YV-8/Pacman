@@ -11,7 +11,7 @@ using Avalonia.Threading;
 
 namespace PacmanSolution.Views;
 
-public partial class GamePageView : UserControl
+public partial class PacmanGameView : UserControl
 {
     private ObservableCollection<Entity> _entity;
     private DispatcherTimer _startTimer;
@@ -19,7 +19,7 @@ public partial class GamePageView : UserControl
     private const double offsetX = 160.5;
     private const double offsetY = 1.5;
     
-    public GamePageView()
+    public PacmanGameView()
     {
         InitializeComponent();
         KeyDown += OnKeyDown;
@@ -78,13 +78,13 @@ public partial class GamePageView : UserControl
     /// <param name="board"></param>
     private void DrawBoard(ObservableCollection<Entity> board)
     {
-        if (GameCanvas == null || board == null) return;
+        if (PacmanCanvas == null || board == null) return;
         
-        var dynamicElements = GameCanvas.Children
+        var dynamicElements = PacmanCanvas.Children
             .Where(x => x != PacmanImage && !(x is Image { Opacity: 0.8 }))
             .ToList();
         
-        foreach (var child in dynamicElements) GameCanvas.Children.Remove(child);
+        foreach (var child in dynamicElements) PacmanCanvas.Children.Remove(child);
         foreach (var cell in board)
         {
             DrawEntity(cell);
@@ -155,12 +155,11 @@ public partial class GamePageView : UserControl
         element.ZIndex = zIndex;
         Canvas.SetLeft(element, positionX - (element.Width / 2));
         Canvas.SetTop(element, positionY - (element.Height / 2));
-        GameCanvas.Children.Add(element);
+        PacmanCanvas.Children.Add(element);
     }
 
     private void MoveUp()
     {
-        G
     }
     private void OnPelletEaten()
     {
