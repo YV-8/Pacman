@@ -16,6 +16,7 @@ public class BoardManager
     private List<Ghost> _ghosts;
     private Pacman _pacman;
     private CellType _cellType;
+    private Board _board;
 
     public int BoardCol
     {
@@ -41,39 +42,7 @@ public class BoardManager
         _boardRow = boardRow;
     }
     
-    private readonly string[] _layout = {
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "W............WW............W",
-        "W.WWWW.WWWWW.WW.WWWWW.WWWW.W",
-        "WoWWWW.WWWWW.WW.WWWWW.WWWWoW",
-        "W.WWWW.WWWWW.WW.WWWWW.WWWW.W",
-        "W..........................W",
-        "W.WWWW.WW.WWWWWWWW.WW.WWWW.W",
-        "W.WWWW.WW.WWWWWWWW.WW.WWWW.W",
-        "W......WW....WW....WW......W",
-        "WWWWWW.WWWWW EE WWWWW.WWWWWW",
-        "EEEEEW.WWWWW EE WWWWW.WEEEEE",
-        "EEEEEW.WW          WW.WEEEEE",
-        "EEEEEW.WW WWW--WWW WW.WEEEEE",
-        "WWWWWW.WW WEEEEEEW WW.WWWWWW",
-        "E      EE WEEEEEEW EE      E",
-        "WWWWWW.WW WEEEEEEW WW.WWWWWW",
-        "EEEEEW.WW WWWWWWWW WW.WEEEEE",
-        "EEEEEW.WW          WW.WEEEEE",
-        "EEEEEW.WW WWWWWWWW WW.WEEEEE",
-        "WWWWWW.WW WWWWWWWW WW.WWWWWW",
-        "W............WW............W",
-        "W.WWWW.WWWWW.WW.WWWWW.WWWW.W",
-        "W.WWWW.WWWWW.WW.WWWWW.WWWW.W",
-        "Wo..WW................WW..oW",
-        "WWW.WW.WW.WWWWWWWW.WW.WW.WWW",
-        "WWW.WW.WW.WWWWWWWW.WW.WW.WWW",
-        "W......WW....WW....WW......W",
-        "W.WWWWWWWWWW.WW.WWWWWWWWWW.W",
-        "W.WWWWWWWWWW.WW.WWWWWWWWWW.W",
-        "W..........................W",
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-    };
+    
 
     public void BuildGameBoard(ObservableCollection<Entity> Board)
     {
@@ -81,16 +50,16 @@ public class BoardManager
         {
             for (int col = 0; col < _boardCol; col++)
             {
-                char cellChar = _layout[row][col];
+                char cellChar = _board.Layout[row][col];
                 var cell = CreateCellFromChar(row, col, cellChar);
                 Board.Add(cell);
             }
         }
     }
 
-    private BoardCell CreateCellFromChar(int row, int col, char symbol)
+    private Board CreateCellFromChar(int row, int col, char symbol)
     {
-        var cell = new BoardCell(row, col, CellType.EMPTY);
+        var cell = new Board(row, col, CellType.EMPTY);
         cell.HasPellet = false;
 
         switch (symbol)

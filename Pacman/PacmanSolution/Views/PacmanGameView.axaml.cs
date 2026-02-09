@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Controls;
@@ -14,10 +15,15 @@ namespace PacmanSolution.Views;
 public partial class PacmanGameView : UserControl
 {
     private ObservableCollection<Entity> _entity;
+    private ObservableCollection<Entity> _board;
     private DispatcherTimer _startTimer;
     private const double cellSize = 46.6;
     private const double offsetX = 160.5;
     private const double offsetY = 1.5;
+    private double _horizontalSpped = 10;
+    private double _pacmanRow = 0;
+    private double _pacmanCol = 0;
+    private string _currentDirection = "right";
     
     public PacmanGameView()
     {
@@ -61,6 +67,7 @@ public partial class PacmanGameView : UserControl
         if (DataContext is GamePageViewModel gamePageViewModel)
         {
             DrawBoard(gamePageViewModel.Board);
+            _board = gamePageViewModel.Board;
         }
     }
     
@@ -72,7 +79,7 @@ public partial class PacmanGameView : UserControl
     }
 
     /// <summary>
-    ///  DrawBoard is who generate the inside board
+    ///  DrawBoard is who generate the wall board
     /// cellsize is the size each cell in the board
     /// </summary>
     /// <param name="board"></param>
@@ -87,7 +94,8 @@ public partial class PacmanGameView : UserControl
         foreach (var child in dynamicElements) PacmanCanvas.Children.Remove(child);
         foreach (var cell in board)
         {
-            DrawEntity(cell);
+            DrawEntity(cell);//vm.build()
+            // methodxhere(object sender, 
         }
     }
     
@@ -160,6 +168,54 @@ public partial class PacmanGameView : UserControl
 
     private void MoveUp()
     {
+        
+    }
+
+    private void DefaultTimerOn(Object sender, EventArgs e)
+    {
+        double nextRow = _pacmanRow;
+        double nextCol = _pacmanCol;
+        _horizontalSpped += 10;
+        _pacmanRow = Canvas.GetLeft(PacmanImage);
+        _pacmanCol = Canvas.GetTop(PacmanImage);
+        var pacmanPosition = Canvas.GetLeft(PacmanImage) + _horizontalSpped;
+        var bottonPosition = PacmanCanvas.Width - PacmanImage.Width;
+        ValidateWall(pacmanPosition,_currentDirection,_pacmanRow,_pacmanCol,nextRow, nextCol);
+        switch (_currentDirection)
+        {
+            case "up":    nextRow--; break;
+            case "down":  nextRow++; break;
+            case "left":  nextCol--; break;
+            case "right": nextCol++; break;
+        }
+    }
+
+    private void ValidateWall(double pacmanPosition, string currentDirection, double pacRow,
+        double pacCol, double nextRow, double nextCol)
+    {
+        if (!IsWall(pacRow,pacCol))
+        {
+            pacmanPosition = 0;
+        }
+        if (!IsWall(nextRow,nextCol))
+        {
+            pacmanPosition = 0;
+        }
+    }
+    private bool IsWall(double row, double col)
+    {
+        bool isWall = false;
+        var targetCellTYpe = _board.FirstOrDefault(c => c.Row == row && c.Col == col);
+        if (targetCellTYpe is null)
+        {
+            isWall = true;
+        }
+
+        if (targetCellTYpe.Type == CellType.WALL || targetCellTYpe.Type == CellType.DOOR)
+        {
+            isWall =false;
+        }
+        return isWall;
     }
     private void OnPelletEaten()
     {
@@ -168,7 +224,7 @@ public partial class PacmanGameView : UserControl
             vm.Score += 10;
         }
     }
-    private void ManagePacman()
+    private void ManagePacman(double _pacmanRow, double _pacmanCol, double nextRow)
     {
         
     }
