@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace PacmanSolution.Models;
 
-public class BoardManager
+public class EngineManager
 {
     /// <summary>
     /// Row ---- horizontal
@@ -36,7 +36,7 @@ public class BoardManager
         set => _cellType = value;
     }
 
-    public BoardManager(int boardCol, int boardRow)
+    public EngineManager(int boardCol, int boardRow)
     {
         _boardCol = boardCol;
         _boardRow = boardRow;

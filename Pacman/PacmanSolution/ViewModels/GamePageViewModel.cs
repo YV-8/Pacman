@@ -19,7 +19,7 @@ public partial class GamePageViewModel: ObservableObject
     private ManagePageChange _navigation;
     [ObservableProperty]
     private IImage? _pacmanCurrentSprite;
-    private BoardManager _boardManager;
+    private EngineManager _engineManager;
     private ObservableCollection<Entity> _board = new();
     private SoundManager _soundManager = new ();
     private SpriteManager _spriteManager = new ();
@@ -36,11 +36,11 @@ public partial class GamePageViewModel: ObservableObject
     {
         _navigation = navigation;
         Board.Clear();
-        _boardManager = new BoardManager(28,31);//31*32
+        _engineManager = new EngineManager(28,31);//31*32
         Score = 0;
         HighScore = 0;
         
-        _boardManager.BuildGameBoard(Board);
+        _engineManager.BuildGameBoard(Board);
         StartGameLoop();
     }
     

@@ -14,16 +14,16 @@ namespace PacmanSolution.Views;
 
 public partial class PacmanGameView : UserControl
 {
-    private ObservableCollection<Entity> _entity;
     private ObservableCollection<Entity> _board;
-    private DispatcherTimer _startTimer;
+    private DispatcherTimer _gameTimer;
     private const double cellSize = 46.6;
     private const double offsetX = 160.5;
     private const double offsetY = 1.5;
     private double _horizontalSpped = 10;
-    private double _pacmanRow = 0;
-    private double _pacmanCol = 0;
+    private double _pacmanRow = 1;
+    private double _pacmanCol = 1;
     private string _currentDirection = "right";
+    private int _score;
     
     public PacmanGameView()
     {
@@ -40,7 +40,6 @@ public partial class PacmanGameView : UserControl
             switch (e.Key)
             {
                 case Key.Up:
-                    MoveUp();
                     vm.ChangeDirection("up");
                     break;
                 case Key.Down:  
@@ -64,10 +63,18 @@ public partial class PacmanGameView : UserControl
     /// <param name="e"></param>
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
+        this.Unloaded += (s, e) => _gameTimer?.Stop();
         if (DataContext is GamePageViewModel gamePageViewModel)
         {
             DrawBoard(gamePageViewModel.Board);
             _board = gamePageViewModel.Board;
+            var pacmanCell = _board.FirstOrDefault(c => c.Type == CellType.PACMAN);
+            if (pacmanCell != null)
+            {
+                _pacmanRow = pacmanCell.Row;
+                _pacmanCol = pacmanCell.Col;
+            }
+            StartGameTimer();
         }
     }
     
@@ -165,12 +172,6 @@ public partial class PacmanGameView : UserControl
         Canvas.SetTop(element, positionY - (element.Height / 2));
         PacmanCanvas.Children.Add(element);
     }
-
-    private void MoveUp()
-    {
-        
-    }
-
     private void DefaultTimerOn(Object sender, EventArgs e)
     {
         double nextRow = _pacmanRow;
@@ -179,7 +180,6 @@ public partial class PacmanGameView : UserControl
         _pacmanRow = Canvas.GetLeft(PacmanImage);
         _pacmanCol = Canvas.GetTop(PacmanImage);
         var pacmanPosition = Canvas.GetLeft(PacmanImage) + _horizontalSpped;
-        var bottonPosition = PacmanCanvas.Width - PacmanImage.Width;
         ValidateWall(pacmanPosition,_currentDirection,_pacmanRow,_pacmanCol,nextRow, nextCol);
         switch (_currentDirection)
         {
@@ -193,25 +193,39 @@ public partial class PacmanGameView : UserControl
     private void ValidateWall(double pacmanPosition, string currentDirection, double pacRow,
         double pacCol, double nextRow, double nextCol)
     {
-        if (!IsWall(pacRow,pacCol))
+        var targetCellType = _board.FirstOrDefault(c => c.Row == pacRow && c.Col == pacCol);
+        if (!IsWall(targetCellType,pacRow,pacCol))
         {
-            pacmanPosition = 0;
+            
         }
-        if (!IsWall(nextRow,nextCol))
+        if (!IsWall(targetCellType,nextRow,nextCol))
         {
             pacmanPosition = 0;
         }
     }
-    private bool IsWall(double row, double col)
+    private void StartGameTimer()
+    {
+        _gameTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(200)
+        };
+        _gameTimer.Tick += GameTimerTick;
+        _gameTimer.Start();
+    }
+    private void GameTimerTick(object? sender, EventArgs e)
+    {
+        ManagePacman();
+    }
+    private bool IsWall(Entity targetCellType, double row, double col)
     {
         bool isWall = false;
-        var targetCellTYpe = _board.FirstOrDefault(c => c.Row == row && c.Col == col);
-        if (targetCellTYpe is null)
+        
+        if (targetCellType is null)
         {
             isWall = true;
         }
 
-        if (targetCellTYpe.Type == CellType.WALL || targetCellTYpe.Type == CellType.DOOR)
+        if (targetCellType.Type == CellType.WALL || targetCellType.Type == CellType.DOOR)
         {
             isWall =false;
         }
@@ -224,8 +238,101 @@ public partial class PacmanGameView : UserControl
             vm.Score += 10;
         }
     }
-    private void ManagePacman(double _pacmanRow, double _pacmanCol, double nextRow)
+    private void ManagePacman()
     {
+        //if (DataContext is GamePageViewModel vm)
+        double nextRow = _pacmanRow;
+        double nextCol = _pacmanCol;
         
+        switch (_currentDirection)
+        {
+            case "up":
+                nextRow--;
+                break;
+            case "down":
+                nextRow++;
+                break;
+            case "left":
+                nextCol--;
+                break;
+            case "right":
+                nextCol++;
+                break;
+        }
+        
+        if (CanMoveTo(nextRow, nextCol))
+        {
+            if(_board is not null)
+            {
+                UpdatePacmanPosition(nextRow, nextCol);
+            }
+            
+        }
+    }
+    
+    /// <summary>
+    /// CanMove ask the targetcell  isn't null
+    /// if it's not null; It isn't wall o door is true; but it's false
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="col"></param>
+    /// <returns></returns>
+    private bool CanMoveTo(double row, double col)
+    {
+        var targetCell = _board.FirstOrDefault(c => c.Row == row && c.Col == col);
+        bool isNotWall = false;
+        if (targetCell is null)
+        {
+            isNotWall = false;
+        }
+        else if(targetCell.Type is not CellType.WALL && targetCell.Type is not CellType.DOOR)
+        {
+            isNotWall = true;
+        }
+
+        return isNotWall;
+    }
+    
+    private void UpdatePacmanPosition(double newRow, double newCol)
+    {
+        var oldCell = _board.FirstOrDefault(c => c.Row == _pacmanRow && c.Col == _pacmanCol);
+        var newCell = _board.FirstOrDefault(c => c.Row == newRow && c.Col == newCol);
+        
+        if (oldCell == null || newCell == null)
+            return;
+        
+        oldCell.Type = CellType.EMPTY;
+        
+        if (newCell.HasPellet)
+        {
+            newCell.HasPellet = false;
+            _score += 10;
+            UpdateScore();
+            // Aquí deberías buscar el elipse en el Canvas y quitarlo, 
+            // o usar una técnica de "DataTemplates" más adelante
+        }
+        
+        if (newCell.Type == CellType.ENERGIZE)
+        {
+            newCell.Type = CellType.EMPTY;
+            _score += 50;
+            UpdateScore();
+            // Aquí activar el modo "frightened" de los fantasmas
+        }
+        
+        newCell.Type = CellType.PACMAN;
+        _pacmanRow = newRow;
+        _pacmanCol = newCol;
+        var (targetX, targetY) = GetCellCenter((int)newRow, (int)newCol);
+        Canvas.SetLeft(PacmanImage, targetX - (PacmanImage.Width / 2));
+        Canvas.SetTop(PacmanImage, targetY - (PacmanImage.Height / 2));
+    }
+    
+    private void UpdateScore()
+    {
+        if (DataContext is GamePageViewModel vm)
+        {
+            vm.Score = _score;
+        }
     }
 }

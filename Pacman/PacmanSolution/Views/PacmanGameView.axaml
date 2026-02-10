@@ -80,14 +80,14 @@
                     Width="2000" Height="1700"
                     Background="Black">
                 <Image Source="avares://PacmanSolution/Assets/Imagen/Board/Board.png"
-                       Width="1680" Height="1450"
+                       Width="1680" Height="1400"
                        ZIndex="1"
                        Opacity="0.8"
                        IsHitTestVisible="False"
                        Canvas.Left="-30"/>
                 <Image x:Name="PacmanImage" Source="{Binding PacmanCurrentSprite}"
                          Width="50" Height="50" ZIndex="5"
-                         Canvas.Top="1010" Canvas.Left="650"/>
+                         Canvas.Top="1020" Canvas.Left="720"/>
             </Canvas>
         </Viewbox>
     </DockPanel>
