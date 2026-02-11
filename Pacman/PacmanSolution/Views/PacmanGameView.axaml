@@ -86,7 +86,7 @@
                        IsHitTestVisible="False"
                        Canvas.Left="-30"/>
                 <Image x:Name="PacmanImage" Source="{Binding PacmanCurrentSprite}"
-                         Width="50" Height="50" ZIndex="5"
+                         Width="35" Height="35" ZIndex="10"
                          Canvas.Top="1020" Canvas.Left="720"/>
             </Canvas>
         </Viewbox>
