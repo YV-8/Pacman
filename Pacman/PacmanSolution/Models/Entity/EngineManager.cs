@@ -16,8 +16,7 @@ public class EngineManager
     private List<Ghost> _ghosts;
     private Pacman _pacman;
     private CellType _cellType;
-    private Board _board;
-
+    private Board _boardLayout;
     public int BoardCol
     {
         get => _boardCol;
@@ -40,49 +39,66 @@ public class EngineManager
     {
         _boardCol = boardCol;
         _boardRow = boardRow;
+        _boardLayout = new Board(0, 0, CellType.EMPTY);
     }
     
     
 
-    public void BuildGameBoard(ObservableCollection<Entity> Board)
+    public void BuildGameBoard(ObservableCollection<Entity> board)
     {
-        for (int row = 0; row < _boardRow; row++)
+        if (board == null)
         {
-            for (int col = 0; col < _boardCol; col++)
+            throw new System.ArgumentNullException(nameof(board));
+        }
+
+        board.Clear();
+        if (_boardLayout?.Layout == null || _boardLayout.Layout.Length == 0)
+        {
+            throw new System.InvalidOperationException("Board layout is not initialized");
+        }
+        
+        int layoutRows = _boardLayout.Layout.Length;
+        
+        for (int row = 0; row < layoutRows; row++)
+        {
+            string currentRow = _boardLayout.Layout[row];
+            
+            for (int col = 0; col < currentRow.Length; col++)
             {
-                char cellChar = _board.Layout[row][col];
+                char cellChar = currentRow[col];
                 var cell = CreateCellFromChar(row, col, cellChar);
-                Board.Add(cell);
+                board.Add(cell);
             }
         }
     }
 
-    private Board CreateCellFromChar(int row, int col, char symbol)
+    private Entity CreateCellFromChar(int row, int col, char symbol)
     {
-        var cell = new Board(row, col, CellType.EMPTY);
-        cell.HasPellet = false;
-
         switch (symbol)
         {
             case 'W':
-                cell.Type = CellType.WALL;
-                break;
+                return new Board(row, col, CellType.WALL);
+            
             case '-':
-                cell.Type = CellType.DOOR;
-                break;
+                return new Board(row, col, CellType.DOOR);
+            
             case '.':
-                cell.Type = CellType.EMPTY;
-                cell.HasPellet = true;
-                break;
+                var cellWithPellet = new Board(row, col, CellType.EMPTY);
+                cellWithPellet.HasPellet = true;
+                return cellWithPellet;
+            
             case 'o':
-                cell.Type = CellType.ENERGIZE;
-                break;
+                return new Board(row, col, CellType.ENERGIZE);
+            
+            case 'P':
+                return new Pacman(row, col, CellType.PACMAN, 40, 40, 10);
+            
             case 'E':
-                break;
             case ' ':
-                cell.Type = CellType.EMPTY;
-                break;
+                return new Board(row, col, CellType.EMPTY);
+            
+            default:
+                return new Board(row, col, CellType.EMPTY);
         }
-        return cell;
     }
 }
