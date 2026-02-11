@@ -1,4 +1,3 @@
-using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
@@ -16,7 +15,7 @@ public partial class MainWindowViewModel:ObservableObject
         Navigation = new ManagePageChange();
     }
     [RelayCommand]
-    public void Navigate(string target)
+    private void Navigate(string target)
     {
         Navigation.ChangePage(target);
     }

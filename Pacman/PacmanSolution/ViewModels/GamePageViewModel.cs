@@ -1,6 +1,6 @@
-using System;
 using System.Collections.ObjectModel;
-
+using System.Linq;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -62,5 +62,4 @@ public partial class GamePageViewModel: ObservableObject
             _soundManager.StopSound();
         }
     }
-    
 }
