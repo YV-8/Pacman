@@ -8,7 +8,6 @@ using Avalonia.Interactivity;
 using PacmanSolution.Models;
 using PacmanSolution.ViewModels;
 using Avalonia.Media;
-using Avalonia.Threading;
 
 namespace PacmanSolution.Views;
 
@@ -26,23 +25,22 @@ public partial class PacmanGameView : UserControl
         KeyDown += OnKeyDown;
         Loaded += OnLoaded;
     }
-    
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (DataContext is GamePageViewModel vm)
         {
             switch (e.Key)
             {
-                case Key.Up:
+                case Key.Up or Key.W:
                     vm.ChangeDirection("up");
                     break;
-                case Key.Down:  
+                case Key.Down or  Key.S:  
                     vm.ChangeDirection("down"); 
                     break;
-                case Key.Left: 
+                case Key.Left or  Key.A: 
                     vm.ChangeDirection("left"); 
                     break;
-                case Key.Right: 
+                case Key.Right or Key.D: 
                     vm.ChangeDirection("right"); 
                     break;
             }
@@ -64,26 +62,45 @@ public partial class PacmanGameView : UserControl
                 viewModel.PauseGame();
             }
         };
-        if (DataContext is GamePageViewModel gamePageViewModel)
+        if (DataContext is GamePageViewModel gamevm)
         {
-            _gamePageViewModel = gamePageViewModel;
-            DrawBoard(GamePageViewModel.Board);
-            GamePageViewModel.OnElementRemoved += OnElementRemovedFromBoard;
+            _gamePageViewModel = gamevm;
+            DrawBoard(gamevm.Board);
+            _gamePageViewModel.OnElementRemoved += OnElementRemovedFromBoard;
         
             // Configura el binding de la posición de Pacman
             SetupPacmanPositionBinding();
         }
     }
-    
+    /// <summary>
+    /// Configura el binding manual para la posición de Pacman en el Canvas
+    /// </summary>
+    private void SetupPacmanPositionBinding()
+    {
+        if (_gamePageViewModel is null)
+            return;
+
+        // Actualiza la posición inicial
+        UpdatePacmanPosition(_gamePageViewModel.PacmanCanvasLeft, _gamePageViewModel.PacmanCanvasTop);
+
+        // Suscribe a los cambios de posición
+        _gamePageViewModel.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName is nameof(GamePageViewModel.PacmanCanvasLeft) or 
+                nameof(GamePageViewModel.PacmanCanvasTop))
+            {
+                UpdatePacmanPosition(_gamePageViewModel.PacmanCanvasLeft, _gamePageViewModel.PacmanCanvasTop);
+            }
+        };
+    }
     /// <summary>
     /// CanMove ask the targetcell  isn't null
     /// if it's not null; It isn't wall o door is true; but it's false
     /// </summary>
-    /// <param name="row"></param>
-    /// <param name="col"></param>
+    /// <param name="left"></param>
+    /// <param name="top"></param>
     /// <returns></returns>
-    
-    public void UpdatePacmanPosition(double newRow, double newCol)
+    public void UpdatePacmanPosition(double left, double top)
     {
         Canvas.SetLeft(PacmanImage, left);
         Canvas.SetTop(PacmanImage, top);
@@ -96,7 +113,7 @@ public partial class PacmanGameView : UserControl
     /// <param name="board"></param>
     private void DrawBoard(ObservableCollection<Entity> board)
     {
-        if (PacmanCanvas == null || board == null) return;
+        if (PacmanCanvas is null || board is null) return;
         
         var dynamicElements = PacmanCanvas.Children
             .Where(x => x != PacmanImage && !(x is Image { Opacity: 0.8 }))
@@ -112,16 +129,9 @@ public partial class PacmanGameView : UserControl
         }
     }
     
-    /// <summary>
-    /// DrawEntity in charge of draw each entity
-    /// first=> wall second => pellet or Energize; last door for ghost's door and pacman
-    /// </summary>
-    /// <param name="cell">
-    /// each cell sie the similar but had diferent components
-    /// </param>
     private void DrawEntity(Entity cell)
     {
-        var (centerX, centerY) = GetCellCenter(cell.Row, cell.Col);
+        var (centerX, centerY) =GamePageViewModel.GetCellCenter(cell.Row, cell.Col);
         
         if (cell.Type == CellType.WALL)
         {
@@ -152,7 +162,7 @@ public partial class PacmanGameView : UserControl
                 Width = 20, 
                 Height = 20, 
                 Fill = Brushes.White,
-                Tag = $"energizer_{cell.Row}_{cell.Col}" // Etiqueta única
+                Tag = $"energizer_{cell.Row}_{cell.Col}"
             };
             AddShapeToCanvas(energizer, centerX, centerY, 5);
         }
@@ -183,47 +193,13 @@ public partial class PacmanGameView : UserControl
         Canvas.SetTop(element, positionY - (element.Height / 2));
         PacmanCanvas.Children.Add(element);
     }
-    private void StartGameTimer()
+    /// <summary>
+    /// Maneja el evento cuando un elemento debe ser removido del tablero
+    /// </summary>
+    private void OnElementRemovedFromBoard(object? sender, GamePageViewModel.ElementRemovedEventArgs e)
     {
-        _gameTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(200)
-        };
-        _gameTimer.Tick += GameTimerTick;
-        _gameTimer.Start();
+        RemoveElementFromCanvas(e.ElementType, e.Row, e.Col);
     }
-    private void GameTimerTick(object? sender, EventArgs e)
-    {
-        ManagePacman();
-    }
-    private void ManagePacman()
-    {
-        //if (DataContext is GamePageViewModel vm)
-        double nextRow = _pacmanRow;
-        double nextCol = _pacmanCol;
-        
-        switch (_currentDirection)
-        {
-            case "up":
-                nextRow--;
-                break;
-            case "down":
-                nextRow++;
-                break;
-            case "left":
-                nextCol--;
-                break;
-            case "right":
-                nextCol++;
-                break;
-        }
-        
-        if (CanMoveTo(nextRow, nextCol))
-        {
-            UpdatePacmanPosition(nextRow, nextCol);
-        }
-    }
-    
     /// <summary>
     /// Elimina una píldora específica del Canvas usando su Tag
     /// </summary>
@@ -237,14 +213,6 @@ public partial class PacmanGameView : UserControl
         if (pelletToRemove != null)
         {
             PacmanCanvas.Children.Remove(pelletToRemove);
-        }
-    }
-    
-    private void UpdateScore()
-    {
-        if (DataContext is GamePageViewModel vm)
-        {
-            vm.Score = _score;
         }
     }
 }
