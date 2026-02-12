@@ -14,7 +14,7 @@ namespace PacmanSolution.Views;
 
 public partial class PacmanGameView : UserControl
 {
-    //private GamePageViewModel? _gamePageViewModel;
+    private GamePageViewModel? _gamePageViewModel;
     private const double _cellSize = 45.8;
     private const double _offsetX = 175;
     private const double _offsetY = 15;
@@ -34,19 +34,15 @@ public partial class PacmanGameView : UserControl
             switch (e.Key)
             {
                 case Key.Up:
-                    _currentDirection = "up";
                     vm.ChangeDirection("up");
                     break;
                 case Key.Down:  
-                    _currentDirection = "down";
                     vm.ChangeDirection("down"); 
                     break;
                 case Key.Left: 
-                    _currentDirection = "left";
                     vm.ChangeDirection("left"); 
                     break;
                 case Key.Right: 
-                    _currentDirection = "right";
                     vm.ChangeDirection("right"); 
                     break;
             }
@@ -70,27 +66,15 @@ public partial class PacmanGameView : UserControl
         };
         if (DataContext is GamePageViewModel gamePageViewModel)
         {
-            DrawBoard(gamePageViewModel.Board);
-            _board = gamePageViewModel.Board;
-            var pacmanCell = _board.FirstOrDefault(c => c.Type == CellType.PACMAN);
-            if (pacmanCell is not null)
-            {
-                _pacmanRow = pacmanCell.Row;
-                _pacmanCol = pacmanCell.Col;
-                
-                var (centerX, centerY) = GetCellCenter(_pacmanRow, _pacmanCol);
-                Canvas.SetLeft(PacmanImage, centerX - (PacmanImage.Width / 2));
-                Canvas.SetTop(PacmanImage, centerY - (PacmanImage.Height / 2));
-            }
-            StartGameTimer();
+            _gamePageViewModel = gamePageViewModel;
+            DrawBoard(GamePageViewModel.Board);
+            GamePageViewModel.OnElementRemoved += OnElementRemovedFromBoard;
+        
+            // Configura el binding de la posición de Pacman
+            SetupPacmanPositionBinding();
         }
     }
-    public (double x, double y) GetCellCenter(double row, double col)
-    {
-        double x = _offsetX + (col * _cellSize) + (_cellSize / 2);
-        double y = _offsetY + (row * _cellSize) + (_cellSize / 2);
-        return (x, y);
-    }
+    
     /// <summary>
     /// CanMove ask the targetcell  isn't null
     /// if it's not null; It isn't wall o door is true; but it's false
@@ -98,58 +82,11 @@ public partial class PacmanGameView : UserControl
     /// <param name="row"></param>
     /// <param name="col"></param>
     /// <returns></returns>
-    public bool CanMoveTo(double row, double col)
-    {
-        var targetCell = _board.FirstOrDefault(c => c.Row == row && c.Col == col);
-        bool isNotWall = false;
-        if (targetCell is null)
-        {
-            isNotWall = false;
-        }
-        else if(targetCell.Type is not CellType.WALL && targetCell.Type is not CellType.DOOR)
-        {
-            isNotWall = true;
-        }
-
-        return isNotWall;
-    }
     
     public void UpdatePacmanPosition(double newRow, double newCol)
     {
-        var oldCell = _board.FirstOrDefault(c => c.Row == _pacmanRow && c.Col == _pacmanCol);
-        var newCell = _board.FirstOrDefault(c => c.Row == newRow && c.Col == newCol);
-        
-        if (oldCell == null || newCell == null)
-            return;
-        
-        oldCell.Type = CellType.EMPTY;
-        OnPelletEaten(newCell, newRow,newCol);
-        
-        newCell.Type = CellType.PACMAN;
-        _pacmanRow = newRow;
-        _pacmanCol = newCol;
-        var (targetX, targetY) = GetCellCenter((int)newRow, (int)newCol);
-        Canvas.SetLeft(PacmanImage, targetX - (PacmanImage.Width / 2));
-        Canvas.SetTop(PacmanImage, targetY - (PacmanImage.Height / 2));
-    }
-    public void OnPelletEaten(Entity newCell,double newRow,double newCol)
-    {
-        var newCellType ="pellet";
-        if (newCell.HasPellet)
-        {
-            newCell.HasPellet = false;
-            _score += 10;
-            UpdateScore();
-            RemoveElementFromCanvas(newCellType,newRow, newCol);
-        }
-        if (newCell.Type == CellType.ENERGIZE)
-        {
-            newCell.Type = CellType.EMPTY;
-            newCellType ="energizer";
-            _score += 50;
-            UpdateScore();
-            RemoveElementFromCanvas(newCellType,newRow, newCol);
-        }
+        Canvas.SetLeft(PacmanImage, left);
+        Canvas.SetTop(PacmanImage, top);
     }
 
     /// <summary>
