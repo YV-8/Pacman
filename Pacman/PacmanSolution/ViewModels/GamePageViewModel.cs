@@ -88,4 +88,22 @@ public partial class GamePageViewModel: ObservableObject
         _gameTimer?.Stop();
         _movementTimer?.Stop();
     }
+    public void UpdatePacmanCanvasPosition()
+    {
+        var (centerX, centerY) = GetCellCenter(PacmanRow, PacmanCol);
+        PacmanCanvasLeft = centerX - (PacmanImageSize / 2);
+        PacmanCanvasTop = centerY - (PacmanImageSize / 2);
+    }
+    /// <summary>
+    /// Get the row and col and order in the canvas
+    /// </summary>
+    /// <param name="row"/>
+    /// <param name="col"/>
+    /// <returns></returns>
+    public static (double x, double y) GetCellCenter(double row, double col)
+    {
+        var x = OffsetX + (col * CellSize) + (CellSize / 2);
+        var y = OffsetY + (row * CellSize) + (CellSize / 2);
+        return (x, y);
+    }
 }
