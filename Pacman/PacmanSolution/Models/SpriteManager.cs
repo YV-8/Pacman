@@ -41,9 +41,9 @@ public class SpriteManager
          return new Rect(x, y, width, height);
      }
      /// <summary>
-     ///  verificamos si el bitmap cargado con el path es nulo o no
-     /// si no lo es retoramos un croppedBitmap y la region que necesitamos
-     /// para heredarlo
+     ///  check si el bitmap update con el path es null o no
+     /// si no lo es retoramos un croppedBitmap y la region que need
+     /// para heredared
      /// </summary>
      /// <param name="path"></param>
      /// <param name="region"></param>
@@ -56,7 +56,7 @@ public class SpriteManager
      }
      
      /// <summary>
-     /// se limpia todo
+     /// clean all
      /// </summary>
      public void ClearCache()
      {
