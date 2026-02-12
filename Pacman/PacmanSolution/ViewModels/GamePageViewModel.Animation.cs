@@ -208,21 +208,27 @@ public partial class GamePageViewModel
     /// <param name="newCol"></param>
     private void EatDotsInteraction(Entity newCell,double newRow,double newCol)
     {
-        var newCellType ="pellet";
+        string newCellType ="pellet";
+        bool _ateSomething = false;
         if (newCell.HasPellet)
         {
             newCell.HasPellet = false;
-            _score += 10;
-            //UpdateScore();
+            Score += 10;
+            _ateSomething = true;
         }
         if (newCell.Type is CellType.ENERGIZE)
         {
             newCell.Type = CellType.EMPTY;
             newCellType ="energizer";
-            _score += 50;
-            //UpdateScore();
+            _ateSomething = true;
+            Score += 50;
         }
-        OnElementRemoved?.Invoke(this, new ElementRemovedEventArgs(newCellType, newRow, newCol));
+
+        if (_ateSomething)
+        {
+            OnElementRemoved?.Invoke(this, new ElementRemovedEventArgs(newCellType, newRow, newCol));
+            UpdateScoreViewCommand(newCellType);
+        }
     }
     
     
@@ -240,12 +246,6 @@ public partial class GamePageViewModel
         }
     }*/
     
-
-    [RelayCommand]
-    private void ViewScoresCommand()
-    {
-        // Implementar lógica para mostrar puntuaciones
-    }
     /// <summary>
     /// Argumentos del evento para elementos removidos del Canvas
     /// </summary>

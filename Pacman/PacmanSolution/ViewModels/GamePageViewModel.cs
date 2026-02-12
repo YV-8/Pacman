@@ -1,7 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -22,6 +21,9 @@ public partial class GamePageViewModel: ObservableObject
     private DispatcherTimer _gameTimer;
     private DispatcherTimer? _gameLoopTimer;
     private ObservableCollection<Entity> _board = new();
+    private int _TotalScore=1200;
+    private int _TotalScoreCherry=1500;
+    private int _scoreCherry=0;
     public ObservableCollection<Entity> Board
     {
         get => _board;
@@ -105,5 +107,32 @@ public partial class GamePageViewModel: ObservableObject
         var x = OffsetX + (col * CellSize) + (CellSize / 2);
         var y = OffsetY + (row * CellSize) + (CellSize / 2);
         return (x, y);
+    }
+    
+    [RelayCommand]
+    private void UpdateScoreViewCommand(string cellType)
+    {
+        if (cellType is "Cherry")
+        {
+            Score += 100;
+        }
+        else if (cellType is "pellet" || cellType is "energizer")
+        { 
+            Score = _score;
+        }
+        
+        ScoreStateValidate();
+    }
+
+    private void ScoreStateValidate()
+    {
+        if (Score < _TotalScore)
+        {
+            Console.WriteLine("Winner");
+        }else if (Score > HighScore)
+        {
+            HighScore = Score;
+            Console.WriteLine("Continue game");
+        }
     }
 }
