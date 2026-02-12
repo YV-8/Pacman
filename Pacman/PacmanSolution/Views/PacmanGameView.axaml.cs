@@ -14,18 +14,11 @@ namespace PacmanSolution.Views;
 
 public partial class PacmanGameView : UserControl
 {
-    private GamePageViewModel? _gamePageViewModel;
-    private ObservableCollection<Entity> _board;
-    private DispatcherTimer _gameTimer;
+    //private GamePageViewModel? _gamePageViewModel;
     private const double _cellSize = 45.8;
     private const double _offsetX = 175;
     private const double _offsetY = 15;
     private double _horizontalSpped = 10;
-    private double _pacmanRow = 1;
-    private double _pacmanCol = 1;
-    private string _currentDirection = "right";
-    private int _score;
-    
     
     public PacmanGameView()
     {
@@ -68,7 +61,13 @@ public partial class PacmanGameView : UserControl
     /// <param name="e"></param>
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
-        this.Unloaded += (s, e) => _gameTimer?.Stop();
+        this.Unloaded += (s, e) =>
+        {
+            if (DataContext is GamePageViewModel viewModel)
+            {
+                viewModel.PauseGame();
+            }
+        };
         if (DataContext is GamePageViewModel gamePageViewModel)
         {
             DrawBoard(gamePageViewModel.Board);
@@ -260,21 +259,6 @@ public partial class PacmanGameView : UserControl
     {
         ManagePacman();
     }
-    private bool IsWall(Entity targetCellType, double row, double col)
-    {
-        bool isWall = false;
-        
-        if (targetCellType is null)
-        {
-            isWall = true;
-        }
-
-        if (targetCellType.Type == CellType.WALL || targetCellType.Type == CellType.DOOR)
-        {
-            isWall =false;
-        }
-        return isWall;
-    }
     private void ManagePacman()
     {
         //if (DataContext is GamePageViewModel vm)
@@ -325,9 +309,5 @@ public partial class PacmanGameView : UserControl
         {
             vm.Score = _score;
         }
-    }
-    public void ResumeGame()
-    {
-        _gameTimer?.Start();
     }
 }

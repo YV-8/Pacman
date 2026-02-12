@@ -39,6 +39,34 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
+        <Style Selector="Button.PacmanRetroGame">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Yellow"/>
+            <Setter Property="BorderThickness" Value="4"/>
+            <Setter Property="Padding" Value="10,10"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="RenderTransform" Value="none"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="FontFamily" Value="Courier New"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="Yellow"/>
+            <Setter Property="FontSize" Value="18"/>
+            <!--<Setter/> -->
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="TextBlock.ButtonOptGame">
+            <Setter Property="Foreground" Value="Yellow"/>
+            <Setter Property="FontFamily" Value="Courier New"/>
+            <Setter Property="FontSize" Value="50"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
     </Window.Styles>
     
     <Panel>
