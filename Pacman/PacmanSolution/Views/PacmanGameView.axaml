@@ -5,7 +5,7 @@
              xmlns:vm="clr-namespace:PacmanSolution.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
              x:Class="PacmanSolution.Views.PacmanGameView"
-             x:DataType="vm:GamePageViewModel"
+             x:DataType="vm:PacmanGameViewModel"
              Background="Black">
     
     <DockPanel LastChildFill="True">
