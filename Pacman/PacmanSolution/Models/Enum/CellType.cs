@@ -6,7 +6,7 @@ public enum CellType
     EMPTY,
     INSIDEWALL,
     PACMAN,
-    Cherry,
+    CHERRY,
     DOT,
     DOOR,
     ENERGIZE,

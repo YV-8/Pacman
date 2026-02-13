@@ -84,7 +84,7 @@ public class EngineManager
             
             case '.':
                 var cellWithPellet = new Board(row, col, CellType.EMPTY);
-                cellWithPellet.HasPellet = true;
+                cellWithPellet.HasDot = true;
                 return cellWithPellet;
             
             case 'o':

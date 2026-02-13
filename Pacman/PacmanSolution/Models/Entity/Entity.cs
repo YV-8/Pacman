@@ -24,7 +24,7 @@ public abstract partial class Entity:ObservableObject
     [ObservableProperty] 
     private CellType _type;
     [ObservableProperty] 
-    private bool _hasPellet;
+    private bool _hasDot;
     public Bitmap? Sprite { get; set; }
     public Rect? SourceRect { get; set; }
     public Entity(int row, int col, CellType cellType, double width, double height, int zIndex)

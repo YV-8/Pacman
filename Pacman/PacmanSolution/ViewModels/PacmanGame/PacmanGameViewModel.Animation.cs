@@ -1,13 +1,8 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
-using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
 
 namespace PacmanSolution.ViewModels;
@@ -51,9 +46,6 @@ public partial class GamePageViewModel
         }
     }
     
-    /// <summary>
-    /// Start the loop the game for animations
-    /// </summary>
     private void StartGameLoop()
     {
         _gameTimer = new DispatcherTimer
@@ -64,9 +56,6 @@ public partial class GamePageViewModel
         _gameTimer.Start();
     }
     
-    /// <summary>
-    /// Start the movement to the pacman
-    /// </summary>
     private void StartMovementTimer()
     {
         _movementTimer = new DispatcherTimer
@@ -78,7 +67,7 @@ public partial class GamePageViewModel
     }
     
     /// <summary>
-    /// UpdateSPrites is a method modification who sprite is to get
+    /// UpdateSprites is a method modification who sprite is to get
     /// whit _SpriteManager.GetSpritesSection with the Nae path and the rect is rectangle
     /// which change the board space had assigned as CellType.Pacman
     /// _animationFrame is the parr is between 0 - 1 
@@ -99,12 +88,7 @@ public partial class GamePageViewModel
         if (newSprite is not null)
         {
             PacmanCurrentSprite = newSprite;
-            /*
-             * foreach (var entity in Board.Where(e => e.Type is CellType.PACMAN))
-               {
-                   entity.CurrentDisplaySprite = newSprite;
-               }
-             */
+            
             foreach (var entity in Board)
             {
                 if (entity.Type == CellType.PACMAN)
