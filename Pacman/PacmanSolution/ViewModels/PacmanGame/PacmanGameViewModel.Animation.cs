@@ -3,16 +3,14 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
+using PacmanSolution.Views;
 
 namespace PacmanSolution.ViewModels;
 
-public partial class GamePageViewModel
-{ 
-    [ObservableProperty]
-    private int _score;
-    [ObservableProperty]
-    private int _highScore;
+public partial class PacmanGameViewModel
+{
     [ObservableProperty]
     private int _pacmanRow;
     [ObservableProperty]
@@ -21,8 +19,15 @@ public partial class GamePageViewModel
     private double _pacmanCanvasLeft;
     [ObservableProperty]
     private double _pacmanCanvasTop;
+    [ObservableProperty]
+    private int _score;
+    [ObservableProperty]
+    private int _highScore;
     private int _currentSpriteRow = 0;
     private int _animationFrame = 0;
+    private int _totalScore=1200;
+    private int _TotalScoreCherry=1500;
+    private int _scoreCherry=0;
     private const double CellSize = 45.8;
     private const double OffsetX = 175;
     private const double OffsetY = 15;
@@ -30,7 +35,8 @@ public partial class GamePageViewModel
     private string _currentDirection = "right";
     private DispatcherTimer _movementTimer;
     private DispatcherTimer? _animationTimer;
-    public event EventHandler<ElementRemovedEventArgs>? OnElementRemoved;
+    public event EventHandler<PacmanGameView.ElementRemovedEventArgs>? OnElementRemoved;
+
     
     /// <summary>
     /// Initializes Pacman's position from the board
@@ -60,9 +66,9 @@ public partial class GamePageViewModel
     {
         _movementTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(200) // Velocidad del movimiento
+            Interval = TimeSpan.FromMilliseconds(200) // speed move
         };
-        _movementTimer.Tick += (s, e) => MovePacman();
+        _movementTimer.Tick += (s, e) => MovePacman(PacmanRow,PacmanCol);
         _movementTimer.Start();
     }
     
@@ -76,12 +82,12 @@ public partial class GamePageViewModel
     {
         _animationFrame = (_animationFrame + 1) % 2;
 
-        int size = 16; 
+        int _size = 16; 
         var rect = new PixelRect(
-            _animationFrame * size,
-            _currentSpriteRow * size,
-            size, 
-            size);
+            _animationFrame * _size,
+            _currentSpriteRow * _size,
+            _size, 
+            _size);
         
         var newSprite  = _spriteManager.GetSpriteSection("PacmanViews.png", rect);
         
@@ -126,13 +132,24 @@ public partial class GamePageViewModel
         }
     }
 
+
     /// <summary>
     /// Move Pacman in the current direction
     /// </summary>
-    private void MovePacman()
+    private void MovePacman(int nextRow, int nextCol)
     {
-        int nextRow = PacmanRow;
-        int nextCol = PacmanCol;
+        var targetEntity = Board.FirstOrDefault(c => c.Row == PacmanRow && c.Col == PacmanCol);
+        if (_engine.CanMoveTo(targetEntity))
+        {
+            var result = _engine.InteractionObjects(targetEntity);
+            if (result.PointsEarned > 0) {
+                Score += result.PointsEarned;
+                if (Score > HighScore) HighScore = Score;
+                
+                OnElementRemoved?.Invoke(this, new PacmanGameView.ElementRemovedEventArgs(
+                    result.RemovedElementType, nextRow, nextCol));
+            }
+        }
 
         switch (_currentDirection)
         {
@@ -149,24 +166,12 @@ public partial class GamePageViewModel
                 nextCol++;
                 break;
         }
-        if (CanMoveTo(nextRow, nextCol))
-        {
-            UpdatePacmanPosition(nextRow, nextCol);
-        }
+        UpdatePacmanPosition(_animationFrame, nextRow, nextCol);
     }
     
-    private bool CanMoveTo(int row, int col)
+    private void UpdatePacmanPosition(int animationFrame, int newRow, int newCol)
     {
-        var targetCell = Board.FirstOrDefault(c => c.Row == row && c.Col == col);
-
-        if (targetCell is null)
-            return false;
-
-        return targetCell.Type is not CellType.WALL && targetCell.Type is not CellType.DOOR;
-    }
-    public void UpdatePacmanPosition(int newRow, int newCol)
-    {
-        _animationFrame = (_animationFrame + 1) % 2;
+        animationFrame = (animationFrame + 1) % 2;
         var oldCell = _board.FirstOrDefault(c => c.Row == PacmanRow && c.Col == PacmanCol);
         var newCell = _board.FirstOrDefault(c => c.Row == newRow && c.Col == newCol);
         
@@ -174,82 +179,26 @@ public partial class GamePageViewModel
             return;
         
         oldCell.Type = CellType.EMPTY;
-        EatDotsInteraction(newCell, newRow,newCol);
+        _engine.InteractionObjects(newCell);
         
         newCell.Type = CellType.PACMAN;
         PacmanRow = newRow;
         PacmanCol = newCol;
         UpdatePacmanCanvasPosition();
-        // Incrementa el frame de animación
-        _animationFrame = (_animationFrame + 1) % 2;
+        
+        animationFrame = (animationFrame + 1) % 2;
     }
-    
-    /// <summary>
-    /// The method is 
-    /// </summary>
-    /// <param name="newCell"></param>
-    /// <param name="newRow"></param>
-    /// <param name="newCol"></param>
-    private void EatDotsInteraction(Entity newCell,double newRow,double newCol)
+    [RelayCommand]
+    private void AddPoints(string cellType, int points)
     {
-        string newCellType ="pellet";
-        bool _ateSomething = false;
-        if (newCell.HasPellet)
+        if (cellType is "Cherry")
         {
-            newCell.HasPellet = false;
-            Score += 10;
-            _ateSomething = true;
+            Score += 100;
         }
-        if (newCell.Type is CellType.ENERGIZE)
-        {
-            newCell.Type = CellType.EMPTY;
-            newCellType ="energizer";
-            _ateSomething = true;
-            Score += 50;
+        else if (cellType is "pellet" || cellType is "energizer")
+        { 
+            Score = _score;
         }
-
-        if (_ateSomething)
-        {
-            OnElementRemoved?.Invoke(this, new ElementRemovedEventArgs(newCellType, newRow, newCol));
-            UpdateScoreViewCommand(newCellType);
-        }
-    }
-    
-    
-    /*[RelayCommand]*/
-    /*public void ToggleAudioCommand(bool isChecked)
-    {
-        string path = "PacmanTheme";
-        if (isChecked)
-        {
-            _soundManager.PlaySound(path, true);
-        }
-        else
-        {
-            _soundManager.StopSound();
-        }
-    }*/
-    
-    /// <summary>
-    /// Argumentos del evento para elementos removidos del Canvas
-    /// </summary>
-    public class ElementRemovedEventArgs : EventArgs
-    {
-        public string ElementType { get; }
-        public double Row { get; }
-        public double Col { get; }
-
-        /// <summary>
-        /// ElementRemovedEventArgs 
-        /// </summary>
-        /// <param name="elementType"></param>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
-        public ElementRemovedEventArgs(string elementType, double row, double col)
-        {
-            ElementType = elementType;
-            Row = row;
-            Col = col;
-        }
+        _engine.ScoreStateValidate(Score, _totalScore,HighScore);
     }
 }
