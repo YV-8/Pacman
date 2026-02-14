@@ -75,22 +75,20 @@ public class GameEngine
     }
     
     /// <summary>
-    /// Ask is this position has cell or entity type wall or door
+    /// Ask is this position has cell or entity type wall or door is false
+    /// the counter u opposite is true
     /// </summary>
     /// <param name="targetEntity"></param>
     /// <returns></returns>
     public bool CanMoveTo(Entity targetEntity)
     {
-        var canMove = false;
-        if (targetEntity is null)
+        if (targetEntity is null) return false;
+
+        if (targetEntity.Type is EntityType.WALL || targetEntity.Type is EntityType.DOOR)
         {
-            return canMove;
-        } 
-        if (targetEntity.Type is not CellType.WALL && targetEntity.Type is not CellType.DOOR)
-        {
-            canMove = true;
+            return false;
         }
-        return canMove;
+        return true;
     }
     
     /// <summary>
@@ -126,13 +124,13 @@ public class GameEngine
             newEntity.HasDot = false;
             result.PointsEarned = DotPoints;
             result.RemovedElementType = "pellet";
-        }else if (newEntity.Type == CellType.ENERGIZE) {
-            newEntity.Type = CellType.EMPTY;
+        }else if (newEntity.Type == EntityType.ENERGIZE) {
+            newEntity.Type = EntityType.EMPTY;
             result.PointsEarned = EnergizerPoints;
             result.RemovedElementType = "energizer";
-        }else if (newEntity.Type == CellType.CHERRY)
+        }else if (newEntity.Type == EntityType.CHERRY)
         {
-            newEntity.Type = CellType.EMPTY;
+            newEntity.Type = EntityType.EMPTY;
             result.PointsEarned = cherryPoints;
             result.RemovedElementType = "cherry";
             result.Success = true;
@@ -142,7 +140,7 @@ public class GameEngine
     }
     
     /// <summary>
-    /// verificate the point had the score
+    /// verify the point had the score
     /// </summary>
     public void ScoreStateValidate(int Score, int _totalScore, int HighScore)
     {

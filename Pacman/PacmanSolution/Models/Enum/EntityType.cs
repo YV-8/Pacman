@@ -1,6 +1,6 @@
 namespace PacmanSolution.Models;
 
-public enum CellType
+public enum EntityType
 {
     WALL,
     EMPTY,

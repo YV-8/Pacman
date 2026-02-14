@@ -2,7 +2,7 @@ namespace PacmanSolution.Models;
 
 public class Pacman: Entity
 {
-    public Pacman(int row, int col, CellType cellType, double width, double height, int zindex) : base(row, col, cellType, width, height, zindex)
+    public Pacman(int row, int col, EntityType entityType, double width, double height, int zindex) : base(row, col, entityType, width, height, zindex)
     {
     }
 

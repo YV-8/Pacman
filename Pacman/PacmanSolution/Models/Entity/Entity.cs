@@ -22,16 +22,16 @@ public abstract partial class Entity:ObservableObject
     [ObservableProperty] 
     private bool _isActive = true;
     [ObservableProperty] 
-    private CellType _type;
+    private EntityType _type;
     [ObservableProperty] 
     private bool _hasDot;
     public Bitmap? Sprite { get; set; }
     public Rect? SourceRect { get; set; }
-    public Entity(int row, int col, CellType cellType, double width, double height, int zIndex)
+    public Entity(int row, int col, EntityType entityType, double width, double height, int zIndex)
     {
         Row = row;
         Col = col;
-        Type = cellType;
+        Type = entityType;
         Width = width;
         Height = height;
         ZIndex = zIndex;

@@ -15,7 +15,7 @@ public class EngineManager
     //private int Cols = 10;
     private List<Ghost> _ghosts;
     private Pacman _pacman;
-    private CellType _cellType;
+    private EntityType _entityType;
     private Board _boardLayout;
     public int BoardCol
     {
@@ -29,17 +29,17 @@ public class EngineManager
         set => _boardRow = value;
     }
 
-    public CellType CellType
+    public EntityType EntityType
     {
-        get => _cellType;
-        set => _cellType = value;
+        get => _entityType;
+        set => _entityType = value;
     }
 
     public EngineManager(int boardCol, int boardRow)
     {
         _boardCol = boardCol;
         _boardRow = boardRow;
-        _boardLayout = new Board(0, 0, CellType.EMPTY);
+        _boardLayout = new Board(0, 0, EntityType.EMPTY);
     }
     
     
@@ -77,28 +77,28 @@ public class EngineManager
         switch (symbol)
         {
             case 'W':
-                return new Board(row, col, CellType.WALL);
+                return new Board(row, col, EntityType.WALL);
             
             case '-':
-                return new Board(row, col, CellType.DOOR);
+                return new Board(row, col, EntityType.DOOR);
             
             case '.':
-                var cellWithPellet = new Board(row, col, CellType.EMPTY);
+                var cellWithPellet = new Board(row, col, EntityType.EMPTY);
                 cellWithPellet.HasDot = true;
                 return cellWithPellet;
             
             case 'o':
-                return new Board(row, col, CellType.ENERGIZE);
+                return new Board(row, col, EntityType.ENERGIZE);
             
             case 'P':
-                return new Pacman(row, col, CellType.PACMAN, 40, 40, 10);
+                return new Pacman(row, col, EntityType.PACMAN, 40, 40, 10);
             
             case 'E':
             case ' ':
-                return new Board(row, col, CellType.EMPTY);
+                return new Board(row, col, EntityType.EMPTY);
             
             default:
-                return new Board(row, col, CellType.EMPTY);
+                return new Board(row, col, EntityType.EMPTY);
         }
     }
 }

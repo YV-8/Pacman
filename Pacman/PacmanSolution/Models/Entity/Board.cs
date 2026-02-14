@@ -2,7 +2,7 @@ namespace PacmanSolution.Models;
 
 public class Board:Entity
 {
-    public Board(int row, int col, CellType type) 
+    public Board(int row, int col, EntityType type) 
         : base(row, col, type, 46.6, 46.6, 1) 
     { }
 
