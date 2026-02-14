@@ -11,13 +11,13 @@ using Avalonia.Media;
 
 namespace PacmanSolution.Views;
 
-public abstract partial class PacmanGameView : UserControl
+public partial class PacmanGameView : UserControl
 {
     private PacmanGameViewModel? _gamePageViewModel;
     private const double _cellSize = 45.8;
     private const double _offsetX = 175;
     private const double _offsetY = 15;
-    private double _horizontalSpped = 10;
+    private double _horizontalSpeed = 10;
     public event EventHandler<ElementRemovedEventArgs>? OnElementRemoved;
     
     public PacmanGameView()
@@ -33,29 +33,31 @@ public abstract partial class PacmanGameView : UserControl
             switch (e.Key)
             {
                 case Key.Up or Key.W:
-                    vm.ChangeDirection("up");
+                    vm.ChangeDirection("UP");
                     break;
                 case Key.Down or  Key.S:  
-                    vm.ChangeDirection("down"); 
+                    vm.ChangeDirection("DOWN"); 
                     break;
                 case Key.Left or  Key.A: 
-                    vm.ChangeDirection("left"); 
+                    vm.ChangeDirection("LEFT"); 
                     break;
                 case Key.Right or Key.D: 
-                    vm.ChangeDirection("right"); 
+                    vm.ChangeDirection("RIGHT"); 
                     break;
             }
         }
     }
     
     /// <summary>
-    /// the OnLoaded is a method that incharge
+    /// the OnLoaded is a method that in charge
     /// of call the DrawBoard
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
+        this.Focus();
+    
         this.Unloaded += (s, e) =>
         {
             if (DataContext is PacmanGameViewModel viewModel)
@@ -67,24 +69,22 @@ public abstract partial class PacmanGameView : UserControl
         {
             _gamePageViewModel = gamevm;
             DrawBoard(gamevm.Board);
-            OnElementRemoved += OnElementRemovedFromBoard;
-        
-            // Configura el binding de la posición de Pacman
+            gamevm.OnElementRemoved += OnElementRemovedFromBoard;
+            
             SetupPacmanPositionBinding();
         }
     }
     /// <summary>
-    /// Configura el binding manual para la posición de Pacman en el Canvas
+    /// Configure el binding manual para the positión de Pacman en el Canvas
+    /// The ViewModel isn't null with left and Top
+    /// Subscribe propertyChanged and filter eac
     /// </summary>
     private void SetupPacmanPositionBinding()
     {
         if (_gamePageViewModel is null)
             return;
-
-        // Actualiza la posición inicial
         UpdatePacmanPosition(_gamePageViewModel.PacmanCanvasLeft, _gamePageViewModel.PacmanCanvasTop);
-
-        // Suscribe a los cambios de posición
+        
         _gamePageViewModel.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName is nameof(PacmanGameViewModel.PacmanCanvasLeft) or 
@@ -95,13 +95,13 @@ public abstract partial class PacmanGameView : UserControl
         };
     }
     /// <summary>
-    /// CanMove ask the targetcell  isn't null
+    /// CanMove ask the targetEntity  isn't null
     /// if it's not null; It isn't wall o door is true; but it's false
     /// </summary>
     /// <param name="left"></param>
     /// <param name="top"></param>
     /// <returns></returns>
-    public void UpdatePacmanPosition(double left, double top)
+    private void UpdatePacmanPosition(double left, double top)
     {
         Canvas.SetLeft(PacmanImage, left);
         Canvas.SetTop(PacmanImage, top);
@@ -134,9 +134,9 @@ public abstract partial class PacmanGameView : UserControl
     {
         var (centerX, centerY) =PacmanGameViewModel.GetCellCenter(cell.Row, cell.Col);
         
-        if (cell.Type == CellType.WALL)
+        if (cell.Type == EntityType.WALL)
         {
-            double size = (cell.Type == CellType.WALL) ? 25 : 16;
+            double size = (cell.Type == EntityType.WALL) ? 25 : 16;
             var color = Brushes.Transparent;
         
             AddShapeToCanvas(new Rectangle 
@@ -144,7 +144,7 @@ public abstract partial class PacmanGameView : UserControl
                 centerX, centerY, 2);
         }
         
-        if (cell.HasDot && cell.Type is not CellType.ENERGIZE)
+        if (cell.HasDot && cell.Type is not EntityType.ENERGIZE)
         {
             var pellet = new Ellipse 
             { 
@@ -156,7 +156,7 @@ public abstract partial class PacmanGameView : UserControl
             AddShapeToCanvas(pellet, centerX, centerY, 4);
         }
         
-        if (cell.Type is CellType.ENERGIZE)
+        if (cell.Type is EntityType.ENERGIZE)
         {
             var energizer = new Ellipse 
             { 
@@ -168,7 +168,7 @@ public abstract partial class PacmanGameView : UserControl
             AddShapeToCanvas(energizer, centerX, centerY, 5);
         }
 
-        if (cell.Type == CellType.DOOR)
+        if (cell.Type == EntityType.DOOR)
         {
             double width = 25;
             double height = 10;
@@ -188,14 +188,14 @@ public abstract partial class PacmanGameView : UserControl
         PacmanCanvas.Children.Add(element);
     }
     /// <summary>
-    /// Maneja el evento cuando un elemento debe ser removido del tablero
+    /// Manage the event where an element would be to remove of board
     /// </summary>
     private void OnElementRemovedFromBoard(object? sender, ElementRemovedEventArgs e)
     {
         RemoveElementFromCanvas(e.ElementType, e.Row, e.Col);
     }
     
-    private void RemoveElementFromCanvas(String cellType, double row, double col)
+    private void RemoveElementFromCanvas(string cellType, double row, double col)
     {
         string tag = $"{cellType}_{row}_{col}";
         var pelletToRemove = PacmanCanvas.Children
@@ -208,9 +208,9 @@ public abstract partial class PacmanGameView : UserControl
         }
     }
     /// <summary>
-    /// Argumentos del evento para elementos removidos del Canvas
+    /// Arguments of the event for elements remove of the Canvas
     /// </summary>
-    public abstract class ElementRemovedEventArgs : EventArgs
+    public class ElementRemovedEventArgs : EventArgs
     {
         public string ElementType { get; }
         public double Row { get; }

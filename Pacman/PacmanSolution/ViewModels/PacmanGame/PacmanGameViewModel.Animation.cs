@@ -3,7 +3,6 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
 using PacmanSolution.Views;
 
@@ -23,16 +22,20 @@ public partial class PacmanGameViewModel
     private int _score;
     [ObservableProperty]
     private int _highScore;
+    
     private int _currentSpriteRow = 0;
     private int _animationFrame = 0;
     private int _totalScore=1200;
-    private int _TotalScoreCherry=1500;
+    private int _totalScoreCherry=1500;
     private int _scoreCherry=0;
+    
     private const double CellSize = 45.8;
     private const double OffsetX = 175;
     private const double OffsetY = 15;
     private const double PacmanImageSize = 40;
-    private string _currentDirection = "right";
+    private string _currentDirection = "RIGHT";
+    
+    private bool _isAutoMode = true;
     private DispatcherTimer _movementTimer;
     private DispatcherTimer? _animationTimer;
     public event EventHandler<PacmanGameView.ElementRemovedEventArgs>? OnElementRemoved;
@@ -43,7 +46,7 @@ public partial class PacmanGameViewModel
     /// </summary>
     private void InitializePacmanPosition()
     {
-        var pacmanCell = _board.FirstOrDefault(c => c.Type == CellType.PACMAN);
+        var pacmanCell = _board.FirstOrDefault(c => c.Type == EntityType.PACMAN);
         if (pacmanCell is not null)
         {
             _pacmanRow = pacmanCell.Row;
@@ -68,7 +71,7 @@ public partial class PacmanGameViewModel
         {
             Interval = TimeSpan.FromMilliseconds(200) // speed move
         };
-        _movementTimer.Tick += (s, e) => MovePacman(PacmanRow,PacmanCol);
+        _movementTimer.Tick += (s, e) => MovePacman();
         _movementTimer.Start();
     }
     
@@ -97,7 +100,7 @@ public partial class PacmanGameViewModel
             
             foreach (var entity in Board)
             {
-                if (entity.Type == CellType.PACMAN)
+                if (entity.Type == EntityType.PACMAN)
                 {
                     entity.CurrentDisplaySprite = newSprite;
                 }
@@ -110,19 +113,26 @@ public partial class PacmanGameViewModel
     /// <param name="direction"></param>
     public void ChangeDirection(string direction)
     {
-        int oldRow = _currentSpriteRow;
-        switch (direction.ToLower())
+        if (_isAutoMode)
         {
-            case "right":
+            _isAutoMode = false;
+            _movementTimer?.Stop();
+            Console.WriteLine("Control manual activado. Timer detenido.");
+        }
+        _currentDirection = direction.ToUpper();
+        int oldRow = _currentSpriteRow;
+        switch (_currentDirection)
+        {
+            case "RIGHT":
                 _currentSpriteRow = 0;
                 break;
-            case "left":
+            case "LEFT":
                 _currentSpriteRow = 1;
                 break;
-            case "up":
+            case "UP":
                 _currentSpriteRow = 2;
                 break;
-            case "down":
+            case "DOWN":
                 _currentSpriteRow = 3;
                 break;
         }
@@ -130,43 +140,77 @@ public partial class PacmanGameViewModel
         {
             UpdateSprites();
         }
+        MovePacman();
     }
 
 
     /// <summary>
     /// Move Pacman in the current direction
     /// </summary>
-    private void MovePacman(int nextRow, int nextCol)
+    private void MovePacman()
     {
-        var targetEntity = Board.FirstOrDefault(c => c.Row == PacmanRow && c.Col == PacmanCol);
-        if (_engine.CanMoveTo(targetEntity))
+        int nextRow = PacmanRow;
+        int nextCol = PacmanCol;
+        switch (_currentDirection)
         {
+            case "UP": 
+                nextRow--;
+                break;
+            case "DOWN":
+                nextRow++;
+                break;
+            case "LEFT":
+                nextCol--;
+                break;
+            case "RIGHT":
+                nextCol++;
+                break;
+        }
+        var targetEntity = Board.FirstOrDefault(c => c.Row == nextRow && c.Col == nextCol);
+        if (targetEntity is not null && _engine.CanMoveTo(targetEntity))
+        {
+            Console.WriteLine($"Intentando mover a {nextRow}, {nextCol}");
             var result = _engine.InteractionObjects(targetEntity);
             if (result.PointsEarned > 0) {
                 Score += result.PointsEarned;
                 if (Score > HighScore) HighScore = Score;
-                
+                Console.WriteLine($"🎯 +{result.PointsEarned} puntos! Score: {Score}");
                 OnElementRemoved?.Invoke(this, new PacmanGameView.ElementRemovedEventArgs(
                     result.RemovedElementType, nextRow, nextCol));
             }
+            UpdatePacmanPosition(_animationFrame, nextRow, nextCol);
         }
-
-        switch (_currentDirection)
+        else
         {
-            case "up":
-                nextRow--;
-                break;
-            case "down":
-                nextRow++;
-                break;
-            case "left":
-                nextCol--;
-                break;
-            case "right":
-                nextCol++;
-                break;
+            if (_isAutoMode)
+            {
+                _isAutoMode = false;
+                _movementTimer?.Stop();
+                
+                if (targetEntity == null)
+                {
+                    Console.WriteLine($"🛑 MODO AUTOMÁTICO DETENIDO - Fuera del tablero en ({nextRow}, {nextCol})");
+                }
+                else
+                {
+                    Console.WriteLine($"🛑 MODO AUTOMÁTICO DETENIDO - Chocó con {targetEntity.Type} en ({nextRow}, {nextCol})");
+                }
+                
+                Console.WriteLine("💡 Ahora puedes controlarlo manualmente con las teclas");
+            }
+            else
+            {
+                // En modo manual, solo mostrar el bloqueo
+                if (targetEntity == null)
+                {
+                    Console.WriteLine($"❌ No existe celda en ({nextRow}, {nextCol})");
+                }
+                else
+                {
+                    Console.WriteLine($"❌ Bloqueado por {targetEntity.Type} en ({nextRow}, {nextCol})");
+                }
+            }
         }
-        UpdatePacmanPosition(_animationFrame, nextRow, nextCol);
     }
     
     private void UpdatePacmanPosition(int animationFrame, int newRow, int newCol)
@@ -178,17 +222,20 @@ public partial class PacmanGameViewModel
         if (oldCell is null || newCell is null)
             return;
         
-        oldCell.Type = CellType.EMPTY;
-        _engine.InteractionObjects(newCell);
-        
-        newCell.Type = CellType.PACMAN;
+        oldCell.Type = EntityType.EMPTY;
+        newCell.Type = EntityType.PACMAN;
         PacmanRow = newRow;
         PacmanCol = newCol;
         UpdatePacmanCanvasPosition();
-        
         animationFrame = (animationFrame + 1) % 2;
+        /*if (PacmanRow == 22 && PacmanCol == 21)
+        {
+            _isAutoMode = false;
+            _movementTimer?.Stop();
+            Console.WriteLine("Llegamos a la meta (22,21). Timer apagado. ¡Tu turno!");
+        }*/
     }
-    [RelayCommand]
+    /*[RelayCommand]
     private void AddPoints(string cellType, int points)
     {
         if (cellType is "Cherry")
@@ -200,5 +247,5 @@ public partial class PacmanGameViewModel
             Score = _score;
         }
         _engine.ScoreStateValidate(Score, _totalScore,HighScore);
-    }
+    }*/
 }

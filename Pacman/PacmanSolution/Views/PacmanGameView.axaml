@@ -6,7 +6,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
              x:Class="PacmanSolution.Views.PacmanGameView"
              x:DataType="vm:PacmanGameViewModel"
-             Background="Black">
+             Background="Black"
+             Focusable="True">
     
     <DockPanel LastChildFill="True">
         <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *, Auto, *, Auto" Margin="10">
