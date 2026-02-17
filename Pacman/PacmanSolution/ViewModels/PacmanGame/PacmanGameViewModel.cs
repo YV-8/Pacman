@@ -15,6 +15,14 @@ public partial class PacmanGameViewModel: ObservableObject
     [ObservableProperty]
     private IImage? _pacmanCurrentSprite;
     [ObservableProperty]
+    private int _pacmanRow;
+    [ObservableProperty]
+    private int _pacmanCol;
+    [ObservableProperty]
+    private double _pacmanCanvasLeft;
+    [ObservableProperty]
+    private double _pacmanCanvasTop;
+    [ObservableProperty]
     private ScoreBoardPageViewModel _scoreViewModel = new();
     private readonly SoundManager _soundManager = new ();
     private readonly SpriteManager _spriteManager = new ();

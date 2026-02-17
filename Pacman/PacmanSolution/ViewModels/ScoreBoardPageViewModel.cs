@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace PacmanSolution.ViewModels;
@@ -38,5 +36,17 @@ public partial class ScoreBoardPageViewModel:ObservableObject
             Console.WriteLine("Winner");
         }
         
+    }
+    //[RelayCommand]
+    private void AddPoints(string cellType, int points)
+    {
+        if (cellType is "Cherry")
+        {
+            Score += 100;
+        }
+        else if (cellType is "pellet" || cellType is "energizer")
+        {
+            Score = _score;
+        }
     }
 }

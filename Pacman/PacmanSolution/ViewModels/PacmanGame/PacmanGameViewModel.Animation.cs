@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using Avalonia;
 using Avalonia.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
 using PacmanSolution.Models;
 using PacmanSolution.Views;
 
@@ -10,20 +9,13 @@ namespace PacmanSolution.ViewModels;
 
 public partial class PacmanGameViewModel
 {
-    [ObservableProperty]
-    private int _pacmanRow;
-    [ObservableProperty]
-    private int _pacmanCol;
-    [ObservableProperty]
-    private double _pacmanCanvasLeft;
-    [ObservableProperty]
-    private double _pacmanCanvasTop;
     private int _currentSpriteRow = 0;
     private int _animationFrame = 0;
     private const double CellSize = 45.8;
     private const double OffsetX = 175;
     private const double OffsetY = 15;
     private const double PacmanImageSize = 40;
+    private const string _nameSprite = null;
     private bool _isAutoMode = true;
     
     private DispatcherTimer _movementTimer;
@@ -51,7 +43,7 @@ public partial class PacmanGameViewModel
         {
             Interval = TimeSpan.FromMilliseconds(150)
         };
-        _gameTimer.Tick += (s, e) => UpdateSprites();
+        _gameTimer.Tick += (s, e) => UpdatePacmanSprites();
         _gameTimer.Start();
     }
     
@@ -77,7 +69,7 @@ public partial class PacmanGameViewModel
         _currentSpriteRow = _engine.ChangeDirection(direction, _currentSpriteRow);
         if (oldRow != _currentSpriteRow)
         {
-            UpdateSprites();
+            UpdatePacmanSprites();
         }
 
         GetMotionPacman();
@@ -139,7 +131,7 @@ public partial class PacmanGameViewModel
     /// which change the board space had assigned as CellType.Pacman
     /// _animationFrame is the parr is between 0 - 1 
     /// </summary>
-    private void UpdateSprites()
+    private void UpdatePacmanSprites()
     {
         _animationFrame = (_animationFrame + 1) % 2;
 
@@ -166,6 +158,34 @@ public partial class PacmanGameViewModel
         }
     }
     
+    private void UpdateGohstSprites()
+    {
+        _animationFrame = (_animationFrame + 1) % 2;
+
+        int _size = 16; 
+        foreach (var entity in Board)
+        {
+            int ghostRow = entity.Type switch
+            {
+                EntityType.REDGHOST => 0,
+                EntityType.PINKGHOST => 1,
+                EntityType.CYANGHOST => 2,
+                EntityType.ORANGEGHOST => 3,
+                _ => -1
+            };
+
+            if (ghostRow != -1)
+            {
+                var rect = new PixelRect(
+                    _animationFrame * _size, // Columna 0 o 1 para la animación de pies
+                    ghostRow * _size,        // Fila según el color
+                    _size, _size);
+            
+                entity.CurrentDisplaySprite = _spriteManager.GetSpriteSection("GhostViews.png", rect);
+            }
+        }
+    }
+    
     
     private void UpdatePacmanPosition(int animationFrame, int newRow, int newCol)
     {
@@ -183,17 +203,4 @@ public partial class PacmanGameViewModel
         UpdatePacmanCanvasPosition();
         animationFrame = (animationFrame + 1) % 2;
     }
-    /*[RelayCommand]
-    private void AddPoints(string cellType, int points)
-    {
-        if (cellType is "Cherry")
-        {
-            Score += 100;
-        }
-        else if (cellType is "pellet" || cellType is "energizer")
-        { 
-            Score = _score;
-        }
-        _engine.ScoreStateValidate(Score, _totalScore,HighScore);
-    }*/
 }
