@@ -91,7 +91,9 @@ public class EngineManager
                 return new Board(row, col, EntityType.ENERGIZE);
             
             case 'P':
-                return new Pacman(row, col, EntityType.PACMAN, 40, 40, 10);
+                return new Pacman(row, col, EntityType.PACMAN, 50, 50, 10);
+            case 'G':
+                return new Ghost(row, col, EntityType.GHOST, 40, 40, 10);
             
             case 'E':
             case ' ':

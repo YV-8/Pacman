@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Avalonia.Threading;
 
 namespace PacmanSolution.Models;
 
@@ -17,6 +18,7 @@ public class GameEngine
     private const int DotPoints = 10;
     private const int EnergizerPoints = 50;
     private const int cherryPoints = 100;
+    private string _currentDirection = "RIGHT";
 
     public GameEngine()
     {
@@ -55,7 +57,6 @@ public class GameEngine
 
         }
     }
-
     public void AddGameObject(Entity obj)
     {
         GameObjects.Add(obj);
@@ -64,7 +65,6 @@ public class GameEngine
     {
         GameObjects.Remove(obj); 
     }
-    
     public void Reset()
     {
         GameObjects.Clear();
@@ -97,27 +97,6 @@ public class GameEngine
     /// <param name="newEntity"></param>
     public InteractionResultObject InteractionObjects(Entity newEntity)
     {
-        /*string newCellType ="pellet";
-        bool _ateSomething = false;
-        if (newCell.HasPellet)
-        {
-            newCell.HasPellet = false;
-            Score += 10;
-            _ateSomething = true;
-        }
-        if (newCell.Type is CellType.ENERGIZE)
-        {
-            newCell.Type = CellType.EMPTY;
-            newCellType ="energizer";
-            _ateSomething = true;
-            Score += 50;
-        }
-        if (_ateSomething)
-        {
-            OnElementRemoved?.Invoke(this, 
-                new ElementRemovedEventArgs(newCellType, newRow, newCol));
-            UpdateScoreViewCommand(newCellType);
-        }*/
         var result = new InteractionResultObject { Success = true };
 
         if (newEntity.HasDot) {
@@ -137,6 +116,57 @@ public class GameEngine
         }
         
         return result;
+    }
+    
+    /// <summary>
+    /// Method change the direction if oldRow is different the actual direction
+    /// </summary>
+    /// <param name="direction"></param>
+    public int ChangeDirection(string direction, int _currentSpriteRow)
+    {
+        _currentDirection = direction.ToUpper();
+        switch (_currentDirection)
+        {
+            case "RIGHT":
+                _currentSpriteRow = 0;
+                break;
+            case "LEFT":
+                _currentSpriteRow = 1;
+                break;
+            case "UP":
+                _currentSpriteRow = 2;
+                break;
+            case "DOWN":
+                _currentSpriteRow = 3;
+                break;
+        }
+
+        return _currentSpriteRow;
+    }
+    
+    /// <summary>
+    /// Move Pacman in the current direction
+    /// </summary>
+    public (int row, int col) MovePacman(int PacmanRow, int PacmanCol)
+    {
+        int nextRow = PacmanRow;
+        int nextCol = PacmanCol;
+        switch (_currentDirection)
+        {
+            case "UP": 
+                nextRow--;
+                break;
+            case "DOWN":
+                nextRow++;
+                break;
+            case "LEFT":
+                nextCol--;
+                break;
+            case "RIGHT":
+                nextCol++;
+                break;
+        }
+        return (nextRow, nextCol);
     }
     
     /// <summary>

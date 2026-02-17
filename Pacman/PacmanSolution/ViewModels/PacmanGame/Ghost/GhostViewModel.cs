@@ -1,6 +1,6 @@
 namespace PacmanSolution.ViewModels;
 
-public class GoSettingsViewModel
+public class GhostViewModel
 {
     
 }
