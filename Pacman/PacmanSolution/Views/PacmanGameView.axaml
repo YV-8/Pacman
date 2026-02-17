@@ -62,8 +62,8 @@
                          Canvas.Top="1020" Canvas.Left="720"/>
                 <Rectangle x:Name="RedGhost" Fill="DarkRed "
                            Width = "40" Height="40" ZIndex="10"
-                           Canvas.Top="520" Canvas.Left="720"/> 
-                <!-- <Image x:Name="RedGhost" Source="{Binding PacmanCurrentSprite}"
+                           Canvas.Top="500" Canvas.Left="720"/> 
+                 <!-- <Image x:Name="RedGhost" Source="{Binding PacmanCurrentSprite}"
                        Width="40" Height="40" ZIndex="10"
                        Canvas.Top="520" Canvas.Left="720"/> -->
             </Canvas>

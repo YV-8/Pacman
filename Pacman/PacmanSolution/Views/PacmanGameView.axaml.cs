@@ -83,14 +83,14 @@ public partial class PacmanGameView : UserControl
     {
         if (_gamePageViewModel is null)
             return;
-        UpdatePacmanPosition(_gamePageViewModel.PacmanCanvasLeft, _gamePageViewModel.PacmanCanvasTop);
+        UpdatePacmanPosition(PacmanImage,_gamePageViewModel.PacmanCanvasLeft, _gamePageViewModel.PacmanCanvasTop);
         
         _gamePageViewModel.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName is nameof(PacmanGameViewModel.PacmanCanvasLeft) or 
                 nameof(PacmanGameViewModel.PacmanCanvasTop))
             {
-                UpdatePacmanPosition(_gamePageViewModel.PacmanCanvasLeft, _gamePageViewModel.PacmanCanvasTop);
+                UpdatePacmanPosition(PacmanImage,_gamePageViewModel.PacmanCanvasLeft, _gamePageViewModel.PacmanCanvasTop);
             }
         };
     }
@@ -101,7 +101,7 @@ public partial class PacmanGameView : UserControl
     /// <param name="left"></param>
     /// <param name="top"></param>
     /// <returns></returns>
-    private void UpdatePacmanPosition(double left, double top)
+    private void UpdatePacmanPosition(Image PhotoImagen, double left, double top)
     {
         Canvas.SetLeft(PacmanImage, left);
         Canvas.SetTop(PacmanImage, top);
