@@ -1,23 +1,42 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace PacmanSolution.ViewModels;
 
-public sealed class ScoreBoardPageViewModel:INotifyPropertyChanged
+public partial class ScoreBoardPageViewModel:ObservableObject
 {
     public event PropertyChangedEventHandler? PropertyChanged;
+    [ObservableProperty]
+    private int _score;
+    [ObservableProperty]
+    private int _highScore;
+    private readonly int _totalScore=2590;
+    private int _totalScoreCherry=1500;
+    private int _scoreCherry=0;
 
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    public ScoreBoardPageViewModel()
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        Score = 0;
+        HighScore = 0;
     }
 
-    private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    public void amount(int result)
     {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
+        Score += result;
+        if (Score > HighScore)
+        {
+            HighScore = Score;
+            Console.WriteLine($"{result} puntos! Score: {Score}");
+        }
+
+        if (HighScore > _totalScore)
+        {
+            ///todas las pilldoras comidas
+            Console.WriteLine("Winner");
+        }
+        
     }
 }

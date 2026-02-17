@@ -14,10 +14,12 @@ public partial class PacmanGameViewModel: ObservableObject
     private ManagePageChange _navigation;
     [ObservableProperty]
     private IImage? _pacmanCurrentSprite;
+    [ObservableProperty]
+    private ScoreBoardPageViewModel _scoreViewModel = new();
+    private readonly SoundManager _soundManager = new ();
+    private readonly SpriteManager _spriteManager = new ();
     private readonly GameEngine _engine = new();
     private EngineManager _engineManager;
-    private SoundManager _soundManager = new ();
-    private SpriteManager _spriteManager = new ();
     private DispatcherTimer _gameTimer;
     private DispatcherTimer? _gameLoopTimer;
     private ObservableCollection<Entity> _board = new();
@@ -35,8 +37,6 @@ public partial class PacmanGameViewModel: ObservableObject
         
         _engineManager.BuildGameBoard(Board);
         InitializePacmanPosition();
-        Score = 0;
-        HighScore = 0;
         StartGameLoop();
         StartMovementTimer();
     }
@@ -47,9 +47,9 @@ public partial class PacmanGameViewModel: ObservableObject
         Navigation.ChangePage(target);
     }
     [RelayCommand]
-    public void ToggleAudioCommand( bool isChecked)
+    private void ToggleAudioCommand( bool isChecked)
     {
-        string path = "PacmanTheme";
+        var path = "PacmanTheme";
         if (isChecked)
         {
             _soundManager.PlaySound(path,true);
@@ -60,7 +60,7 @@ public partial class PacmanGameViewModel: ObservableObject
         }
     }
     /// <summary>
-    /// Detiene y limpia los timers
+    /// stop and clean the timers
     /// </summary>
     public void CleanupTimers()
     {
@@ -68,7 +68,9 @@ public partial class PacmanGameViewModel: ObservableObject
         _movementTimer?.Stop();
         _gameTimer?.Stop();
     }
-    
+    /// <summary>
+    /// Resume game with time 
+    /// </summary>
     public void ResumeGame()
     {
         _gameTimer?.Start();
@@ -83,7 +85,7 @@ public partial class PacmanGameViewModel: ObservableObject
         _gameTimer?.Stop();
         _movementTimer?.Stop();
     }
-    public void UpdatePacmanCanvasPosition()
+    private void UpdatePacmanCanvasPosition()
     {
         var (centerX, centerY) = GetCellCenter(PacmanRow, PacmanCol);
         PacmanCanvasLeft = centerX - (PacmanImageSize / 2);
