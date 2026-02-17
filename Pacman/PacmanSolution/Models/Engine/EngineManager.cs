@@ -17,6 +17,7 @@ public class EngineManager
     private Pacman _pacman;
     private EntityType _entityType;
     private Board _boardLayout;
+    private EntityType _ghostEntityType;
     public int BoardCol
     {
         get => _boardCol;
@@ -74,6 +75,7 @@ public class EngineManager
 
     private Entity CreateCellFromChar(int row, int col, char symbol)
     {
+        int ghostCount = 0;
         switch (symbol)
         {
             case 'W':
@@ -93,8 +95,8 @@ public class EngineManager
             case 'P':
                 return new Pacman(row, col, EntityType.PACMAN, 50, 50, 10);
             case 'G':
-                return new Ghost(row, col, EntityType.GHOST, 40, 40, 10);
-            
+                _ghostEntityType = GetTypeGhost(ghostCount + 1);
+                return new Ghost(row, col, _ghostEntityType, 40, 40, 10);
             case 'E':
             case ' ':
                 return new Board(row, col, EntityType.EMPTY);
@@ -102,5 +104,23 @@ public class EngineManager
             default:
                 return new Board(row, col, EntityType.EMPTY);
         }
+    }
+
+    private EntityType GetTypeGhost(int ghostCount)
+    {
+        ghostCount++;
+        switch(ghostCount)
+        {
+            case 1:
+                return EntityType.REDGHOST;
+            case 2:
+                return EntityType.CYANGHOST;  
+            case 3:
+                return EntityType.PINKGHOST;
+            case 4:
+                return EntityType.ORANGEGHOST;
+            default:
+                return EntityType.REDGHOST;
+        };
     }
 }

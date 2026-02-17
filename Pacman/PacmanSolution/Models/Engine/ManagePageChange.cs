@@ -20,7 +20,7 @@ public partial class ManagePageChange: ObservableObject
                 CurrentPage = new ScoreBoardPageViewModel();
                 break;
             case"GoSettingsMenu":
-                CurrentPage = new GhostViewModel();
+                CurrentPage = new GoSettingViewModel();
                 break;
             case"Menu":
                 CurrentPage = new MainWindowViewModel();
