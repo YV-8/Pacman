@@ -12,10 +12,12 @@
     <DockPanel LastChildFill="True">
         <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *, Auto, *, Auto" Margin="10">
             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                <TextBlock Classes="ButtonOptGame" Text="{Binding Score, 
-                StringFormat='SCORE: {0}'}" FontSize="18"/>
-                <TextBlock Classes="ButtonOptGame" Text="{Binding HighScore, 
-                StringFormat='HI-SCORE: {0}'}" FontSize="14" Foreground="White"/>
+                <TextBlock Classes="ButtonOptGame"  FontSize="18"
+                           Text="{Binding ScoreViewModel.Score,
+                            StringFormat='SCORE: {0}'}"/>
+                <TextBlock Classes="ButtonOptGame" FontSize="14" Foreground="White"
+                           Text="{Binding ScoreViewModel.HighScore,
+                            StringFormat='HI-SCORE: {0}'}"/>
             </StackPanel>
 
             <TextBlock Classes="ButtonOptGame" Text="PACMAN" FontSize="45"
@@ -56,8 +58,14 @@
                        IsHitTestVisible="False"
                        Canvas.Left="-30"/>
                 <Image x:Name="PacmanImage" Source="{Binding PacmanCurrentSprite}"
-                         Width="35" Height="35" ZIndex="10"
+                         Width="40" Height="40" ZIndex="10"
                          Canvas.Top="1020" Canvas.Left="720"/>
+                <Rectangle x:Name="RedGhost" Fill="DarkRed "
+                           Width = "40" Height="40" ZIndex="10"
+                           Canvas.Top="520" Canvas.Left="720"/> 
+                <!-- <Image x:Name="RedGhost" Source="{Binding PacmanCurrentSprite}"
+                       Width="40" Height="40" ZIndex="10"
+                       Canvas.Top="520" Canvas.Left="720"/> -->
             </Canvas>
         </Viewbox>
     </DockPanel>

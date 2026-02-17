@@ -33,16 +33,16 @@ public partial class PacmanGameView : UserControl
             switch (e.Key)
             {
                 case Key.Up or Key.W:
-                    vm.ChangeDirection("UP");
+                    vm.GetDirection("UP");
                     break;
                 case Key.Down or  Key.S:  
-                    vm.ChangeDirection("DOWN"); 
+                    vm.GetDirection("DOWN"); 
                     break;
                 case Key.Left or  Key.A: 
-                    vm.ChangeDirection("LEFT"); 
+                    vm.GetDirection("LEFT"); 
                     break;
                 case Key.Right or Key.D: 
-                    vm.ChangeDirection("RIGHT"); 
+                    vm.GetDirection("RIGHT"); 
                     break;
             }
         }
@@ -106,12 +106,7 @@ public partial class PacmanGameView : UserControl
         Canvas.SetLeft(PacmanImage, left);
         Canvas.SetTop(PacmanImage, top);
     }
-
-    /// <summary>
-    ///  DrawBoard is who generate the wall board
-    /// cellsize is the size each cell in the board
-    /// </summary>
-    /// <param name="board"></param>
+    
     private void DrawBoard(ObservableCollection<Entity> board)
     {
         if (PacmanCanvas is null || board is null) return;
@@ -202,7 +197,7 @@ public partial class PacmanGameView : UserControl
             .OfType<Ellipse>()
             .FirstOrDefault(e => e.Tag?.ToString() == tag);
         
-        if (pelletToRemove != null)
+        if (pelletToRemove is not null)
         {
             PacmanCanvas.Children.Remove(pelletToRemove);
         }
