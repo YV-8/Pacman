@@ -8,6 +8,8 @@ public class Pacman: Entity
 
     public override void Update(double deltaTime)
     {
-        throw new System.NotImplementedException();
+        var (centerX, centerY) = GetCellCenter(Row, Col);
+        CanvasLeft = centerX - (Width / 2);
+        CanvasTop = centerY - (Height / 2);
     }
 }
