@@ -2,7 +2,72 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:PacmanSolution.ViewModels"
+             xmlns:converters="using:PacmanSolution.Models.Engine"
+             xmlns:engine="clr-namespace:PacmanSolution.Models.Engine"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="PacmanSolution.Views.PacmanView">
-    Welcome to Avalonia!
+             x:Class="PacmanSolution.Views.PacmanView"
+             x:DataType="vm:GameViewModel">
+    <UserControl.Resources>
+        <engine:IsNotNullConverter x:Key="IsNotNullConverter"/>
+        <engine:SpriteCropConverter x:Key="SpriteCropConverter"/>
+    </UserControl.Resources>
+    <Canvas x:Name="PacmanCanvas" Width="2000" Height="1700" Background="Black">
+        <Image Source="avares://PacmanSolution/Assets/Imagen/Board/Board.png"
+               Width="1680" Height="1400" ZIndex="1" Opacity="0.8"
+               IsHitTestVisible="False" Canvas.Left="-30"/>
+        
+        <ItemsControl x:Name="GameObjectsHost"
+                      Classes="GameObjectsHost"
+                      x:CompileBindings="False"
+                      ItemsSource="{Binding GameObjects}"
+                      Width="2000"
+                      Height="1700"
+                      Canvas.Left="0"
+                      Canvas.Top="0">
+
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas Width="2000" Height="1700"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <!-- Posiciona cada objeto en el Canvas usando X, Y y ZIndex del modelo -->
+            <ItemsControl.Styles>
+                <Style Selector="ItemsControl.GameObjectsHost ContentPresenter">
+                    <Setter Property="Canvas.Left"   Value="{Binding DataContext.X,      RelativeSource={RelativeSource Mode=Self}}"/>
+                    <Setter Property="Canvas.Top"    Value="{Binding DataContext.Y,      RelativeSource={RelativeSource Mode=Self}}"/>
+                    <Setter Property="ZIndex" Value="{Binding DataContext.Zindex, RelativeSource={RelativeSource Mode=Self}}"/>
+                </Style>
+            </ItemsControl.Styles>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Panel Width="{Binding Width}" Height="{Binding Height}">
+
+                        <!-- Puntos / pellets: elipse con color sólido -->
+                        <Ellipse Width="{Binding Width}"
+                                 Height="{Binding Height}"
+                                 Fill="{Binding FillColor}"
+                                 IsVisible="{Binding FillColor, 
+                                 Converter={StaticResource IsNotNullConverter}}"/>
+
+                        <!-- Pacman, fantasmas, paredes con sprite sheet recortado -->
+                        <Image Width="{Binding Width}"
+                               Height="{Binding Height}"
+                               IsVisible="{Binding Sprite, Converter={StaticResource IsNotNullConverter}}"
+                               RenderOptions.BitmapInterpolationMode="None">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource SpriteCropConverter}">
+                                    <Binding Path="Sprite"/>
+                                    <Binding Path="SourceRect"/>
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </Panel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Canvas>
+    
 </UserControl>
