@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using PacmanSolution.ViewModels;
 
 namespace PacmanSolution.Models;
 
@@ -75,28 +76,43 @@ public class EngineManager
 
     private Entity CreateCellFromChar(int row, int col, char symbol)
     {
+        double EntityWidth = GameConfig.CellWidth;
+        double EntityHeight = GameConfig.CellHeight;
         int ghostCount = 0;
         switch (symbol)
         {
             case 'W':
-                return new Board(row, col, EntityType.WALL);
+                return new Board(row, col, EntityType.WALL){ Width = EntityWidth, Height = EntityHeight };;
             
             case '-':
                 return new Board(row, col, EntityType.DOOR);
             
             case '.':
-                var cellWithPellet = new Board(row, col, EntityType.EMPTY);
-                cellWithPellet.HasDot = true;
-                return cellWithPellet;
+                var dot = new Board(row, col, EntityType.EMPTY)
+                {
+                    HasDot = true,
+                    // Hacemos los puntos un poco más pequeños para que
+                    // se adapten mejor al tamaño de la celda.
+                    Width = 4,
+                    Height = 4
+                };
+                dot.UpdateCanvasPosition();
+                return dot;
             
             case 'o':
-                return new Board(row, col, EntityType.ENERGIZE);
-            
+                var energizer = new Board(row, col, EntityType.ENERGIZE)
+                {
+                    // Energizadores también un poco más pequeños que antes.
+                    Width = 10,
+                    Height = 10
+                };
+                energizer.UpdateCanvasPosition();
+                return energizer;
             case 'P':
-                return new Pacman(row, col, EntityType.PACMAN, 50, 50, 10);
+                return new Pacman(row, col, EntityType.PACMAN, 25 , 25, 10);
             case 'G':
                 _ghostEntityType = GetTypeGhost(ghostCount + 1);
-                return new Ghost(row, col, _ghostEntityType, 40, 40, 10);
+                return new Ghost(row, col, _ghostEntityType, 25 , 25, 10);
             case 'E':
             case ' ':
                 return new Board(row, col, EntityType.EMPTY);

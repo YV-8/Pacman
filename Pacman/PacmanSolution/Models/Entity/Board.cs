@@ -1,9 +1,11 @@
+using PacmanSolution.ViewModels;
+
 namespace PacmanSolution.Models;
 
 public class Board:Entity
 {
     public Board(int row, int col, EntityType type) 
-        : base(row, col, type, 46.6, 46.6, 1) 
+        : base(row, col, type, GameConfig.CellWidth, GameConfig.CellHeight, 1) 
     { }
 
     public override void Update(double deltaTime) 
@@ -28,6 +30,7 @@ public class Board:Entity
         "E     .EE W GGG  W EE.     E",
         "WWWWWW.WW W      W WW.WWWWWW",
         "EEEEEW.WW WWWWWWWW WW.WEEEEE",
+        "EEEEEW.WW          WW.WEEEEE",
         "EEEEEW.WW          WW.WEEEEE",
         "WWWWWW.WW WWWWWWWW WW.WWWWWW",
         "W............WW............W",
