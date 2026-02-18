@@ -3,19 +3,22 @@ using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using PacmanSolution.ViewModels;
 
 namespace PacmanSolution.Models;
 
+/// <summary>
+/// Sincroniza el tablero lógico con los GameObjects visuales.
+/// Usa GameConfig para que el mapa completo (28×31) quepa en el área de juego sin cortar.
+/// </summary>
 public class GameBoardSyncService
 {
-    private const double CellSize = 60.0;
-    private const double DotSize  = 10.0;
-    private const double EntitySize = 40.0;
+    private const double DotSize = 5.0;
+    private const double EntitySize = 18.0;
 
-    // Mapeo Entity → su GameObject visual correspondiente
     private readonly Dictionary<Entity, GameObject> _entityToVisual = new();
-    
     private readonly ObservableCollection<GameObject> _visualObjects;
+    private GameObject? _pacmanVisual;
 
     public GameBoardSyncService(ObservableCollection<GameObject> visualObjects)
     {
@@ -23,36 +26,48 @@ public class GameBoardSyncService
     }
 
     /// <summary>
-    /// Recorre el Board completo y crea un GameObject por cada Entity relevante
+    /// Recorre el Board completo y crea un GameObject por cada Entity relevante.
+    /// Pacman tiene un único visual; su posición se actualiza con UpdatePacmanPosition.
     /// </summary>
     public void BuildFromBoard(ObservableCollection<Entity> board)
     {
         _visualObjects.Clear();
         _entityToVisual.Clear();
+        _pacmanVisual = null;
 
         foreach (var entity in board)
         {
-            var visual = CreateVisualForEntity(entity);
-            if (visual is null) continue;
+            if (entity.Type == EntityType.PACMAN)
+            {
+                var visual = CreateVisualForEntity(entity);
+                if (visual is null) continue;
+                _pacmanVisual = visual;
+                _visualObjects.Add(visual);
+                continue;
+            }
 
-            _entityToVisual[entity] = visual;
-            _visualObjects.Add(visual);
+            var v = CreateVisualForEntity(entity);
+            if (v is null) continue;
 
-            // Suscribirse a cambios de la entidad para sincronizar
+            _entityToVisual[entity] = v;
+            _visualObjects.Add(v);
             entity.PropertyChanged += (_, args) => OnEntityChanged(entity, args.PropertyName);
         }
     }
 
-    /// <summary>
-    /// Llama esto cuando Pacman se mueve para actualizar su visual
-    /// </summary>
-    public void UpdatePacmanVisual(Entity pacmanEntity, Bitmap? sprite, Rect sourceRect)
+    /// <summary>Actualiza la posición del visual de Pacman cuando se mueve (teclas).</summary>
+    public void UpdatePacmanPosition(int row, int col)
     {
-        if (!_entityToVisual.TryGetValue(pacmanEntity, out var visual)) return;
-        visual.X          = pacmanEntity.Col * CellSize;
-        visual.Y          = pacmanEntity.Row * CellSize;
-        visual.Sprite     = sprite;
-        visual.SourceRect = sourceRect;
+        if (_pacmanVisual is null) return;
+        _pacmanVisual.X = col * GameConfig.CellWidth;
+        _pacmanVisual.Y = row * GameConfig.CellHeight;
+    }
+
+    /// <summary>Actualiza el sprite del visual de Pacman (Bitmap o CroppedBitmap, ambos usables como IImage).</summary>
+    public void UpdatePacmanSprite(object? sprite)
+    {
+        if (_pacmanVisual is null) return;
+        _pacmanVisual.Sprite = sprite as Avalonia.Media.IImage;
     }
 
     /// <summary>
@@ -70,8 +85,8 @@ public class GameBoardSyncService
         {
             EntityType.DOT or EntityType.EMPTY when entity.HasDot => new GameObject
             {
-                X         = entity.Col * CellSize + (CellSize - DotSize) / 2,
-                Y         = entity.Row * CellSize + (CellSize - DotSize) / 2,
+                X         = entity.Col * GameConfig.CellWidth + (GameConfig.CellWidth - DotSize) / 2,
+                Y         = entity.Row * GameConfig.CellHeight + (GameConfig.CellHeight - DotSize) / 2,
                 Width     = DotSize,
                 Height    = DotSize,
                 Zindex    = 5,
@@ -79,8 +94,8 @@ public class GameBoardSyncService
             },
             EntityType.ENERGIZE => new GameObject
             {
-                X         = entity.Col * CellSize + (CellSize - DotSize * 2) / 2,
-                Y         = entity.Row * CellSize + (CellSize - DotSize * 2) / 2,
+                X         = entity.Col * GameConfig.CellWidth + (GameConfig.CellWidth - DotSize * 2) / 2,
+                Y         = entity.Row * GameConfig.CellHeight + (GameConfig.CellHeight - DotSize * 2) / 2,
                 Width     = DotSize * 2,
                 Height    = DotSize * 2,
                 Zindex    = 5,
@@ -88,21 +103,21 @@ public class GameBoardSyncService
             },
             EntityType.PACMAN => new GameObject
             {
-                X      = entity.Col * CellSize,
-                Y      = entity.Row * CellSize,
+                X      = entity.Col * GameConfig.CellWidth,
+                Y      = entity.Row * GameConfig.CellHeight,
                 Width  = EntitySize,
                 Height = EntitySize,
                 Zindex = 10
             },
             EntityType.REDGHOST => new GameObject
             {
-                X      = entity.Col * CellSize,
-                Y      = entity.Row * CellSize,
+                X      = entity.Col * GameConfig.CellWidth,
+                Y      = entity.Row * GameConfig.CellHeight,
                 Width  = EntitySize,
                 Height = EntitySize,
                 Zindex = 9
             },
-            _ => null // WALL, DOOR, etc. no necesitan visual en el ItemsControl
+            _ => null
         };
     }
 
@@ -116,11 +131,11 @@ public class GameBoardSyncService
                 HideDot(entity);
                 break;
             case nameof(Entity.Row) or nameof(Entity.Col):
-                visual.X = entity.Col * CellSize;
-                visual.Y = entity.Row * CellSize;
+                visual.X = entity.Col * GameConfig.CellWidth;
+                visual.Y = entity.Row * GameConfig.CellHeight;
                 break;
             case nameof(Entity.CurrentDisplaySprite):
-                visual.Sprite = entity.CurrentDisplaySprite as Bitmap;
+                visual.Sprite = entity.CurrentDisplaySprite;
                 break;
         }
     }

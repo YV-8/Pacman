@@ -14,51 +14,42 @@ public partial class PacmanView : UserControl
     {
         InitializeComponent();
         KeyDown += OnKeyDown;
-        Loaded += (s, e) => this.Focus();
+        Loaded += OnLoaded;
     }
-    
+
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
-        if (DataContext is GameViewModel vm)
+        if (_pacmanViewModel is null) return;
+        switch (e.Key)
         {
-            switch (e.Key)
-            {
-                case Key.Up or Key.W:
-                    _pacmanViewModel.GetDirection("UP");
-                    break;
-                case Key.Down or  Key.S:  
-                    _pacmanViewModel.GetDirection("DOWN"); 
-                    break;
-                case Key.Left or  Key.A: 
-                    _pacmanViewModel.GetDirection("LEFT"); 
-                    break;
-                case Key.Right or Key.D: 
-                    _pacmanViewModel.GetDirection("RIGHT"); 
-                    break;
-            }
+            case Key.Up or Key.W:
+                _pacmanViewModel.GetDirection("UP");
+                break;
+            case Key.Down or Key.S:
+                _pacmanViewModel.GetDirection("DOWN");
+                break;
+            case Key.Left or Key.A:
+                _pacmanViewModel.GetDirection("LEFT");
+                break;
+            case Key.Right or Key.D:
+                _pacmanViewModel.GetDirection("RIGHT");
+                break;
         }
     }
-    
-    /// <summary>
-    /// the OnLoaded is a method that in charge
-    /// of call the DrawBoard
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
         this.Focus();
-    
-        this.Unloaded += (s, e) =>
-        {
-            if (DataContext is GameViewModel viewModel)
-            {
-                viewModel.PauseGame();
-            }
-        };
         if (DataContext is GameViewModel gamevm)
         {
             _gamePageViewModel = gamevm;
+            _pacmanViewModel = gamevm.Pacman;
+            _pacmanViewModel.UpdatePacmanSprites(); // Aplicar sprite cuando la vista ya está en el árbol
         }
+        Unloaded += (_, _) =>
+        {
+            if (DataContext is GameViewModel vm)
+                vm.PauseGame();
+        };
     }
 }

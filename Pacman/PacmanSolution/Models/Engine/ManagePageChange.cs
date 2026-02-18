@@ -25,6 +25,10 @@ public partial class ManagePageChange: ObservableObject
             case"Menu":
                 CurrentPage = new MainWindowViewModel();
                 break;
+            case "Exit":
+                Environment.Exit(0);
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException(nameof(initialsPage), initialsPage, null);
         }

@@ -7,28 +7,30 @@
              xmlns:engine="clr-namespace:PacmanSolution.Models.Engine"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="PacmanSolution.Views.PacmanView"
-             x:DataType="vm:GameViewModel">
+             x:DataType="vm:GameViewModel"
+             Focusable="True">
     <UserControl.Resources>
         <engine:IsNotNullConverter x:Key="IsNotNullConverter"/>
         <engine:SpriteCropConverter x:Key="SpriteCropConverter"/>
     </UserControl.Resources>
-    <Canvas x:Name="PacmanCanvas" Width="2000" Height="1700" Background="Black">
+    <!-- Tamaño = GameConfig.GameWidth x GameConfig.GameHeight (840x620) para que el mapa completo quepa sin cortar abajo -->
+    <Canvas x:Name="PacmanCanvas" Width="840" Height="620" Background="Black" ClipToBounds="True">
         <Image Source="avares://PacmanSolution/Assets/Imagen/Board/Board.png"
-               Width="1680" Height="1400" ZIndex="1" Opacity="0.8"
-               IsHitTestVisible="False" Canvas.Left="-30"/>
+               Width="840" Height="620" ZIndex="0" 
+               IsHitTestVisible="False" Canvas.Left="0" Canvas.Top="0"/>
         
         <ItemsControl x:Name="GameObjectsHost"
                       Classes="GameObjectsHost"
                       x:CompileBindings="False"
                       ItemsSource="{Binding GameObjects}"
-                      Width="2000"
-                      Height="1700"
+                      Width="840"
+                      Height="620"
                       Canvas.Left="0"
                       Canvas.Top="0">
 
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas Width="2000" Height="1700"/>
+                    <Canvas Width="840" Height="620"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
 
@@ -43,27 +45,21 @@
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Panel Width="{Binding Width}" Height="{Binding Height}">
-
-                        <!-- Puntos / pellets: elipse con color sólido -->
+                    <Panel Width="{Binding Width}" Height="{Binding Height}"
+                           MaxWidth="{Binding Width}" MaxHeight="{Binding Height}"
+                           HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <!-- Puntos / pellets o fallback Pacman (FillColor) -->
                         <Ellipse Width="{Binding Width}"
                                  Height="{Binding Height}"
                                  Fill="{Binding FillColor}"
                                  IsVisible="{Binding FillColor, 
                                  Converter={StaticResource IsNotNullConverter}}"/>
-
-                        <!-- Pacman, fantasmas, paredes con sprite sheet recortado -->
+                        <!-- Pacman / fantasmas: Sprite es IImage (Bitmap o CroppedBitmap) -->
                         <Image Width="{Binding Width}"
                                Height="{Binding Height}"
+                               Source="{Binding Sprite}"
                                IsVisible="{Binding Sprite, Converter={StaticResource IsNotNullConverter}}"
-                               RenderOptions.BitmapInterpolationMode="None">
-                            <Image.Source>
-                                <MultiBinding Converter="{StaticResource SpriteCropConverter}">
-                                    <Binding Path="Sprite"/>
-                                    <Binding Path="SourceRect"/>
-                                </MultiBinding>
-                            </Image.Source>
-                        </Image>
+                               RenderOptions.BitmapInterpolationMode="None"/>
                     </Panel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

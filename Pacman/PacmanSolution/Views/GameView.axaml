@@ -46,16 +46,14 @@
                           Foreground="SkyBlue"/>
             </Button>
         </Panel>
-        <!--684*753 
-        700*800 seria mejor-->
+        <!-- Área de juego: PacmanView tiene tamaño fijo (840×620) para que el mapa completo quepa.
+             Viewbox escala para que quepa en el espacio restante sin cortar la parte de abajo. -->
         <Viewbox Stretch="Uniform">
             <ContentControl Content="{Binding CurrentSubView}">
                 <ContentControl.DataTemplates>
-                    
                     <DataTemplate DataType="vm:GameViewModel">
                         <views:PacmanView />
                     </DataTemplate>
-
                 </ContentControl.DataTemplates>
             </ContentControl>
         </Viewbox>

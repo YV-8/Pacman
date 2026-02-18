@@ -45,10 +45,13 @@ public partial class GameViewModel: ObservableObject
         _syncService = new GameBoardSyncService(_engine.VisualObjects);
         _syncService.BuildFromBoard(Board);
         _movementTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
-        Pacman = new PacmanViewModel(_engine, Board,_movementTimer,Score);
+        Pacman = new PacmanViewModel(_engine, Board, _movementTimer, Score, _syncService);
+        Pacman.UpdatePacmanSprites(); // Sprite inicial para que Pacman se vea
         Ghosts = new GhostViewModel(Board);
         StartGameLoop();
         CurrentSubView = this;
+        // Asegurar sprite en UI cuando la vista ya esté cargada (por si el binding se actualiza después)
+        Avalonia.Threading.Dispatcher.UIThread.Post(() => Pacman.UpdatePacmanSprites(), Avalonia.Threading.DispatcherPriority.Loaded);
     }
     
     [RelayCommand]

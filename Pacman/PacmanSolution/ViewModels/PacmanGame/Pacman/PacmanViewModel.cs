@@ -20,6 +20,7 @@ public partial class PacmanViewModel:ObservableObject
     [ObservableProperty] private Models.Pacman _pacmanModel;
     private readonly GameEngine _engine;
     private readonly ObservableCollection<Entity> _board;
+    private readonly GameBoardSyncService _syncService;
     private readonly SpriteManager _spriteManager = new ();
     private DispatcherTimer? _animationTimer;
     private readonly DispatcherTimer? _movementTimer;
@@ -53,13 +54,20 @@ public partial class PacmanViewModel:ObservableObject
             OnPropertyChanged(nameof(Col)); } 
     }
     public PacmanViewModel(GameEngine engine, ObservableCollection<Entity> board,
-        DispatcherTimer movementTimer,ScoreBoardPageViewModel score)
+        DispatcherTimer movementTimer, ScoreBoardPageViewModel score,
+        GameBoardSyncService syncService)
     {
         _engine = engine;
         _board = board;
         _movementTimer = movementTimer;
+        _syncService = syncService;
         Score = score;
-        PacmanModel = new Models.Pacman(0, 0, EntityType.PACMAN, PacmanImageSize, PacmanImageSize, 10);
+        var pacmanCell = board.FirstOrDefault(e => e.Type == EntityType.PACMAN);
+        int startRow = pacmanCell?.Row ?? 0;
+        int startCol = pacmanCell?.Col ?? 0;
+        _row = startRow;
+        _col = startCol;
+        PacmanModel = new Models.Pacman(startRow, startCol, EntityType.PACMAN, PacmanImageSize, PacmanImageSize, 10);
     }
     
     
@@ -155,14 +163,7 @@ public partial class PacmanViewModel:ObservableObject
         if (newSprite is not null)
         {
             PacmanCurrentSprite = newSprite;
-            
-            foreach (var entity in _board)
-            {
-                if (entity.Type == EntityType.PACMAN)
-                {
-                    entity.CurrentDisplaySprite = newSprite;
-                }
-            }
+            _syncService.UpdatePacmanSprite(newSprite);
         }
     }
     
@@ -179,6 +180,7 @@ public partial class PacmanViewModel:ObservableObject
         newCell.Type = EntityType.PACMAN;
         Row = newRow;
         Col = newCol;
+        _syncService.UpdatePacmanPosition(newRow, newCol);
         animationFrame = (animationFrame + 1) % 2;
     }
     

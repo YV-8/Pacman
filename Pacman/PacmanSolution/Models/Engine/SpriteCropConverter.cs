@@ -2,36 +2,43 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Avalonia;
+using Avalonia.Data.Converters;
 using Avalonia.Media.Imaging;
 
 namespace PacmanSolution.Models.Engine;
 
-public class SpriteCropConverter
+public class SpriteCropConverter : IMultiValueConverter
 {
     public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
     {
-        // values[0] = Bitmap? Sprite
-        // values[1] = Rect SourceRect
-        if (values[0] is not Bitmap bitmap) return null;
-        if (values[1] is not Rect sourceRect) return null;
-        if (sourceRect == default) return bitmap; // si no hay rect, devuelve el sprite completo
-
-        try
+        if (values.Count != 2)
         {
-            // Recorta el sprite sheet según el SourceRect
-            var pixelSize = new PixelSize((int)sourceRect.Width, (int)sourceRect.Height);
-            var cropped   = new RenderTargetBitmap(pixelSize);
-
-            using var ctx = cropped.CreateDrawingContext();
-            ctx.DrawImage(bitmap,
-                sourceRect,                                          // origen en el sprite sheet
-                new Rect(0, 0, sourceRect.Width, sourceRect.Height)); // destino
-            
-            return cropped;
+            return null;
         }
-        catch
+
+        if (values[0] is not Bitmap bitmap)
+        {
+            return null;
+        }
+
+        if (values[1] is not Avalonia.Rect sourceRect)
         {
             return bitmap;
         }
+
+        if (sourceRect.Width > 0 && sourceRect.Height > 0)
+        {
+            return new CroppedBitmap(bitmap, new Avalonia.PixelRect(
+                (int)sourceRect.X,
+                (int)sourceRect.Y,
+                (int)sourceRect.Width,
+                (int)sourceRect.Height));
+        }
+
+        return bitmap;
+    }
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
     }
 }
