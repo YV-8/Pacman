@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:PacmanSolution.ViewModels"
-             xmlns:converters="using:PacmanSolution.Models.Engine"
              xmlns:engine="clr-namespace:PacmanSolution.Models.Engine"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="PacmanSolution.Views.PacmanView"
@@ -13,9 +12,8 @@
         <engine:IsNotNullConverter x:Key="IsNotNullConverter"/>
         <engine:SpriteCropConverter x:Key="SpriteCropConverter"/>
     </UserControl.Resources>
-    <!-- Tamaño = GameConfig.GameWidth x GameConfig.GameHeight (840x620) para que el mapa completo quepa sin cortar abajo -->
     <Canvas x:Name="PacmanCanvas" Width="840" Height="620" Background="Black" ClipToBounds="True">
-        <Image Source="avares://PacmanSolution/Assets/Imagen/Board/Board.png"
+        <Image Source="avares://PacmanSolution/Assets/Imagen/Board/Board2.png"
                Width="840" Height="620" ZIndex="0" 
                IsHitTestVisible="False" Canvas.Left="0" Canvas.Top="0"/>
         
@@ -25,8 +23,8 @@
                       ItemsSource="{Binding GameObjects}"
                       Width="840"
                       Height="620"
-                      Canvas.Left="0"
-                      Canvas.Top="0">
+                      Canvas.Left="140"
+                      Canvas.Top="3">
 
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -47,18 +45,14 @@
                 <DataTemplate>
                     <Panel Width="{Binding Width}" Height="{Binding Height}"
                            MaxWidth="{Binding Width}" MaxHeight="{Binding Height}"
-                           HorizontalAlignment="Left" VerticalAlignment="Top">
+                           HorizontalAlignment="Center" VerticalAlignment="Top">
                         <!-- Puntos / pellets o fallback Pacman (FillColor) -->
-                        <Ellipse Width="{Binding Width}"
-                                 Height="{Binding Height}"
-                                 Fill="{Binding FillColor}"
-                                 IsVisible="{Binding FillColor, 
+                        <Ellipse Width="{Binding Width}" Height="{Binding Height}"
+                                 Fill="{Binding FillColor}" IsVisible="{Binding IsActive, 
                                  Converter={StaticResource IsNotNullConverter}}"/>
                         <!-- Pacman / fantasmas: Sprite es IImage (Bitmap o CroppedBitmap) -->
-                        <Image Width="{Binding Width}"
-                               Height="{Binding Height}"
-                               Source="{Binding Sprite}"
-                               IsVisible="{Binding Sprite, Converter={StaticResource IsNotNullConverter}}"
+                        <Image Width="{Binding Width}" Height="{Binding Height}"
+                               Source="{Binding Sprite}" IsVisible="{Binding Sprite, Converter={StaticResource IsNotNullConverter}}"
                                RenderOptions.BitmapInterpolationMode="None"/>
                     </Panel>
                 </DataTemplate>
