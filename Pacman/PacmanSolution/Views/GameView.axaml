@@ -3,8 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:PacmanSolution.ViewModels"
+             xmlns:views="clr-namespace:PacmanSolution.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
-             x:Class="PacmanSolution.Views.PacmanGameView"
+             x:Class="PacmanSolution.Views.GameView"
              x:DataType="vm:GameViewModel"
              Background="Black"
              Focusable="True">
@@ -48,32 +49,15 @@
         <!--684*753 
         700*800 seria mejor-->
         <Viewbox Stretch="Uniform">
-            <Canvas x:Name="PacmanCanvas" 
-                    Width="2000" Height="1700"
-                    Background="Black">
-                <Image Source="avares://PacmanSolution/Assets/Imagen/Board/Board.png"
-                       Width="1680" Height="1400"
-                       ZIndex="1"
-                       Opacity="0.8"
-                       IsHitTestVisible="False"
-                       Canvas.Left="-30"/>
-                <Image x:Name="PacmanImage" Source="{Binding Pacman.PacmanCurrentSprite}"
-                         Width="40" Height="40" ZIndex="10"
-                         Canvas.Top="{Binding Pacman.PacmanModel.CanvasTop}"
-                         Canvas.Left="{Binding Pacman.PacmanModel.CanvasLeft}"/>
-                
-                <Rectangle x:Name="RedGhost" Fill="DarkRed "
-                           Width = "40" Height="40" ZIndex="10"
-                           Canvas.Top="500" Canvas.Left="720"/> 
-                <Image x:Name="RedImageGhost" Source="{Binding Ghosts.RedGhostSprite}"
-                       Width="40" Height="40" ZIndex="10"
-                       Canvas.Left="{Binding Ghosts.RedGhostLeft}" 
-                       Canvas.Top="{Binding Ghosts.RedGhostTop}"/>
+            <ContentControl Content="{Binding CurrentSubView}">
+                <ContentControl.DataTemplates>
+                    
+                    <DataTemplate DataType="vm:GameViewModel">
+                        <views:PacmanView />
+                    </DataTemplate>
 
-                <Image x:Name="PinkGhost" Source="{Binding Ghosts.PinkGhostSprite}"
-                       Width="40" Height="40" ZIndex="10"
-                       Canvas.Left="820" Canvas.Top="680"/>
-            </Canvas>
+                </ContentControl.DataTemplates>
+            </ContentControl>
         </Viewbox>
     </DockPanel>
 </UserControl>
