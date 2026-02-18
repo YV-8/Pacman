@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Avalonia;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 
 namespace PacmanSolution.Models;
@@ -19,6 +23,8 @@ public class GameEngine
     private const int EnergizerPoints = 50;
     private const int cherryPoints = 100;
     private string _currentDirection = "RIGHT";
+    public ObservableCollection<GameObject> VisualObjects { get; } = new();
+    private GameObject? _pacmanVisual;
 
     public GameEngine()
     {
@@ -73,6 +79,62 @@ public class GameEngine
         _frameCount = 0;
         _fpsTimer = 0;
     }
+    /// <summary>
+    /// Inicializa el objeto visual de Pacman en el Canvas
+    /// </summary>
+    public GameObject CreatePacmanVisual(double x, double y, Bitmap sprite, Rect sourceRect)
+    {
+        var visual = new GameObject
+        {
+            X          = x,
+            Y          = y,
+            Width      = 40,
+            Height     = 40,
+            Zindex     = 10,
+            Sprite     = sprite,
+            SourceRect = sourceRect
+        };
+        _pacmanVisual = visual;
+        VisualObjects.Add(visual);
+        return visual;
+    }
+    /// <summary>
+    /// Actualiza la posición visual de Pacman en el Canvas
+    /// </summary>
+    public void UpdatePacmanVisual(double x, double y, Rect newSourceRect)
+    {
+        if (_pacmanVisual is null) return;
+        _pacmanVisual.X          = x;
+        _pacmanVisual.Y          = y;
+        _pacmanVisual.SourceRect = newSourceRect;
+    }
+
+    /// <summary>
+    /// Create to pellet
+    /// </summary>
+    public GameObject CreateDotVisual(double x, double y)
+    {
+        var visual = new GameObject
+        {
+            X         = x,
+            Y         = y,
+            Width     = 10,
+            Height    = 10,
+            Zindex    = 5,
+            FillColor = Brushes.White
+        };
+        VisualObjects.Add(visual);
+        return visual;
+    }
+
+    /// <summary>
+    /// Delete a objet visual tp Canvas
+    /// </summary>
+    public void RemoveVisualObject(GameObject obj)
+    {
+        VisualObjects.Remove(obj);
+    }
+
     
     /// <summary>
     /// Ask is this position has cell or entity type wall or door is false

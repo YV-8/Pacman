@@ -14,7 +14,7 @@ public partial class ManagePageChange: ObservableObject
         switch (initialsPage)
         {
             case"GoGame":
-                CurrentPage = new PacmanGameViewModel(this);
+                CurrentPage = new GameViewModel(this);
                 break;
             case"GoScoreBoard":
                 CurrentPage = new ScoreBoardPageViewModel();

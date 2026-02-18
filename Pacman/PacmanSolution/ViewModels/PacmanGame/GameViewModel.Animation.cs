@@ -7,7 +7,7 @@ using PacmanSolution.Views;
 
 namespace PacmanSolution.ViewModels;
 
-public partial class PacmanGameViewModel
+public partial class GameViewModel
 {
     private int _currentSpriteRow = 0;
     private int _animationFrame = 0;
@@ -157,35 +157,6 @@ public partial class PacmanGameViewModel
             }
         }
     }
-    
-    private void UpdateGohstSprites()
-    {
-        _animationFrame = (_animationFrame + 1) % 2;
-
-        int _size = 16; 
-        foreach (var entity in Board)
-        {
-            int ghostRow = entity.Type switch
-            {
-                EntityType.REDGHOST => 0,
-                EntityType.PINKGHOST => 1,
-                EntityType.CYANGHOST => 2,
-                EntityType.ORANGEGHOST => 3,
-                _ => -1
-            };
-
-            if (ghostRow != -1)
-            {
-                var rect = new PixelRect(
-                    _animationFrame * _size, // Columna 0 o 1 para la animación de pies
-                    ghostRow * _size,        // Fila según el color
-                    _size, _size);
-            
-                entity.CurrentDisplaySprite = _spriteManager.GetSpriteSection("GhostViews.png", rect);
-            }
-        }
-    }
-    
     
     private void UpdatePacmanPosition(int animationFrame, int newRow, int newCol)
     {

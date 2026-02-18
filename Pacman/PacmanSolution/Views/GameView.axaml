@@ -5,7 +5,7 @@
              xmlns:vm="clr-namespace:PacmanSolution.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
              x:Class="PacmanSolution.Views.PacmanGameView"
-             x:DataType="vm:PacmanGameViewModel"
+             x:DataType="vm:GameViewModel"
              Background="Black"
              Focusable="True">
     
@@ -13,10 +13,10 @@
         <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto, *, Auto, *, Auto" Margin="10">
             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                 <TextBlock Classes="ButtonOptGame"  FontSize="18"
-                           Text="{Binding ScoreViewModel.Score,
+                           Text="{Binding Score.Score,
                             StringFormat='SCORE: {0}'}"/>
                 <TextBlock Classes="ButtonOptGame" FontSize="14" Foreground="White"
-                           Text="{Binding ScoreViewModel.HighScore,
+                           Text="{Binding Score.HighScore,
                             StringFormat='HI-SCORE: {0}'}"/>
             </StackPanel>
 
@@ -57,15 +57,22 @@
                        Opacity="0.8"
                        IsHitTestVisible="False"
                        Canvas.Left="-30"/>
-                <Image x:Name="PacmanImage" Source="{Binding PacmanCurrentSprite}"
+                <Image x:Name="PacmanImage" Source="{Binding Pacman.PacmanCurrentSprite}"
                          Width="40" Height="40" ZIndex="10"
-                         Canvas.Top="1020" Canvas.Left="720"/>
+                         Canvas.Top="{Binding Pacman.PacmanModel.CanvasTop}"
+                         Canvas.Left="{Binding Pacman.PacmanModel.CanvasLeft}"/>
+                
                 <Rectangle x:Name="RedGhost" Fill="DarkRed "
                            Width = "40" Height="40" ZIndex="10"
                            Canvas.Top="500" Canvas.Left="720"/> 
-                 <!-- <Image x:Name="RedGhost" Source="{Binding PacmanCurrentSprite}"
+                <Image x:Name="RedImageGhost" Source="{Binding Ghosts.RedGhostSprite}"
                        Width="40" Height="40" ZIndex="10"
-                       Canvas.Top="520" Canvas.Left="720"/> -->
+                       Canvas.Left="{Binding Ghosts.RedGhostLeft}" 
+                       Canvas.Top="{Binding Ghosts.RedGhostTop}"/>
+
+                <Image x:Name="PinkGhost" Source="{Binding Ghosts.PinkGhostSprite}"
+                       Width="40" Height="40" ZIndex="10"
+                       Canvas.Left="820" Canvas.Top="680"/>
             </Canvas>
         </Viewbox>
     </DockPanel>

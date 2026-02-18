@@ -8,15 +8,15 @@ using Avalonia.Interactivity;
 using PacmanSolution.Models;
 using PacmanSolution.ViewModels;
 using Avalonia.Media;
+using PacmanSolution.ViewModels.Pacman;
 
 namespace PacmanSolution.Views;
 
 public partial class PacmanGameView : UserControl
 {
-    private PacmanGameViewModel? _gamePageViewModel;
-    private const double _cellSize = 45.8;
-    private const double _offsetX = 175;
-    private const double _offsetY = 15;
+    private GameViewModel? _gamePageViewModel;
+    private GhostViewModel? _ghostViewModel;
+    private PacmanViewModel? _pacmanViewModel;
     private double _horizontalSpeed = 10;
     public event EventHandler<ElementRemovedEventArgs>? OnElementRemoved;
     
@@ -28,21 +28,21 @@ public partial class PacmanGameView : UserControl
     }
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
-        if (DataContext is PacmanGameViewModel vm)
+        if (DataContext is GameViewModel vm)
         {
             switch (e.Key)
             {
                 case Key.Up or Key.W:
-                    vm.GetDirection("UP");
+                    _pacmanViewModel.GetDirection("UP");
                     break;
                 case Key.Down or  Key.S:  
-                    vm.GetDirection("DOWN"); 
+                    _pacmanViewModel.GetDirection("DOWN"); 
                     break;
                 case Key.Left or  Key.A: 
-                    vm.GetDirection("LEFT"); 
+                    _pacmanViewModel.GetDirection("LEFT"); 
                     break;
                 case Key.Right or Key.D: 
-                    vm.GetDirection("RIGHT"); 
+                    _pacmanViewModel.GetDirection("RIGHT"); 
                     break;
             }
         }
@@ -60,40 +60,38 @@ public partial class PacmanGameView : UserControl
     
         this.Unloaded += (s, e) =>
         {
-            if (DataContext is PacmanGameViewModel viewModel)
+            if (DataContext is GameViewModel viewModel)
             {
                 viewModel.PauseGame();
             }
         };
-        if (DataContext is PacmanGameViewModel gamevm)
+        if (DataContext is GameViewModel gamevm)
         {
             _gamePageViewModel = gamevm;
-            DrawBoard(gamevm.Board);
+            gamevm.DrawBoard(Board);
             gamevm.OnElementRemoved += OnElementRemovedFromBoard;
-            
-            SetupPacmanPositionBinding();
         }
     }
-    /// <summary>
-    /// Configure el binding manual para the positión de Pacman en el Canvas
-    /// The ViewModel isn't null with left and Top
-    /// Subscribe propertyChanged and filter eac
-    /// </summary>
-    private void SetupPacmanPositionBinding()
+    
+    private void SetupGhostPositionBindings()
     {
-        if (_gamePageViewModel is null)
-            return;
-        UpdatePacmanPosition(PacmanImage,_gamePageViewModel.PacmanCanvasLeft, _gamePageViewModel.PacmanCanvasTop);
-        
-        _gamePageViewModel.PropertyChanged += (s, e) =>
+        if (_ghostViewModel is null) return;
+
+        // Actualizar posición inicial
+        Canvas.SetLeft(RedGhost, _ghostViewModel.RedGhostLeft);
+        Canvas.SetTop(RedGhost, _ghostViewModel.RedGhostTop);
+
+        // Escuchar cambios de posición
+        _ghostViewModel.PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName is nameof(PacmanGameViewModel.PacmanCanvasLeft) or 
-                nameof(PacmanGameViewModel.PacmanCanvasTop))
-            {
-                UpdatePacmanPosition(PacmanImage,_gamePageViewModel.PacmanCanvasLeft, _gamePageViewModel.PacmanCanvasTop);
-            }
+            if (e.PropertyName == nameof(GhostViewModel.RedGhostLeft))
+                Canvas.SetLeft(RedGhost, _ghostViewModel.RedGhostLeft);
+        
+            if (e.PropertyName == nameof(GhostViewModel.RedGhostTop))
+                Canvas.SetTop(RedGhost, _ghostViewModel.RedGhostTop);
         };
     }
+    
     /// <summary>
     /// CanMove ask the targetEntity  isn't null
     /// if it's not null; It isn't wall o door is true; but it's false
@@ -107,73 +105,6 @@ public partial class PacmanGameView : UserControl
         Canvas.SetTop(PacmanImage, top);
     }
     
-    private void DrawBoard(ObservableCollection<Entity> board)
-    {
-        if (PacmanCanvas is null || board is null) return;
-        
-        var dynamicElements = PacmanCanvas.Children
-            .Where(x => x != PacmanImage && !(x is Image { Opacity: 0.8 }))
-            .ToList();
-
-        foreach (var child in dynamicElements)
-        {
-            PacmanCanvas.Children.Remove(child);
-        }
-        foreach (var cell in board)
-        {
-            DrawEntity(cell);
-        }
-    }
-    
-    private void DrawEntity(Entity cell)
-    {
-        var (centerX, centerY) =PacmanGameViewModel.GetCellCenter(cell.Row, cell.Col);
-        
-        if (cell.Type == EntityType.WALL)
-        {
-            double size = (cell.Type == EntityType.WALL) ? 25 : 16;
-            var color = Brushes.Transparent;
-        
-            AddShapeToCanvas(new Rectangle 
-                { Width = size, Height = size, Fill = color }, 
-                centerX, centerY, 2);
-        }
-        
-        if (cell.HasDot && cell.Type is not EntityType.ENERGIZE)
-        {
-            var pellet = new Ellipse 
-            { 
-                Width = 8, 
-                Height = 8, 
-                Fill = Brushes.White,
-                Tag = $"pellet_{cell.Row}_{cell.Col}"
-            };
-            AddShapeToCanvas(pellet, centerX, centerY, 4);
-        }
-        
-        if (cell.Type is EntityType.ENERGIZE)
-        {
-            var energizer = new Ellipse 
-            { 
-                Width = 20, 
-                Height = 20, 
-                Fill = Brushes.White,
-                Tag = $"energizer_{cell.Row}_{cell.Col}"
-            };
-            AddShapeToCanvas(energizer, centerX, centerY, 5);
-        }
-
-        if (cell.Type == EntityType.DOOR)
-        {
-            double width = 25;
-            double height = 10;
-            var color = Brushes.White;
-        
-            AddShapeToCanvas(new Rectangle 
-                { Width = width, Height = height, Fill = color }, 
-                centerX, centerY, 2);
-        }
-    }
     
     private void AddShapeToCanvas(Control element, double positionX, double positionY, int zIndex)
     {
