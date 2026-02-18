@@ -1,35 +1,32 @@
 using System;
 using System.Collections.ObjectModel;
-using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
+using PacmanSolution.ViewModels.Pacman;
+using PacmanSolution.Views;
 
 namespace PacmanSolution.ViewModels;
 
-public partial class PacmanGameViewModel: ObservableObject
+public partial class GameViewModel: ObservableObject
 {
-    [ObservableProperty]
-    private ManagePageChange _navigation;
-    [ObservableProperty]
-    private IImage? _pacmanCurrentSprite;
-    [ObservableProperty]
-    private int _pacmanRow;
-    [ObservableProperty]
-    private int _pacmanCol;
-    [ObservableProperty]
-    private double _pacmanCanvasLeft;
-    [ObservableProperty]
-    private double _pacmanCanvasTop;
-    [ObservableProperty]
-    private ScoreBoardPageViewModel _scoreViewModel = new();
+    [ObservableProperty] private PacmanViewModel _pacman;
+    [ObservableProperty] private GhostViewModel _ghosts;
+    [ObservableProperty] private ScoreBoardPageViewModel _score;
+    [ObservableProperty] private ManagePageChange _navigation;
+    [ObservableProperty] private object _currentSubView;
+    
     private readonly SoundManager _soundManager = new ();
-    private readonly SpriteManager _spriteManager = new ();
     private readonly GameEngine _engine = new();
-    private EngineManager _engineManager;
+    private readonly EngineManager _engineManager;
+    private readonly GameBoardSyncService _syncService;
     private DispatcherTimer _gameTimer;
     private DispatcherTimer? _gameLoopTimer;
+    private DispatcherTimer _movementTimer;
+    private const string _nameSprite = null;
+    public ObservableCollection<GameObject> GameObjects => _engine.VisualObjects;
+
     private ObservableCollection<Entity> _board = new();
     public ObservableCollection<Entity> Board
     {
@@ -37,16 +34,21 @@ public partial class PacmanGameViewModel: ObservableObject
         set => _board = value;
     }
 
-    public PacmanGameViewModel(ManagePageChange navigation)
+    public GameViewModel(ManagePageChange navigation)
     {
         _navigation = navigation;
         Board.Clear();
-        _engineManager = new EngineManager(28,31);//31*32
-        
+        Score = new ScoreBoardPageViewModel();
+        _engineManager = new EngineManager(28, 31);
         _engineManager.BuildGameBoard(Board);
-        InitializePacmanPosition();
+        
+        _syncService = new GameBoardSyncService(_engine.VisualObjects);
+        _syncService.BuildFromBoard(Board);
+        _movementTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+        Pacman = new PacmanViewModel(_engine, Board,_movementTimer,Score);
+        Ghosts = new GhostViewModel(Board);
         StartGameLoop();
-        StartMovementTimer();
+        CurrentSubView = this;
     }
     
     [RelayCommand]
@@ -72,7 +74,7 @@ public partial class PacmanGameViewModel: ObservableObject
     /// </summary>
     public void CleanupTimers()
     {
-        _animationTimer?.Stop();
+        //_animationTimer?.Stop();
         _movementTimer?.Stop();
         _gameTimer?.Stop();
     }
@@ -92,23 +94,5 @@ public partial class PacmanGameViewModel: ObservableObject
     {
         _gameTimer?.Stop();
         _movementTimer?.Stop();
-    }
-    private void UpdatePacmanCanvasPosition()
-    {
-        var (centerX, centerY) = GetCellCenter(PacmanRow, PacmanCol);
-        PacmanCanvasLeft = centerX - (PacmanImageSize / 2);
-        PacmanCanvasTop = centerY - (PacmanImageSize / 2);
-    }
-    /// <summary>
-    /// Get the row and col and order in the canvas
-    /// </summary>
-    /// <param name="row"/>
-    /// <param name="col"/>
-    /// <returns></returns>
-    public static (double x, double y) GetCellCenter(double row, double col)
-    {
-        var x = OffsetX + (col * CellSize) + (CellSize / 2);
-        var y = OffsetY + (row * CellSize) + (CellSize / 2);
-        return (x, y);
     }
 }
