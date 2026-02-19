@@ -1,6 +1,6 @@
 namespace PacmanSolution.Models;
 
-public class GhostState
+public enum GhostState
 {
-    
+    Normal, Frightened, Dead
 }

@@ -7,20 +7,12 @@ namespace PacmanSolution.ViewModels;
 /// </summary>
 public static class GameConfig
 {
-    // Tamaño total del área jugable donde se posicionan las entidades
     private const int GameWidth = 800;
     private const int GameHeight = 620;
-    
-    // Cantidad lógica de columnas/filas del layout del tablero (28x31).
     private const int BoardCols = 28;
     private const int BoardRows = 31;
-    
-    // Tamaño base de entidades móviles (Pacman, fantasmas).
     public const double EntitySize = 25;
-    
-    // Usamos un tamaño de celda uniforme (cuadrado). Tomamos como referencia el alto,
-    // así el grid ocupa todo el alto disponible y queda algo más “cuadrado”.
-    private const double CellSize = (double)GameHeight / BoardRows; // 620 / 31 ≈ 20
+    private const double CellSize = (double)GameHeight / BoardRows;
     
     /// <summary>Ancho de celda en píxeles.</summary>
     public const double CellWidth = CellSize;

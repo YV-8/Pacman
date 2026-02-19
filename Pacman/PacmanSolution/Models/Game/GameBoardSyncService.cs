@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Avalonia;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using PacmanSolution.ViewModels;
 
 namespace PacmanSolution.Models;
@@ -81,6 +79,14 @@ public class GameBoardSyncService
 
     private GameObject? CreateVisualForEntity(Entity entity)
     {
+        static GameObject MakeGhostVisual(Entity e) => new GameObject
+        {
+            X      = e.Col * GameConfig.CellWidth,
+            Y      = e.Row * GameConfig.CellHeight,
+            Width  = EntitySize,
+            Height = EntitySize,
+            Zindex = 9
+        };
         return entity.Type switch
         {
             EntityType.DOT or EntityType.EMPTY when entity.HasDot => new GameObject
@@ -99,7 +105,7 @@ public class GameBoardSyncService
                 Width     = DotSize * 2,
                 Height    = DotSize * 2,
                 Zindex    = 5,
-                FillColor = Brushes.OrangeRed
+                FillColor = Brushes.BurlyWood
             },
             EntityType.PACMAN => new GameObject
             {
@@ -109,14 +115,10 @@ public class GameBoardSyncService
                 Height = EntitySize,
                 Zindex = 10
             },
-            EntityType.REDGHOST => new GameObject
-            {
-                X      = entity.Col * GameConfig.CellWidth,
-                Y      = entity.Row * GameConfig.CellHeight,
-                Width  = EntitySize,
-                Height = EntitySize,
-                Zindex = 9
-            },
+            EntityType.REDGHOST    => MakeGhostVisual(entity),
+            EntityType.PINKGHOST   => MakeGhostVisual(entity),
+            EntityType.CYANGHOST   => MakeGhostVisual(entity),
+            EntityType.ORANGEGHOST => MakeGhostVisual(entity),
             _ => null
         };
     }

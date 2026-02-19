@@ -24,7 +24,7 @@ public class Board:Entity
         "W......WW....WW....WW......W",
         "WWWWWW.WWWWW EE WWWWW.WWWWWW",
         "EEEEEW.WWWWW EE WWWWW.WEEEEE",
-        "EEEEEW.WW          WW.WEEEEE",
+        "EEEEEW.WW     G    WW.WEEEEE",
         "EEEEEW.WW WWW--WWW WW.WEEEEE",
         "WWWWWW.WW W      W WW.WWWWWW",
         "E     .EE W GGG  W EE.     E",
