@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Avalonia;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -8,69 +10,84 @@ namespace PacmanSolution.ViewModels;
 
 public partial class GhostViewModel :ObservableObject
 {
-    [ObservableProperty] private IImage? _redGhostSprite;
-    [ObservableProperty] private IImage? _pinkGhostSprite;
-    [ObservableProperty] private IImage? _cyanGhostSprite;
-    [ObservableProperty] private IImage? _orangeGhostSprite;
+    [ObservableProperty]
+    private ObservableCollection<Ghost> _ghosts = new ();
 
-    //Canvas (X, Y)
-    [ObservableProperty] private double _redGhostLeft;
-    [ObservableProperty] private double _redGhostTop;
-    
-    [ObservableProperty] private double _pinkGhostTop;
-    [ObservableProperty] private double _pinkGhostLeft;
-    
-    [ObservableProperty] private double _cyanGhostTop;
-    [ObservableProperty] private double _cyanGhostLeft;
-    
-    [ObservableProperty] private double _orangeGhostTop;
-    [ObservableProperty] private double _orangeGhostLeft;
-    
-    private readonly SpriteManager _spriteManager;
     private readonly ObservableCollection<Entity> _board;
+    private readonly SpriteManager _spriteManager = new();
+    private readonly GameBoardSyncService? _syncService;
+    private int _globalAnimationFrame = 0;
+    private const int _size = 16;
 
-    public GhostViewModel(ObservableCollection<Entity> board)
+    public GhostViewModel(ObservableCollection<Entity> board,GameBoardSyncService? syncService)
     {
+        _syncService = syncService;
         _board = board;
+        InitializeGhosts();
     }
-    
-    private void UpdateGohstSprites(int _animationFrame, ObservableCollection<Entity> Board)
+    private void InitializeGhosts()
     {
-        _animationFrame = (_animationFrame + 1) % 2;
-
-        int _size = 16; 
-        RedGhostSprite = _spriteManager.GetSpriteSection("GhostViews.png", 
-            new PixelRect(0, 0 * _size, _size, _size)); // Col 0, Fila 0
-
-        PinkGhostSprite = _spriteManager.GetSpriteSection("GhostViews.png", 
-            new PixelRect(0, 1 * _size, _size, _size)); // Col 0, Fila 1
-
-        CyanGhostSprite = _spriteManager.GetSpriteSection("GhostViews.png", 
-            new PixelRect(0, 2 * _size, _size, _size)); // Col 0, Fila 2
-
-        OrangeGhostSprite = _spriteManager.GetSpriteSection("GhostViews.png", 
-            new PixelRect(0, 3 * _size, _size, _size)); // Col 0, Fila 3
-        
-        foreach (var entity in Board)
+        Ghosts.Clear();
+        foreach (var entity in _board.OfType<Ghost>())
         {
-            int ghostRow = entity.Type switch
-            {
-                EntityType.REDGHOST => 0,
-                EntityType.PINKGHOST => 1,
-                EntityType.CYANGHOST => 2,
-                EntityType.ORANGEGHOST => 3,
-                _ => -1
-            };
-
-            if (ghostRow != -1)
-            {
-                var rect = new PixelRect(
-                    _animationFrame * _size, // Columna 0 o 1 para la animación de pies
-                    ghostRow * _size,        // Fila según el color
-                    _size, _size);
-            
-                entity.CurrentDisplaySprite = _spriteManager.GetSpriteSection("GhostViews.png", rect);
-            }
+            Ghosts.Add(entity);
         }
     }
+    
+    public void GhostsTimer()
+    {
+        _globalAnimationFrame = (_globalAnimationFrame + 1) % 2;
+        UpdateAllSprites();
+    }
+    
+    private static readonly Dictionary<EntityType, int> SpriteRow = new()
+    {
+        { EntityType.REDGHOST,    0 },
+        { EntityType.PINKGHOST,   1 },
+        { EntityType.CYANGHOST,   2 },
+        { EntityType.ORANGEGHOST, 3 },
+    };
+    private static readonly Dictionary<GhostDirection, int> DirectionBaseCol = new()
+    {
+        { GhostDirection.Right, 0 },
+        { GhostDirection.Left,  2 },
+        { GhostDirection.Up,    4 },
+        { GhostDirection.Down,  6 },
+    };
+    public void UpdateAllSprites()
+    {
+        foreach (var ghost in Ghosts)
+        {
+            ghost.AnimationFrame = _globalAnimationFrame;
+            ghost.CurrentDisplaySprite = GetGhostSprite(ghost);
+        }
+    }
+
+    private IImage? GetGhostSprite(Ghost ghost)
+    {
+        int baseCol = DirectionBaseCol[ghost.Direction];
+        int col = baseCol + _globalAnimationFrame;
+        if (ghost.State is GhostState.Frightened)
+        {
+            var frightenedRect = new PixelRect(_globalAnimationFrame * _size, 4 * _size, _size, _size);
+            return _spriteManager.GetSpriteSection("GhostViews.png", frightenedRect);  
+        }
+
+        if (!SpriteRow.TryGetValue(ghost.Type, out int row)) return null;
+        var rect = new PixelRect(col*_size, row*_size, _size, _size);
+        return _spriteManager.GetSpriteSection("GhostViews.png", rect);
+    }
+
+    public void SetFrightened()
+    {
+        foreach (var ghost in Ghosts)
+            ghost.State = GhostState.Frightened;
+    }
+
+    public void SetNormal()
+    {
+        foreach (var ghost in Ghosts)
+            ghost.State = GhostState.Normal;
+    }
+   
 }

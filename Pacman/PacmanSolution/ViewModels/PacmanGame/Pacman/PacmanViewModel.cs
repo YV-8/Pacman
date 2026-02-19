@@ -24,14 +24,6 @@ public partial class PacmanViewModel:ObservableObject
     private readonly SpriteManager _spriteManager = new ();
     private DispatcherTimer? _animationTimer;
     private readonly DispatcherTimer? _movementTimer;
-    /*[ObservableProperty]
-       private int _pacmanRow;
-       [ObservableProperty]
-       private int _pacmanCol;
-       [ObservableProperty]
-       private double _pacmanCanvasLeft;
-       [ObservableProperty]
-       private double _pacmanCanvasTop;*/
     
     private int _row;
     private int _col;

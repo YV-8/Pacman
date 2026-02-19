@@ -27,7 +27,11 @@ public partial class GameViewModel
         {
             Interval = TimeSpan.FromMilliseconds(150)
         };
-        _gameTimer.Tick += (s, e) => _pacman.UpdatePacmanSprites();
+        _gameTimer.Tick += (s, e) =>
+        {
+            _pacman.UpdatePacmanSprites();
+            Ghosts.GhostsTimer();
+        };
         _gameTimer.Start();
         InitializePacmanPosition();
         StartMovementTimer();
