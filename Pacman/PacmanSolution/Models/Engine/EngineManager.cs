@@ -12,8 +12,7 @@ public class EngineManager
     /// </summary>
     private int _boardCol;
     private int _boardRow;
-    //private int Rows = 10;
-    //private int Cols = 10;
+    private int _ghostCount = 0;
     private List<Ghost> _ghosts;
     private Pacman _pacman;
     private EntityType _entityType;
@@ -52,7 +51,7 @@ public class EngineManager
         {
             throw new System.ArgumentNullException(nameof(board));
         }
-
+        _ghostCount = 0;
         board.Clear();
         if (_boardLayout?.Layout == null || _boardLayout.Layout.Length == 0)
         {
@@ -91,8 +90,6 @@ public class EngineManager
                 var dot = new Board(row, col, EntityType.EMPTY)
                 {
                     HasDot = true,
-                    // Hacemos los puntos un poco más pequeños para que
-                    // se adapten mejor al tamaño de la celda.
                     Width = 4,
                     Height = 4
                 };
@@ -100,19 +97,15 @@ public class EngineManager
                 return dot;
             
             case 'o':
-                var energizer = new Board(row, col, EntityType.ENERGIZE)
-                {
-                    // Energizadores también un poco más pequeños que antes.
-                    Width = 10,
-                    Height = 10
-                };
+                var energizer = new Board(row, col, EntityType.ENERGIZE) { Width = 10, Height = 10 };
                 energizer.UpdateCanvasPosition();
                 return energizer;
             case 'P':
-                return new Pacman(row, col, EntityType.PACMAN, 25 , 25, 10);
+                return new Pacman(row, col, EntityType.PACMAN, 25 , 25, 10){ Width = 15, Height = 15 };
             case 'G':
-                _ghostEntityType = GetTypeGhost(ghostCount + 1);
-                return new Ghost(row, col, _ghostEntityType, 25 , 25, 10);
+                var ghostType = GetTypeGhost(_ghostCount);
+                _ghostCount++;
+                return new Ghost(row, col, ghostType, 25, 25, 10);
             case 'E':
             case ' ':
                 return new Board(row, col, EntityType.EMPTY);
@@ -124,7 +117,6 @@ public class EngineManager
 
     private EntityType GetTypeGhost(int ghostCount)
     {
-        ghostCount++;
         switch(ghostCount)
         {
             case 1:
