@@ -1,10 +1,11 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
+using PacmanSolution.Model;
 using PacmanSolution.Models;
+using PacmanSolution.Models.Ghosts;
 
 namespace PacmanSolution.ViewModels;
 
@@ -12,7 +13,11 @@ public partial class GhostViewModel :ObservableObject
 {
     [ObservableProperty]
     private ObservableCollection<Ghost> _ghosts = new ();
-
+    private readonly BlinkyBehavior _blinky = new();
+    private readonly PinkyBehavior  _pinky  = new();
+    private readonly InkyBehavior   _inky   = new();
+    private readonly ClydeBehavior  _clyde  = new();
+    private readonly HouseBehavior  _house  = new();
     private readonly ObservableCollection<Entity> _board;
     private readonly SpriteManager _spriteManager = new();
     private readonly GameBoardSyncService? _syncService;
@@ -24,12 +29,29 @@ public partial class GhostViewModel :ObservableObject
         _syncService = syncService;
         _board = board;
         InitializeGhosts();
+        MoveGhosts();
+        UpdateAllSprites();
     }
     private void InitializeGhosts()
     {
         Ghosts.Clear();
         foreach (var entity in _board.OfType<Ghost>())
         {
+            switch (entity.Type)
+            {
+                case EntityType.REDGHOST:
+                    entity.ExitDelayTicks = 0;
+                    break;
+                case EntityType.PINKGHOST:
+                    entity.ExitDelayTicks = 10;
+                    break;
+                case EntityType.CYANGHOST:
+                    entity.ExitDelayTicks = 25;
+                    break;
+                case EntityType.ORANGEGHOST:
+                    entity.ExitDelayTicks = 45;
+                    break;
+            }
             Ghosts.Add(entity);
         }
     }
@@ -40,20 +62,39 @@ public partial class GhostViewModel :ObservableObject
         UpdateAllSprites();
     }
     
-    private static readonly Dictionary<EntityType, int> SpriteRow = new()
+    private static int GetSpriteRow(EntityType type)
     {
-        { EntityType.REDGHOST,    0 },
-        { EntityType.PINKGHOST,   1 },
-        { EntityType.CYANGHOST,   2 },
-        { EntityType.ORANGEGHOST, 3 },
-    };
-    private static readonly Dictionary<GhostDirection, int> DirectionBaseCol = new()
+        switch (type)
+        {
+            case EntityType.REDGHOST:    
+                return 0;
+            case EntityType.PINKGHOST:   
+                return 1;
+            case EntityType.CYANGHOST:   
+                return 2;
+            case EntityType.ORANGEGHOST: 
+                return 3;
+            default:                     
+                return 0;
+        }
+        
+    }
+    private static int  GetDirectionBaseCol(GhostDirection ChangeDirection)
     {
-        { GhostDirection.Right, 0 },
-        { GhostDirection.Left,  2 },
-        { GhostDirection.Up,    4 },
-        { GhostDirection.Down,  6 },
-    };
+        switch (ChangeDirection)
+        {
+            case GhostDirection.Right: 
+                return 0;
+            case GhostDirection.Left:  
+                return 2;
+            case GhostDirection.Up:    
+                return 4;
+            case GhostDirection.Down:  
+                return 6;
+            default:
+                return 0;
+        }
+    }
     public void UpdateAllSprites()
     {
         foreach (var ghost in Ghosts)
@@ -63,31 +104,36 @@ public partial class GhostViewModel :ObservableObject
         }
     }
 
-    private IImage? GetGhostSprite(Ghost ghost)
+    private void MoveGhosts()
     {
-        int baseCol = DirectionBaseCol[ghost.Direction];
-        int col = baseCol + _globalAnimationFrame;
-        if (ghost.State is GhostState.Frightened)
-        {
-            var frightenedRect = new PixelRect(_globalAnimationFrame * _size, 4 * _size, _size, _size);
-            return _spriteManager.GetSpriteSection("GhostViews.png", frightenedRect);  
-        }
-
-        if (!SpriteRow.TryGetValue(ghost.Type, out int row)) return null;
-        var rect = new PixelRect(col*_size, row*_size, _size, _size);
-        return _spriteManager.GetSpriteSection("GhostViews.png", rect);
+        var pacman = _board.FirstOrDefault(e => e.Type == EntityType.PACMAN) as Models.Pacman;
+        var blinky = Ghosts.FirstOrDefault(g => g.Type == EntityType.REDGHOST);
+        if (pacman is null || blinky is null) return; 
     }
 
+    private IImage? GetGhostSprite(Ghost ghost)
+    {
+        if (ghost.State == GhostState.FRIGHTENED)
+        {
+            var frightenedRect = new PixelRect(_globalAnimationFrame * _size, 4 * _size, _size, _size);
+            return _spriteManager.GetSpriteSection("GhostViews.png", frightenedRect);
+        }
+
+        int row = GetSpriteRow(ghost.Type);
+        int col = GetDirectionBaseCol(ghost.Direction) + _globalAnimationFrame;
+        return _spriteManager.GetSpriteSection("GhostViews.png", 
+            new PixelRect(col * _size, row * _size, _size, _size));
+    }
     public void SetFrightened()
     {
         foreach (var ghost in Ghosts)
-            ghost.State = GhostState.Frightened;
+            ghost.State = GhostState.FRIGHTENED;
     }
 
     public void SetNormal()
     {
         foreach (var ghost in Ghosts)
-            ghost.State = GhostState.Normal;
+            ghost.State = GhostState.NORMAL;
     }
    
 }
