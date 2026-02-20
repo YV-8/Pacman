@@ -29,8 +29,16 @@ public partial class GameViewModel
         };
         _gameTimer.Tick += (s, e) =>
         {
-            _pacman.UpdatePacmanSprites();
-            Ghosts.GhostsTimer();
+            try
+            {
+                Console.WriteLine($"[GameTimer] Tick {Ghosts.GetModeTimer()}");
+                _pacman.UpdatePacmanSprites();
+                Ghosts.GhostsTimer();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[GameTimer] EXCEPCIÓN: {ex.Message}\n{ex.StackTrace}");
+            }
         };
         _gameTimer.Start();
         InitializePacmanPosition();

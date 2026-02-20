@@ -111,29 +111,6 @@ public partial class PacmanViewModel:ObservableObject
             {
                 _isAutoMode = false;
                 _movementTimer?.Stop();
-                
-                if (targetEntity is null)
-                {
-                    Console.WriteLine($"🛑 MODO AUTOMÁTICO DETENIDO - Fuera del tablero en ({nextRow}, {nextCol})");
-                }
-                else
-                {
-                    Console.WriteLine($"🛑 MODO AUTOMÁTICO DETENIDO - Chocó con {targetEntity.Type} en ({nextRow}, {nextCol})");
-                }
-                
-                Console.WriteLine("💡 Ahora puedes controlarlo manualmente con las teclas");
-            }
-            else
-            {
-                // En modo manual, solo mostrar el bloqueo
-                if (targetEntity == null)
-                {
-                    Console.WriteLine($"❌ No existe celda en ({nextRow}, {nextCol})");
-                }
-                else
-                {
-                    Console.WriteLine($"❌ Bloqueado por {targetEntity.Type} en ({nextRow}, {nextCol})");
-                }
             }
         }
     }
@@ -168,8 +145,12 @@ public partial class PacmanViewModel:ObservableObject
         if (oldCell is null || newCell is null)
             return;
         
-        oldCell.Type = EntityType.EMPTY;
-        newCell.Type = EntityType.PACMAN;
+        /*oldCell.Type = EntityType.EMPTY;
+        newCell.Type = EntityType.PACMAN;*/
+        if (oldCell.Type == EntityType.PACMAN)
+            oldCell.Type = EntityType.EMPTY;
+        if (newCell is not Ghost)
+            newCell.Type = EntityType.PACMAN;
         Row = newRow;
         Col = newCol;
         _syncService.UpdatePacmanPosition(newRow, newCol);
