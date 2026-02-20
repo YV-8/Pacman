@@ -119,13 +119,13 @@ public class EngineManager
     {
         switch(ghostCount)
         {
-            case 1:
+            case 0:
                 return EntityType.REDGHOST;
-            case 2:
+            case 1:
                 return EntityType.CYANGHOST;  
-            case 3:
+            case 2:
                 return EntityType.PINKGHOST;
-            case 4:
+            case 3:
                 return EntityType.ORANGEGHOST;
             default:
                 return EntityType.REDGHOST;
