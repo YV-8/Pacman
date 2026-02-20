@@ -8,7 +8,7 @@ namespace PacmanSolution.Model;
 
 public abstract class GhostBehaviorBase
 {
-    private static double Distance(int row, int col, int targetRow, int targetCol)
+    protected static double Distance(int row, int col, int targetRow, int targetCol)
     {
         double distanceRow = row - targetRow;
         double distanceCol = col - targetCol;
@@ -51,7 +51,8 @@ public abstract class GhostBehaviorBase
             }
         }
     }
-    protected GhostDirection GetBestDirectionToTarget(
+
+    public GhostDirection GetBestDirectionToTarget(
         Ghost ghost, int targetRow, int targetCol,
         ObservableCollection<Entity> board)
     {
@@ -76,5 +77,25 @@ public abstract class GhostBehaviorBase
             ? candidates.OrderBy(d => d.dist).First().directionRow
             : ghost.Direction;
     }
-    
+    private static (int row, int col) GetScatterCorner(EntityType type)
+    {
+        switch (type)
+        {
+            case EntityType.REDGHOST:    
+                return (0, 27);
+            case EntityType.PINKGHOST:   
+                return (0, 0);
+            case EntityType.CYANGHOST:   
+                return (30, 27);
+            case EntityType.ORANGEGHOST: 
+                return (30, 0);
+            default:                     
+                return (0, 0);
+        }
+    }
+    public GhostDirection GetScatterDirection(Ghost ghost,ObservableCollection<Entity> _board)
+    {
+        var (cornerRow, cornerCol) = GetScatterCorner(ghost.Type);
+        return GetBestDirectionToTarget(ghost, cornerRow, cornerCol, _board);
+    } 
 }

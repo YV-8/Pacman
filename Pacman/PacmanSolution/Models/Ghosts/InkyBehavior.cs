@@ -1,18 +1,20 @@
-namespace PacmanSolution.Models.Ghost;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using PacmanSolution.Model;
 
-public class InkyBehavior
+namespace PacmanSolution.Models.Ghosts;
+
+public class InkyBehavior:GhostBehaviorBase
 {
     // se distrae cada cierto tiempo
         private readonly Random _random = new Random();
         private int _decisionCounter = 0;
         private const int _randomDecisionUse = 240; //cada unos 6 segundos mas o menos si va como a 40fps
-        public GhostDirection DecideNextDirection(
-            Ghost ghost,
-            Pacman pacman,
-            GameMap map,
-            List<Ghost>? allGhost = null)
+        public GhostDirection DecideNextDirection(Ghost ghost, Pacman pacman, GhostDirection pacmanDirection,
+            Ghost blinky, ObservableCollection<Entity> board)
         {
-            _decisionCounter++;
+            /*_decisionCounter++;
 
             if (_decisionCounter >= _randomDecisionUse)
             {
@@ -20,14 +22,14 @@ public class InkyBehavior
 
                 if (_random.Next(0, 100) < 33) // 33% de probabilidad
                 {
-                    return GetRandomDirection(ghost, map);
+                    return GetRandomDirection(ghost, pacmanDirection);
                 }
             }
             var blinky = allGhost?.FirstOrDefault(g => g.Type == GhostType.Blinky);
 
             if (blinky == null)
             {
-                return new BlinkyBehavior().DecideNextDirection(ghost, pacman, map);
+                return new BlinkyBehavior().DecideNextDirection(ghost, pacman, pacmanDirection);
             }
 
             double midX = pacman.X;
@@ -157,6 +159,14 @@ public class InkyBehavior
                    (dir1 == GhostDirection.Down && dir2 == GhostDirection.Up) ||
                    (dir1 == GhostDirection.Left && dir2 == GhostDirection.Right) ||
                    (dir1 == GhostDirection.Right && dir2 == GhostDirection.Left);
+        }*/ 
+            var (dr, dc) = DistanceDelta(pacmanDirection);
+            int pivotRow = pacman.Row + dr * 2;
+            int pivotCol = pacman.Col + dc * 2;
+
+            // Duplicar el vector Blinky → pivot
+            int targetRow = pivotRow + (pivotRow - blinky.Row);
+            int targetCol = pivotCol + (pivotCol - blinky.Col);
+            return GetBestDirectionToTarget(ghost, targetRow, targetCol, board); 
         }
-    }
 }

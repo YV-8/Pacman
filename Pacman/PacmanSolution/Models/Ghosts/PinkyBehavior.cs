@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using PacmanSolution.Model;
 
-namespace PacmanSolution.Models.Ghost;
+namespace PacmanSolution.Models.Ghosts;
 
 public class PinkyBehavior: GhostBehaviorBase
 {
