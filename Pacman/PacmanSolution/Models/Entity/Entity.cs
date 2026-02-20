@@ -22,14 +22,8 @@ public abstract partial class Entity:ObservableObject
     private int _zIndex;
     [ObservableProperty] 
     private EntityType _type;
-    /// <summary>
-    /// Indica si la entidad tiene un dot/pellet
-    /// </summary>
     [ObservableProperty] 
     private bool _hasDot;
-    /// <summary>
-    /// Controla la visibilidad del elemento en la UI mediante binding
-    /// </summary>
     [ObservableProperty] 
     private bool _isActive = true;
     [ObservableProperty] 

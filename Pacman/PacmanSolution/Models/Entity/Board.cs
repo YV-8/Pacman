@@ -31,7 +31,7 @@ public class Board:Entity
         "WWWWWW.WW W      W WW.WWWWWW",
         "EEEEEW.WW WWWWWWWW WW.WEEEEE",
         "EEEEEW.WW          WW.WEEEEE",
-        "EEEEEW.WW          WW.WEEEEE",
+        "EEEEEW.WW WWWWWWWW WW.WEEEEE",
         "WWWWWW.WW WWWWWWWW WW.WWWWWW",
         "W............WW............W",
         "W.WWWW.WWWWW.WW.WWWWW.WWWW.W",
