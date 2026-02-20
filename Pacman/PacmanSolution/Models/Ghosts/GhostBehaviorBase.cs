@@ -33,23 +33,12 @@ public abstract class GhostBehaviorBase
         }
     }
 
-    private static bool IsOpposite(GhostDirection rowChange, GhostDirection otherDirectioni)
+    private static bool IsOpposite(GhostDirection current, GhostDirection otherDirectioni)
     {
-        switch (rowChange)
-        {
-            case GhostDirection.Up:
-                return rowChange == GhostDirection.Down;
-            case GhostDirection.Down:
-                return rowChange == GhostDirection.Up;
-            case GhostDirection.Left:
-                return otherDirectioni == GhostDirection.Right;
-            case GhostDirection.Right:
-                return otherDirectioni == GhostDirection.Left;
-            default:
-            {
-                return false;
-            }
-        }
+        return (current == GhostDirection.Up    && otherDirectioni == GhostDirection.Down)
+               || (current == GhostDirection.Down  && otherDirectioni == GhostDirection.Up)
+               || (current == GhostDirection.Left  && otherDirectioni == GhostDirection.Right)
+               || (current == GhostDirection.Right && otherDirectioni == GhostDirection.Left);
     }
 
     public GhostDirection GetBestDirectionToTarget(
@@ -69,6 +58,8 @@ public abstract class GhostBehaviorBase
             var entity = board.FirstOrDefault(e => e.Row == testRow && e.Col == testCol);
             if (entity is null || entity.Type is EntityType.WALL) continue;
 
+            if (entity.Type is EntityType.DOOR && ghost.State == GhostState.NORMAL) continue;
+            
             double dist = Distance(testRow, testCol, targetRow, targetCol);
             candidates.Add((directionRow, dist));
         }

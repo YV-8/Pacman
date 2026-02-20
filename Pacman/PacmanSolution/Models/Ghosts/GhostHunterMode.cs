@@ -1,6 +1,6 @@
 namespace PacmanSolution.Models.Ghosts;
 
-public class GhostHunterMode
+public enum GhostHunterMode
 {
-    
+    Scatter,Chase
 }
