@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
+using PacmanSolution.Models.Game;
 using PacmanSolution.ViewModels.Pacman;
 using PacmanSolution.Views;
 
@@ -44,12 +45,14 @@ public partial class GameViewModel: ObservableObject
         
         _syncService = new GameBoardSyncService(_engine.VisualObjects);
         _syncService.BuildFromBoard(Board);
+        
         //_movementTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
         Pacman = new PacmanViewModel(_engine, Board, _movementTimer, Score, _syncService);
         Pacman.UpdatePacmanSprites();
-        Ghosts = new GhostViewModel(Board, _syncService);
+        Ghosts = new GhostViewModel(Board, _syncService,Pacman.PacmanModel);
         _syncService.RegisterGhosts(Ghosts.Ghosts);
         StartGameLoop();
+        Pacman.OnEnergizerEaten += () => Ghosts.SetFrightened();
         CurrentSubView = this;
         // Asegurar sprite en UI cuando la vista ya esté cargada (por si el binding se actualiza después)
         Dispatcher.UIThread.Post(() => Pacman.UpdatePacmanSprites(), DispatcherPriority.Loaded);

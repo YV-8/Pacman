@@ -54,4 +54,12 @@ public partial class GameViewModel
         _movementTimer.Tick += (s, e) => _pacman.GetMovePacman();
         _movementTimer.Start();
     }
+    private void CheckWinCondition()
+    {
+        if (!_board.Any(e => e.IsActive))
+        {
+            Console.WriteLine("¡Nivel Completado!");
+            // Aquí disparas la lógica de siguiente nivel o victoria
+        }
+    }
 }
