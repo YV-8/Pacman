@@ -145,11 +145,12 @@ public class GameEngine
     public bool CanMoveTo(Entity targetEntity)
     {
         if (targetEntity is null) return false;
-
+        if (targetEntity is Ghost) return true;
         if (targetEntity.Type is EntityType.WALL || targetEntity.Type is EntityType.DOOR)
         {
             return false;
         }
+        
         return true;
     }
     

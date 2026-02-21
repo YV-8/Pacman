@@ -44,7 +44,7 @@ public partial class PacmanView : UserControl
         {
             _gamePageViewModel = gamevm;
             _pacmanViewModel = gamevm.Pacman;
-            _pacmanViewModel.UpdatePacmanSprites(); // Aplicar sprite cuando la vista ya está en el árbol
+            _pacmanViewModel.UpdatePacmanSprites();
         }
         Unloaded += (_, _) =>
         {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Avalonia.Media;
@@ -76,6 +77,28 @@ public class GameBoardSyncService
         if (_entityToVisual.TryGetValue(entity, out var visual))
             _visualObjects.Remove(visual);
     }
+    
+    public void RegisterGhosts(ObservableCollection<Ghost> ghosts)
+    {
+        foreach (var ghost in ghosts)
+        {
+            // Verificar si ya está registrado (viene de BuildFromBoard)
+            if (_entityToVisual.ContainsKey(ghost))
+            {
+                Console.WriteLine($"[Sync] Ghost {ghost.Type} ya registrado en ({ghost.Row},{ghost.Col})");
+                continue;
+            }
+
+            // Si no está, crear visual y registrar
+            Console.WriteLine($"[Sync] Registrando ghost {ghost.Type} en ({ghost.Row},{ghost.Col})");
+            var visual = CreateVisualForEntity(ghost);
+            if (visual is null) continue;
+
+            _entityToVisual[ghost] = visual;
+            _visualObjects.Add(visual);
+            ghost.PropertyChanged += (_, args) => OnEntityChanged(ghost, args.PropertyName);
+        }
+    }
 
     private GameObject? CreateVisualForEntity(Entity entity)
     {
@@ -126,6 +149,7 @@ public class GameBoardSyncService
     private void OnEntityChanged(Entity entity, string? propertyName)
     {
         if (!_entityToVisual.TryGetValue(entity, out var visual)) return;
+        Console.WriteLine($"[OnEntityChanged] {entity.Type} prop={propertyName} pos=({entity.Row},{entity.Col})");
 
         switch (propertyName)
         {
