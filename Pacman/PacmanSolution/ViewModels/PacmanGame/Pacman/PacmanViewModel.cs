@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PacmanSolution.Models;
+using PacmanSolution.Models.Game;
 
 namespace PacmanSolution.ViewModels.Pacman;
 
@@ -31,6 +32,7 @@ public partial class PacmanViewModel:ObservableObject
     private int _animationFrame = 0;
     private bool _isAutoMode = true;
     private const double PacmanImageSize = 40;
+    public event Action? OnEnergizerEaten;
 
     public int Row 
     { 
@@ -73,7 +75,7 @@ public partial class PacmanViewModel:ObservableObject
             Console.WriteLine("Control manual activado. Timer detenido.");
         }
         int oldRow = _currentSpriteRow;
-        _currentSpriteRow = _engine.ChangeDirection(direction, _currentSpriteRow);
+        _currentSpriteRow = _pacmanModel.ChangeDirection(direction, _currentSpriteRow);
         if (oldRow != _currentSpriteRow)
         {
             UpdatePacmanSprites();
@@ -87,21 +89,28 @@ public partial class PacmanViewModel:ObservableObject
     /// </summary>
     public void GetMovePacman()
     {
-        var (nextRow, nextCol) = _engine.MovePacman(Row,Col);
+        var (nextRow, nextCol) = _pacmanModel.MovePacman(Row,Col);
         var targetEntity = _board.FirstOrDefault(c => c.Row == nextRow && c.Col == nextCol);
-        if (targetEntity is not null && _engine.CanMoveTo(targetEntity))
+        Console.WriteLine($"[CanMove] target=({nextRow},{nextCol}) " +
+                          $"type={targetEntity?.Type} " +
+                          $"typeInt={(int?)targetEntity?.Type} " +
+                          $"isGhost={targetEntity is Ghost} " +
+                          $"instanceType={targetEntity?.GetType().Name}");
+        if (targetEntity is null || _engine.CanMoveTo(targetEntity))
         {
-            Console.WriteLine($"Intentando mover a {nextRow}, {nextCol}");
-            var result = _engine.InteractionObjects(targetEntity);
-            int pointsResultEarned = result.PointsEarned;
-            if (pointsResultEarned > 0)
+            if (targetEntity is not null)
             {
-                Score.amount(pointsResultEarned);
-                targetEntity.HasDot = false;
-                targetEntity.IsActive = false;
-                CheckWinCondition();
-                //OnElementRemoved?.Invoke(this, new PacmanGameView.ElementRemovedEventArgs(
-                //result.RemovedElementType, nextRow, nextCol));
+                var result = _engine.InteractionObjects(targetEntity);
+                if (result.PointsEarned > 0)
+                {
+                    Score.amount(result.PointsEarned);
+                    targetEntity.IsActive = false;
+                    if (targetEntity is Pellet { IsEnergizer: true })
+                    {
+                        // Disparar evento o llamar directamente
+                        OnEnergizerEaten?.Invoke();
+                    }
+                }
             }
             UpdatePacmanPosition(_animationFrame, nextRow, nextCol);
         }
@@ -125,7 +134,7 @@ public partial class PacmanViewModel:ObservableObject
     {
         _animationFrame = (_animationFrame + 1) % 2;
 
-        int _size = 16; 
+        int _size = 32; 
         var rect = new PixelRect(_animationFrame * _size, _currentSpriteRow * _size, _size, _size);
         var newSprite  = _spriteManager.GetSpriteSection("PacmanViews.png", rect);
         
@@ -138,33 +147,22 @@ public partial class PacmanViewModel:ObservableObject
     
     private void UpdatePacmanPosition(int animationFrame, int newRow, int newCol)
     {
-        animationFrame = (animationFrame + 1) % 2;
+        _animationFrame = (animationFrame + 1) % 2;
         var oldCell = _board.FirstOrDefault(c => c.Row == Row && c.Col == Col);
         var newCell = _board.FirstOrDefault(c => c.Row == newRow && c.Col == newCol);
         
         if (oldCell is null || newCell is null)
             return;
-        
-        /*oldCell.Type = EntityType.EMPTY;
-        newCell.Type = EntityType.PACMAN;*/
         if (oldCell.Type == EntityType.PACMAN)
             oldCell.Type = EntityType.EMPTY;
         if (newCell is not Ghost)
             newCell.Type = EntityType.PACMAN;
         Row = newRow;
         Col = newCol;
+        PacmanModel.Row = newRow;
+        PacmanModel.Col = newCol;
         _syncService.UpdatePacmanPosition(newRow, newCol);
-        animationFrame = (animationFrame + 1) % 2;
-    }
-    
-    private void CheckWinCondition()
-    {
-        // Si no quedan entidades que tengan un punto, el jugador ganó
-        if (!_board.Any(e => e.HasDot))
-        {
-            Console.WriteLine("¡Nivel Completado!");
-            // Aquí disparas la lógica de siguiente nivel o victoria
-        }
+        //animationFrame = (animationFrame + 1) % 2;
     }
     
 }
