@@ -1,20 +1,18 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Avalonia.Media;
 using PacmanSolution.ViewModels;
 
-namespace PacmanSolution.Models;
+namespace PacmanSolution.Models.Game;
 
 /// <summary>
-/// Sincroniza el tablero lógico con los GameObjects visuales.
-/// Usa GameConfig para que el mapa completo (28×31) quepa en el área de juego sin cortar.
+/// Synchronize the logic board with the logic of GameObjects
+/// Use GameConfig for the map fits in the area the picture
 /// </summary>
 public class GameBoardSyncService
 {
-    private const double DotSize = 5.0;
-    private const double EntitySize = 18.0;
-
+    private const double DotSize = 5;
+    private const double EntitySize = 18;
     private readonly Dictionary<Entity, GameObject> _entityToVisual = new();
     private readonly ObservableCollection<GameObject> _visualObjects;
     private GameObject? _pacmanVisual;
@@ -25,8 +23,8 @@ public class GameBoardSyncService
     }
 
     /// <summary>
-    /// Recorre el Board completo y crea un GameObject por cada Entity relevante.
-    /// Pacman tiene un único visual; su posición se actualiza con UpdatePacmanPosition.
+    /// browse the all board and create each relevant entity
+    /// Pacman had visual the sprite  update with UpdatePacmanPosition
     /// </summary>
     public void BuildFromBoard(ObservableCollection<Entity> board)
     {
@@ -35,6 +33,7 @@ public class GameBoardSyncService
         _pacmanVisual = null;
 
         foreach (var entity in board)
+
         {
             if (entity.Type == EntityType.PACMAN)
             {
@@ -54,7 +53,8 @@ public class GameBoardSyncService
         }
     }
 
-    /// <summary>Actualiza la posición del visual de Pacman cuando se mueve (teclas).</summary>
+    /// <summary>Update the visual position of pacman when it moves
+    /// </summary>
     public void UpdatePacmanPosition(int row, int col)
     {
         if (_pacmanVisual is null) return;
@@ -62,37 +62,37 @@ public class GameBoardSyncService
         _pacmanVisual.Y = row * GameConfig.CellHeight;
     }
 
-    /// <summary>Actualiza el sprite del visual de Pacman (Bitmap o CroppedBitmap, ambos usables como IImage).</summary>
+    /// <summary>Update the pacman with the sprites
+    /// </summary>
     public void UpdatePacmanSprite(object? sprite)
     {
         if (_pacmanVisual is null) return;
-        _pacmanVisual.Sprite = sprite as Avalonia.Media.IImage;
+        _pacmanVisual.Sprite = sprite as IImage;
     }
 
     /// <summary>
-    /// Oculta el visual de un punto cuando Pacman lo come
+    /// Hide the dot when the pacman eat it
     /// </summary>
-    public void HideDot(Entity entity)
+    private void HideDot(Entity entity)
     {
         if (_entityToVisual.TryGetValue(entity, out var visual))
             _visualObjects.Remove(visual);
     }
     
+    /// <summary>
+    /// Check the ghost is in method BuildFromBoard
+    /// in case it's not the method subscribe  with propertyChanged
+    /// </summary>
+    /// <param name="ghosts"></param>
     public void RegisterGhosts(ObservableCollection<Ghost> ghosts)
     {
         foreach (var ghost in ghosts)
         {
-            // Verificar si ya está registrado (viene de BuildFromBoard)
             if (_entityToVisual.ContainsKey(ghost))
-            {
-                Console.WriteLine($"[Sync] Ghost {ghost.Type} ya registrado en ({ghost.Row},{ghost.Col})");
-                continue;
-            }
-
-            // Si no está, crear visual y registrar
-            Console.WriteLine($"[Sync] Registrando ghost {ghost.Type} en ({ghost.Row},{ghost.Col})");
+            { continue; }
             var visual = CreateVisualForEntity(ghost);
-            if (visual is null) continue;
+            if (visual is null)
+            { continue; }
 
             _entityToVisual[ghost] = visual;
             _visualObjects.Add(visual);
@@ -102,7 +102,7 @@ public class GameBoardSyncService
 
     private GameObject? CreateVisualForEntity(Entity entity)
     {
-        static GameObject MakeGhostVisual(Entity e) => new GameObject
+        static GameObject MakeGhostVisual(Entity e) => new()
         {
             X      = e.Col * GameConfig.CellWidth,
             Y      = e.Row * GameConfig.CellHeight,
@@ -110,9 +110,33 @@ public class GameBoardSyncService
             Height = EntitySize,
             Zindex = 9
         };
+        if (entity is Pellet pellet)
+        {
+            if (pellet.IsEnergizer)
+            {
+                return new GameObject
+                {
+                    X         = pellet.Col * GameConfig.CellWidth + 2,
+                    Y         = pellet.Row * GameConfig.CellHeight + 2,
+                    Width     = GameConfig.CellWidth - 4,
+                    Height    = GameConfig.CellHeight - 4,
+                    Zindex    = 5,
+                    FillColor = Brushes.LemonChiffon
+                };
+            }
+            return new GameObject
+            {
+                X         = pellet.Col * GameConfig.CellWidth + (GameConfig.CellWidth - DotSize) / 2,
+                Y         = pellet.Row * GameConfig.CellHeight + (GameConfig.CellHeight - DotSize) / 2,
+                Width     = DotSize,
+                Height    = DotSize,
+                Zindex    = 5,
+                FillColor = Brushes.White
+            };
+        }
         return entity.Type switch
         {
-            EntityType.DOT or EntityType.EMPTY when entity.HasDot => new GameObject
+            /*EntityType.DOT  => new GameObject
             {
                 X         = entity.Col * GameConfig.CellWidth + (GameConfig.CellWidth - DotSize) / 2,
                 Y         = entity.Row * GameConfig.CellHeight + (GameConfig.CellHeight - DotSize) / 2,
@@ -129,7 +153,7 @@ public class GameBoardSyncService
                 Height    = DotSize * 2,
                 Zindex    = 5,
                 FillColor = Brushes.BurlyWood
-            },
+            },*/
             EntityType.PACMAN => new GameObject
             {
                 X      = entity.Col * GameConfig.CellWidth,
@@ -148,12 +172,13 @@ public class GameBoardSyncService
 
     private void OnEntityChanged(Entity entity, string? propertyName)
     {
-        if (!_entityToVisual.TryGetValue(entity, out var visual)) return;
-        Console.WriteLine($"[OnEntityChanged] {entity.Type} prop={propertyName} pos=({entity.Row},{entity.Col})");
-
+        if (!_entityToVisual.TryGetValue(entity, out var visual))
+        {
+            return;
+        }
         switch (propertyName)
         {
-            case nameof(Entity.HasDot) when !entity.HasDot:
+            case nameof(Entity.IsActive) when !entity.IsActive:
                 HideDot(entity);
                 break;
             case nameof(Entity.Row) or nameof(Entity.Col):

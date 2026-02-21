@@ -1,30 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Avalonia;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia.Threading;
+using System.Linq;
 
 namespace PacmanSolution.Models;
 
 public class GameEngine
 {
     private const int TargetFPS = 60;
-    public const int TargetFrameMS = 1000 / TargetFPS;
+    //public const int TargetFrameMS = 1000 / TargetFPS;
     private double TotalTime { get; set; }
     public int CurrentFPS { get; set; }
     private List<Entity> GameObjects { get; set; } = new List<Entity>();
-    public SpriteManager SpriteManager { get; private set; } = new SpriteManager();
+    //public SpriteManager SpriteManager { get; private set; } = new SpriteManager();
     private int _frameCount;
     private double _fpsTimer;
     private DateTime _lastUpdateTime;
     private const int DotPoints = 10;
     private const int EnergizerPoints = 50;
     private const int cherryPoints = 100;
-    private string _currentDirection = "RIGHT";
     public ObservableCollection<GameObject> VisualObjects { get; } = new();
-    private GameObject? _pacmanVisual;
+
+    
+    
 
     public GameEngine()
     {
@@ -79,53 +77,6 @@ public class GameEngine
         _frameCount = 0;
         _fpsTimer = 0;
     }
-    /// <summary>
-    /// Inicializa el objeto visual de Pacman en el Canvas
-    /// </summary>
-    public GameObject CreatePacmanVisual(double x, double y, Bitmap sprite, Rect sourceRect)
-    {
-        var visual = new GameObject
-        {
-            X          = x,
-            Y          = y,
-            Width      = 40,
-            Height     = 40,
-            Zindex     = 10,
-            Sprite     = sprite,
-            SourceRect = sourceRect
-        };
-        _pacmanVisual = visual;
-        VisualObjects.Add(visual);
-        return visual;
-    }
-    /// <summary>
-    /// Actualiza la posición visual de Pacman en el Canvas
-    /// </summary>
-    public void UpdatePacmanVisual(double x, double y, Rect newSourceRect)
-    {
-        if (_pacmanVisual is null) return;
-        _pacmanVisual.X          = x;
-        _pacmanVisual.Y          = y;
-        _pacmanVisual.SourceRect = newSourceRect;
-    }
-
-    /// <summary>
-    /// Create to pellet
-    /// </summary>
-    public GameObject CreateDotVisual(double x, double y)
-    {
-        var visual = new GameObject
-        {
-            X         = x,
-            Y         = y,
-            Width     = 10,
-            Height    = 10,
-            Zindex    = 5,
-            FillColor = Brushes.White
-        };
-        VisualObjects.Add(visual);
-        return visual;
-    }
 
     /// <summary>
     /// Delete a objet visual tp Canvas
@@ -146,6 +97,8 @@ public class GameEngine
     {
         if (targetEntity is null) return false;
         if (targetEntity is Ghost) return true;
+        if (targetEntity.Type is EntityType.REDGHOST or EntityType.PINKGHOST
+            or EntityType.CYANGHOST or EntityType.ORANGEGHOST) return true;
         if (targetEntity.Type is EntityType.WALL || targetEntity.Type is EntityType.DOOR)
         {
             return false;
@@ -161,75 +114,43 @@ public class GameEngine
     public InteractionResultObject InteractionObjects(Entity newEntity)
     {
         var result = new InteractionResultObject { Success = true };
-
-        if (newEntity.HasDot) {
-            newEntity.HasDot = false;
-            result.PointsEarned = DotPoints;
-            result.RemovedElementType = "pellet";
-        }else if (newEntity.Type == EntityType.ENERGIZE) {
-            newEntity.Type = EntityType.EMPTY;
-            result.PointsEarned = EnergizerPoints;
-            result.RemovedElementType = "energizer";
-        }else if (newEntity.Type == EntityType.CHERRY)
+        if (newEntity is Pellet pellet)
         {
-            newEntity.Type = EntityType.EMPTY;
+            ChooseEffectPellet(pellet, result);
+            return result;
+        }
+
+        if (newEntity.Type == EntityType.CHERRY)
+        {
             result.PointsEarned = cherryPoints;
             result.RemovedElementType = "cherry";
-            result.Success = true;
-        }
-        
-        return result;
-    }
-    
-    /// <summary>
-    /// Method change the direction if oldRow is different the actual direction
-    /// </summary>
-    /// <param name="direction"></param>
-    public int ChangeDirection(string direction, int _currentSpriteRow)
-    {
-        _currentDirection = direction.ToUpper();
-        switch (_currentDirection)
-        {
-            case "RIGHT":
-                _currentSpriteRow = 0;
-                break;
-            case "LEFT":
-                _currentSpriteRow = 1;
-                break;
-            case "UP":
-                _currentSpriteRow = 2;
-                break;
-            case "DOWN":
-                _currentSpriteRow = 3;
-                break;
         }
 
-        return _currentSpriteRow;
+        return result;
     }
-    
-    /// <summary>
-    /// Move Pacman in the current direction
-    /// </summary>
-    public (int row, int col) MovePacman(int PacmanRow, int PacmanCol)
+
+    private void ChooseEffectPellet(Pellet pellet,InteractionResultObject result)
     {
-        int nextRow = PacmanRow;
-        int nextCol = PacmanCol;
-        switch (_currentDirection)
+        if (pellet.IsEnergizer)
         {
-            case "UP": 
-                nextRow--;
-                break;
-            case "DOWN":
-                nextRow++;
-                break;
-            case "LEFT":
-                nextCol--;
-                break;
-            case "RIGHT":
-                nextCol++;
-                break;
+            result.PointsEarned = EnergizerPoints;
+            result.RemovedElementType = "energizer";
         }
-        return (nextRow, nextCol);
+        else
+        {
+            result.PointsEarned = DotPoints;
+            result.RemovedElementType = "dot";
+        }
+    }
+
+    private void EffectDotPoints(Entity newEntity, InteractionResultObject result)
+    {
+        
+        if (newEntity.Type == EntityType.CHERRY)
+        {
+            result.PointsEarned = cherryPoints;
+            result.RemovedElementType = "cherry";
+        }
     }
     
     /// <summary>
