@@ -16,6 +16,12 @@ public abstract class GhostBehaviorBase
         return distanceRowCol;
     }
 
+    /// <summary>
+    /// Calculate  the distance  for each  type ghost's  movmient
+    /// </summary>
+    /// <param name="distance"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public static (int distanceRow, int distanceCol) DistanceDelta(GhostDirection distance)
     {
         switch (distance)
@@ -41,6 +47,14 @@ public abstract class GhostBehaviorBase
                || (current == GhostDirection.Right && otherDirectioni == GhostDirection.Left);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="ghost"></param>
+    /// <param name="targetRow"></param>
+    /// <param name="targetCol"></param>
+    /// <param name="board"></param>
+    /// <returns></returns>
     public GhostDirection GetBestDirectionToTarget(
         Ghost ghost, int targetRow, int targetCol,
         ObservableCollection<Entity> board)
