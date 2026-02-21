@@ -87,17 +87,12 @@ public class EngineManager
                 return new Board(row, col, EntityType.DOOR);
             
             case '.':
-                var dot = new Board(row, col, EntityType.EMPTY)
-                {
-                    HasDot = true,
-                    Width = 4,
-                    Height = 4
-                };
+                var dot = new Pellet(row, col, EntityType.DOT, 4, 4, 5, isEnergizer: false);
                 dot.UpdateCanvasPosition();
                 return dot;
             
             case 'o':
-                var energizer = new Board(row, col, EntityType.ENERGIZE) { Width = 10, Height = 10 };
+                var energizer = new Pellet(row, col, EntityType.ENERGIZE, 8, 8, 5, isEnergizer: true);
                 energizer.UpdateCanvasPosition();
                 return energizer;
             case 'P':
