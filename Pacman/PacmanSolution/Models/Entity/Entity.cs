@@ -23,8 +23,6 @@ public abstract partial class Entity:ObservableObject
     [ObservableProperty] 
     private EntityType _type;
     [ObservableProperty] 
-    private bool _hasDot;
-    [ObservableProperty] 
     private bool _isActive = true;
     [ObservableProperty] 
     private double _canvasLeft;
