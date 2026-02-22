@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Media.Imaging;
@@ -8,14 +9,18 @@ public class Pacman: Entity
 {
     private GameObject? _pacmanVisual;
     private string _currentDirection = "RIGHT";
+    public int DeadTicksRemaining { get; set; } = 0;
+    private const int DeadDuration = 84; 
+    public PacmanState State { get; set; } = PacmanState.NORMAL;
     private ObservableCollection<GameObject> VisualObjects { get; } = new();
 
-    public Pacman(int row, int col, EntityType entityType, double width, double height, int zindex) : base(row, col, entityType, width, height, zindex)
+    public Pacman(int row, int col, EntityType entityType, double width, double height, int zindex) 
+        : base(row, col, entityType, width, height, zindex)
     {
     }
-    
+    // normal, imbencible, muerto, muriendo es el periodo de tiempo
     /// <summary>
-    /// Inicializa el objeto visual de Pacman en el Canvas
+    /// Initialize the objet pacman visual in canvas
     /// </summary>
     public GameObject CreatePacmanVisual(double x, double y, Bitmap sprite, Rect sourceRect)
     {
@@ -51,7 +56,6 @@ public class Pacman: Entity
         CanvasLeft = centerX - (Width / 2);
         CanvasTop = centerY - (Height / 2);
     }
-    // normal, imbencible, muerto, muriendo es el periodo de tiempo
     /// <summary>
     /// Method change the direction if oldRow is different the actual direction
     /// </summary>
@@ -101,5 +105,15 @@ public class Pacman: Entity
                 break;
         }
         return (nextRow, nextCol);
+    }
+    
+    public void RespawnPacman(Pacman pacman )
+    {
+        pacman.State = PacmanState.DIEDING;
+        pacman.DeadTicksRemaining = 48;
+        pacman.DeadTicksRemaining = DeadDuration;
+        pacman.UpdateCanvasPosition();
+        Console.WriteLine($"[Comido] {pacman.Type}");
+        
     }
 }

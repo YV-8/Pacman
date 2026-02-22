@@ -136,24 +136,6 @@ public class GameBoardSyncService
         }
         return entity.Type switch
         {
-            /*EntityType.DOT  => new GameObject
-            {
-                X         = entity.Col * GameConfig.CellWidth + (GameConfig.CellWidth - DotSize) / 2,
-                Y         = entity.Row * GameConfig.CellHeight + (GameConfig.CellHeight - DotSize) / 2,
-                Width     = DotSize,
-                Height    = DotSize,
-                Zindex    = 5,
-                FillColor = Brushes.White
-            },
-            EntityType.ENERGIZE => new GameObject
-            {
-                X         = entity.Col * GameConfig.CellWidth + (GameConfig.CellWidth - DotSize * 2) / 2,
-                Y         = entity.Row * GameConfig.CellHeight + (GameConfig.CellHeight - DotSize * 2) / 2,
-                Width     = DotSize * 2,
-                Height    = DotSize * 2,
-                Zindex    = 5,
-                FillColor = Brushes.BurlyWood
-            },*/
             EntityType.PACMAN => new GameObject
             {
                 X      = entity.Col * GameConfig.CellWidth,

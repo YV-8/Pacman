@@ -13,7 +13,7 @@ public partial class GameViewModel
     /// </summary>
     private void InitializePacmanPosition()
     {
-        var pacmanCell = _board.FirstOrDefault(c => c.Type == EntityType.PACMAN);
+        var pacmanCell = Board.FirstOrDefault(c => c.Type == EntityType.PACMAN);
         if (pacmanCell is not null)
         {
             Pacman.Row = pacmanCell.Row;
@@ -41,6 +41,26 @@ public partial class GameViewModel
             }
         };
         _gameTimer.Start();
+        Pacman.OnEnergizerEaten += () => Ghosts.SetFrightened();// suscribe por para el energizantes
+        Pacman.OnPacmanMoved += (row, col) =>
+        {
+            foreach (var ghost in Ghosts.Ghosts)
+                _engine.CollisionsToPacman(ghost, Pacman.PacmanModel, Ghosts.GetModeTimer());
+        };
+        _engine.PacmanDied += () =>
+        {
+            _gameTimer.Stop();
+            _movementTimer?.Stop();
+            Pacman.DeathAnimation();
+        };
+
+        Pacman.OnDeathAnimationFinished += () =>
+        {
+            _countLivePacman--;
+            _gameTimer.Start();
+            _movementTimer?.Start();
+        };
+        
         InitializePacmanPosition();
         StartMovementTimer();
     }
@@ -56,7 +76,7 @@ public partial class GameViewModel
     }
     private void CheckWinCondition()
     {
-        if (!_board.Any(e => e.IsActive))
+        if (!Board.Any(e => e.IsActive))
         {
             Console.WriteLine("¡Nivel Completado!");
             // Aquí disparas la lógica de siguiente nivel o victoria

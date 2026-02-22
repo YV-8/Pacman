@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Avalonia.Media;
 using PacmanSolution.Model;
 using PacmanSolution.Models.Ghosts;
 
@@ -15,14 +14,45 @@ public class Ghost:Entity
     public GhostHunterMode HunterMode { get; set; } = GhostHunterMode.Scatter;
     public int ExitDelayTicks { get; set; } = 0;
     public int AnimationFrame { get; set; } = 0;
+    public int SpawnRow { get; set; }
+    public int SpawnCol { get; set; }
+    public int DeadTicksRemaining { get; set; } = 0;
+    private const int DeadDuration = 21; 
     private readonly BlinkyBehavior _blinky = new();
     private readonly PinkyBehavior  _pinky  = new();
     private readonly InkyBehavior   _inky   = new();
     private readonly ClydeBehavior  _clyde  = new();
+    
 
     public Ghost(int row, int col, EntityType entityType, double width, double height, int zindex) 
         : base(row, col, entityType, width, height, zindex)
     {
+    }
+    public void SetupInitialState(int row, int col)
+    {
+        this.SpawnRow = row;
+        this.SpawnCol = col;
+        this.State = GhostState.INHOUSE;
+        this.HunterMode = GhostHunterMode.Scatter;
+
+        switch (this.Type)
+        {
+            case EntityType.REDGHOST:
+                this.ExitDelayTicks = 0;
+                break;
+            case EntityType.PINKGHOST:
+                this.ExitDelayTicks = 10;
+                break;
+            case EntityType.CYANGHOST:
+                this.ExitDelayTicks = 25;
+                break;
+            case EntityType.ORANGEGHOST:
+                this.ExitDelayTicks = 45;
+                break;
+            default:
+                this.ExitDelayTicks = 0;
+                break;
+        }
     }
     
     public  int GetSpriteRow(EntityType type)
@@ -63,8 +93,10 @@ public class Ghost:Entity
 
         var cell = _board.FirstOrDefault(e => e.Row == newRow && e.Col == newCol);
         if (cell is null || cell.Type is EntityType.WALL) return;
-        if (cell.Type == EntityType.DOOR && ghost.State == GhostState.NORMAL) return;
-        
+        if (cell.Type is EntityType.DOOR && 
+            ghost.State is not GhostState.INHOUSE && 
+            ghost.State is not GhostState.DEAD) return;
+
         ghost.Direction = dir;
         ghost.Row = newRow;
         ghost.Col = newCol;
@@ -81,9 +113,6 @@ public class Ghost:Entity
     /// <returns></returns>
     public GhostDirection AssignDirection(Ghost ghost, Pacman pacman, Ghost blinky, ObservableCollection<Entity> _board)
     {
-        Console.WriteLine($"[AssignDirection] {ghost.Type} HunterMode={ghost.HunterMode} State={ghost.State}");
-        Console.WriteLine($"[Assign] {ghost.Type} Mode={ghost.HunterMode} " +
-                          $"ghost=({ghost.Row},{ghost.Col}) pacman=({pacman.Row},{pacman.Col})");
         GhostDirection nextDirection;
         if (ghost.State == GhostState.FRIGHTENED)
         {
@@ -91,7 +120,7 @@ public class Ghost:Entity
         }
         else if (ghost.HunterMode == GhostHunterMode.Scatter)
         {
-            nextDirection = _blinky.GetScatterDirection(ghost, _board);
+            nextDirection = GetScatter(ghost, _board);
         }
         else
         {
@@ -129,28 +158,64 @@ public class Ghost:Entity
                 e.Row == ghost.Row + rowChange &&
                 e.Col == ghost.Col + colChange);
 
-            if (cell is not null && cell.Type != EntityType.WALL)
+            if (cell is  null || cell.Type is EntityType.WALL)
             {
-                valid.Add(dir);
+                continue;
             }
+            if (cell.Type == EntityType.DOOR) {continue;}
+            valid.Add(dir);
         }
         return valid.Count > 0 ? valid[random.Next(valid.Count)] : ghost.Direction;
     }
-    
+
     public int GetMoveInterval(Ghost ghost)
     {
         switch (ghost.Type)
         {
-            case EntityType.REDGHOST:    
+            case EntityType.REDGHOST:
                 return 2;
-            case EntityType.PINKGHOST:   
+            case EntityType.PINKGHOST:
                 return 3;
-            case EntityType.CYANGHOST:   
+            case EntityType.CYANGHOST:
                 return 3;
-            case EntityType.ORANGEGHOST: 
+            case EntityType.ORANGEGHOST:
                 return 4;
-            default:                     
+            default:
                 return 3;
+        }
+    }
+    private GhostDirection GetScatter(Ghost ghost, ObservableCollection<Entity> board)
+    {
+        switch (ghost.Type)
+        {
+            case EntityType.REDGHOST:    return _blinky.GetScatterDirection(ghost, board);
+            case EntityType.PINKGHOST:   return _pinky.GetScatterDirection(ghost, board);
+            case EntityType.CYANGHOST:   return _inky.GetScatterDirection(ghost, board);
+            case EntityType.ORANGEGHOST: return _clyde.GetScatterDirection(ghost, board);
+            default:                     return ghost.Direction;
+        }
+    }
+
+    public void RespawnGhost(Ghost ghost )
+    {
+        ghost.State = GhostState.DEAD;
+        ghost.DeadTicksRemaining = 14;
+        ghost.DeadTicksRemaining = DeadDuration;
+        ghost.UpdateCanvasPosition();
+        Console.WriteLine($"[Comido] {ghost.Type}");
+        //ghost.Row = 14; 
+        //ghost.Col = 13;
+        
+    }
+    public int GetRespawnDelay(EntityType type)
+    {
+        switch (type)
+        {
+            case EntityType.REDGHOST:    return 0;
+            case EntityType.PINKGHOST:   return 10;
+            case EntityType.CYANGHOST:   return 20;
+            case EntityType.ORANGEGHOST: return 35;
+            default:                     return 0;
         }
     }
 }

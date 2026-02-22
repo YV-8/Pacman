@@ -15,7 +15,9 @@ public class HouseBehavior:GhostBehaviorBase
         if (ghost.Row <= DoorRow)
         {
             ghost.State = GhostState.NORMAL;
-            ghost.Direction = GhostDirection.Up;
+            ghost.HunterMode = GhostHunterMode.Scatter;
+            ghost.Direction = GhostDirection.Left;
+            ghost.Row = ExitRow;
             return true;
         }
         /*if (ghost.Col is not DoorCol)
@@ -49,7 +51,6 @@ public class HouseBehavior:GhostBehaviorBase
             ghost.UpdateCanvasPosition();
             return false;
         }
-
         // Subir directamente — dentro de la casa no hay paredes arriba
         ghost.Direction = GhostDirection.Up;
         ghost.Row--;

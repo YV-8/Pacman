@@ -12,17 +12,14 @@ public class GameEngine
     private double TotalTime { get; set; }
     public int CurrentFPS { get; set; }
     private List<Entity> GameObjects { get; set; } = new List<Entity>();
-    //public SpriteManager SpriteManager { get; private set; } = new SpriteManager();
     private int _frameCount;
     private double _fpsTimer;
     private DateTime _lastUpdateTime;
     private const int DotPoints = 10;
     private const int EnergizerPoints = 50;
     private const int cherryPoints = 100;
+    public event Action? PacmanDied;
     public ObservableCollection<GameObject> VisualObjects { get; } = new();
-
-    
-    
 
     public GameEngine()
     {
@@ -127,6 +124,26 @@ public class GameEngine
         }
 
         return result;
+    }
+    
+    public void CollisionsToPacman(Ghost ghost, Models.Pacman pacman, int _modeTimer)
+    {
+        if (ghost.Row == pacman.Row && ghost.Col == pacman.Col)
+        {
+            if (ghost.State is GhostState.DEAD || ghost.State is GhostState.INHOUSE) return; 
+            if (ghost.State == GhostState.FRIGHTENED)
+            {
+                ghost.RespawnGhost(ghost);
+                if (ghost.State == GhostState.DEAD) return;
+            }
+            else if (ghost.State == GhostState.NORMAL)
+            {
+                
+                pacman.RespawnPacman(pacman);
+                Console.WriteLine($"[Muerte Pacman] por {ghost.Type}");
+                PacmanDied?.Invoke();
+            }
+        }
     }
 
     private void ChooseEffectPellet(Pellet pellet,InteractionResultObject result)

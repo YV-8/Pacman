@@ -9,7 +9,7 @@ namespace PacmanSolution.Model;
 public abstract class GhostBehaviorBase
 {
     protected static double Distance(int row, int col, int targetRow, int targetCol)
-    {
+    { 
         double distanceRow = row - targetRow;
         double distanceCol = col - targetCol;
         double distanceRowCol = distanceRow * distanceRow + distanceCol * distanceCol;
@@ -72,8 +72,10 @@ public abstract class GhostBehaviorBase
             var entity = board.FirstOrDefault(e => e.Row == testRow && e.Col == testCol);
             if (entity is null || entity.Type is EntityType.WALL) continue;
 
-            if (entity.Type is EntityType.DOOR && ghost.State == GhostState.NORMAL) continue;
-            
+            //if (entity.Type is EntityType.DOOR && ghost.State == GhostState.NORMAL) continue;
+            if (entity.Type is EntityType.DOOR && 
+                ghost.State != GhostState.INHOUSE && 
+                ghost.State != GhostState.DEAD) continue;
             double dist = Distance(testRow, testCol, targetRow, targetCol);
             candidates.Add((directionRow, dist));
         }

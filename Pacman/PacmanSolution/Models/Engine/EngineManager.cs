@@ -117,9 +117,9 @@ public class EngineManager
             case 0:
                 return EntityType.REDGHOST;
             case 1:
-                return EntityType.CYANGHOST;  
+                return EntityType.PINKGHOST;  
             case 2:
-                return EntityType.PINKGHOST;
+                return EntityType.CYANGHOST;
             case 3:
                 return EntityType.ORANGEGHOST;
             default:
