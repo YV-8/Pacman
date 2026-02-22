@@ -24,7 +24,7 @@ public class SoundManager
         _shouldLoop = isLooping;
         try
         {
-            var assetUri = new Uri("avares://PacmanSolution/Assets/Media/PacManOriginalThemeTheCantinaBand.wav");
+            var assetUri = new Uri($"avares://PacmanSolution/Assets/Media/{nameSong}.wav");
             using var stream = AssetLoader.Open(assetUri);
             _tempFilePath = Path.Combine(Path.GetTempPath(), "pacman_temp_sound.wav");
             using (var fileStream = File.Create(_tempFilePath))

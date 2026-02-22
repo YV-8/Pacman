@@ -57,7 +57,7 @@ public partial class GameViewModel: ObservableObject
     [RelayCommand]
     private void ToggleAudioCommand( bool isChecked)
     {
-        var path = "PacmanTheme";
+        var path = "PacManGameSound";
         if (isChecked)
         {
             _soundManager.PlaySound(path,true);

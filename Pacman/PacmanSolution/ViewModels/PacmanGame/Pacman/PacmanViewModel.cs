@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
 using PacmanSolution.Models.Game;
 
@@ -23,13 +24,14 @@ public partial class PacmanViewModel:ObservableObject
     private readonly ObservableCollection<Entity> _board;
     private readonly GameBoardSyncService _syncService;
     private readonly SpriteManager _spriteManager = new ();
+    private readonly SoundManager _soundManager = new ();
     
     private int _row;
     private int _col;
     private int _currentSpriteRow = 0;
     private int _animationFrame = 0;
     private int _deathFrame = 0;
-    private const int DeathTotalFrames = 11; // ajusta según tu spritesheet
+    private const int DeathTotalFrames = 12; // ajusta según tu spritesheet
     private const int DeathSpriteRow = 2;    // fila de muerte en tu PNG, ajusta
     
     private DispatcherTimer? _animationTimer;
@@ -184,22 +186,14 @@ public partial class PacmanViewModel:ObservableObject
     {
         _deathFrame = 0;
         _movementTimer?.Stop();
+        DeathAudioCommand(true);
         _deathTimer = new DispatcherTimer();
         _deathTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(300)
+            Interval = TimeSpan.FromMilliseconds(450)
         };
         _deathTimer.Tick += (s, e) =>
         {
-            ;
-            _deathFrame++;
-            if (_deathFrame >= DeathTotalFrames)
-            {
-                _deathTimer.Stop();
-                OnDeathAnimationFinished.Invoke();
-                return;
-            }
-
             var _size = 32;
             var dyingRect = new PixelRect(_deathFrame * _size, DeathSpriteRow * _size, _size, _size);
             var sprite = _spriteManager.GetSpriteSection("PacmanViews.png", dyingRect);
@@ -208,8 +202,29 @@ public partial class PacmanViewModel:ObservableObject
                 PacmanCurrentSprite = sprite;
                 _syncService.UpdatePacmanSprite(sprite);
             }
+            _deathFrame++;
+            if (_deathFrame >= DeathTotalFrames)
+            {
+                _deathTimer.Stop();
+                DeathAudioCommand(false);
+                OnDeathAnimationFinished.Invoke();
+                return;
+            }
+            
         };
         _deathTimer.Start();
+    }
+    private void DeathAudioCommand( bool isChecked)
+    {
+        var path = "PacmanDeathSound";
+        if (isChecked)
+        {
+            _soundManager.PlaySound(path,true);
+        }
+        else
+        {
+            _soundManager.StopSound();
+        }
     }
     
 }

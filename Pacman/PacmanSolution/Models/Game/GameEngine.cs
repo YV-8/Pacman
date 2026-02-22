@@ -19,6 +19,7 @@ public class GameEngine
     private const int EnergizerPoints = 50;
     private const int cherryPoints = 100;
     public event Action? PacmanDied;
+    public event Action? PacmanImbemcible;
     public ObservableCollection<GameObject> VisualObjects { get; } = new();
 
     public GameEngine()
@@ -152,6 +153,7 @@ public class GameEngine
         {
             result.PointsEarned = EnergizerPoints;
             result.RemovedElementType = "energizer";
+            PacmanImbemcible.Invoke();//evento para el pacman pero podria usar lo que uso para que los fantasmas sean comidos
         }
         else
         {
