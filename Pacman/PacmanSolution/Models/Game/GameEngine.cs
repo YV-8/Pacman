@@ -19,12 +19,21 @@ public class GameEngine
     private const int EnergizerPoints = 50;
     private const int cherryPoints = 100;
     public event Action? PacmanDied;
-    public event Action? PacmanImbemcible;
+    public event Action? OnEnergizerEaten;
     public ObservableCollection<GameObject> VisualObjects { get; } = new();
+    public int TotalPellets { get; private set; } = 0;
+    public int EatenPellets { get; private set; } = 0;
+    public event Action? LevelComplete;
+    public event Action<int>? GhostEaten;
 
     public GameEngine()
     {
         _lastUpdateTime = DateTime.Now;
+    }
+    public void InitPelletCount(ObservableCollection<Entity> board)
+    {
+        TotalPellets = board.OfType<Pellet>().Count();
+        EatenPellets = 0;
     }
     public void Update()
     {
@@ -127,15 +136,16 @@ public class GameEngine
         return result;
     }
     
-    public void CollisionsToPacman(Ghost ghost, Models.Pacman pacman, int _modeTimer)
+    public int CollisionsToPacman(Ghost ghost, Models.Pacman pacman, int _modeTimer)
     {
         if (ghost.Row == pacman.Row && ghost.Col == pacman.Col)
         {
-            if (ghost.State is GhostState.DEAD || ghost.State is GhostState.INHOUSE) return; 
+            if (ghost.State is GhostState.DEAD || ghost.State is GhostState.INHOUSE) return 0; 
             if (ghost.State == GhostState.FRIGHTENED)
             {
                 ghost.RespawnGhost(ghost);
-                if (ghost.State == GhostState.DEAD) return;
+                if (ghost.State == GhostState.DEAD) ;
+                return -1;
             }
             else if (ghost.State == GhostState.NORMAL)
             {
@@ -145,6 +155,7 @@ public class GameEngine
                 PacmanDied?.Invoke();
             }
         }
+        return 0;
     }
 
     private void ChooseEffectPellet(Pellet pellet,InteractionResultObject result)
@@ -153,13 +164,16 @@ public class GameEngine
         {
             result.PointsEarned = EnergizerPoints;
             result.RemovedElementType = "energizer";
-            PacmanImbemcible.Invoke();//evento para el pacman pero podria usar lo que uso para que los fantasmas sean comidos
+            OnEnergizerEaten?.Invoke();//evento para el pacman pero podria usar lo que uso para que los fantasmas sean comidos
         }
         else
         {
             result.PointsEarned = DotPoints;
             result.RemovedElementType = "dot";
         }
+        EatenPellets++;
+        if (EatenPellets >= TotalPellets)
+            LevelComplete?.Invoke();
     }
 
     private void EffectDotPoints(Entity newEntity, InteractionResultObject result)

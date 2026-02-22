@@ -114,11 +114,16 @@ public class Ghost:Entity
     public GhostDirection AssignDirection(Ghost ghost, Pacman pacman, Ghost blinky, ObservableCollection<Entity> _board)
     {
         GhostDirection nextDirection;
-        if (ghost.State == GhostState.FRIGHTENED)
+        if (ghost.State is GhostState.FRIGHTENED)
         {
-            nextDirection = GetRandomDirection(ghost, _board);
+            var randomDir = GetRandomDirection(ghost, _board);
+            if (ghost.Row <= 11 && randomDir == GhostDirection.Down)
+            {
+                return GhostDirection.Left;
+            }
+            return randomDir;
         }
-        else if (ghost.HunterMode == GhostHunterMode.Scatter)
+        else if (ghost.HunterMode is GhostHunterMode.Scatter)
         {
             nextDirection = GetScatter(ghost, _board);
         }
