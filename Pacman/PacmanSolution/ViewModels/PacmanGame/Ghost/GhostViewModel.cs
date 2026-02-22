@@ -26,7 +26,8 @@ public partial class GhostViewModel :ObservableObject
 
     private int _globalAnimationFrame = 0;
     private int _modeTimer = 0;
-    private const int ScatterDuration = 28;
+    private int _modeCycleTimer = 0;
+    private const int ScatterDuration = 45;
     private const int ChaseDuration = 80;
     private const int _size = 16;
     private GhostDirection _pacmanDirection = GhostDirection.Left;
@@ -35,11 +36,12 @@ public partial class GhostViewModel :ObservableObject
     public int GetModeTimer() => _modeTimer;
 
     public GhostViewModel(ObservableCollection<Entity> board,GameBoardSyncService? syncService, 
-        Models.Pacman pacmanModel)
+        Models.Pacman pacmanModel,GameEngine engine)
     {
         _syncService = syncService;
         _board = board;
         _pacmanModel = pacmanModel;
+        _gameEngine = engine;
         InitializeGhosts();
     }
     /*public void SetPacmanDirection(GhostDirection direction)
@@ -51,26 +53,10 @@ public partial class GhostViewModel :ObservableObject
         Ghosts.Clear();
         foreach (var entity in _board.OfType<Ghost>())
         {
+            entity.SetupInitialState(entity.Row, entity.Col);
+            // Guardamos en el diccionario por si lo necesitas para otras lógicas
             _spawnPositions[entity.Type] = (entity.Row, entity.Col);
-            switch (entity.Type)
-            {
-                case EntityType.REDGHOST:
-                    entity.ExitDelayTicks = 0;
-                    entity.State = GhostState.INHOUSE;
-                    break;
-                case EntityType.PINKGHOST:
-                    entity.ExitDelayTicks = 10;
-                    entity.State = GhostState.INHOUSE;
-                    break;
-                case EntityType.CYANGHOST:
-                    entity.ExitDelayTicks = 25;
-                    entity.State = GhostState.INHOUSE;
-                    break;
-                case EntityType.ORANGEGHOST:
-                    entity.ExitDelayTicks = 45;
-                    entity.State = GhostState.INHOUSE;
-                    break;
-            }
+        
             Ghosts.Add(entity);
         }
     }
@@ -118,6 +104,13 @@ public partial class GhostViewModel :ObservableObject
     
     private IImage? GetGhostSprite(Ghost ghost)
     {
+        if (ghost.State == GhostState.DEAD)
+        {
+            int deadFright =9 + _globalAnimationFrame;
+            var deadRect = new PixelRect(deadFright * _size, 1 * _size, _size, _size);
+            return _spriteManager.GetSpriteSection("GhostViews.png", deadRect);
+        }
+        
         if (ghost.State == GhostState.FRIGHTENED)
         {
             int colFright =8 + _globalAnimationFrame;
@@ -133,8 +126,11 @@ public partial class GhostViewModel :ObservableObject
     
     private void UpdateHunterMode()
     {
-        
-        var cycleLife = _modeTimer % (ScatterDuration + ChaseDuration);
+        bool anyOutside = Ghosts.Any(g => g.State == GhostState.NORMAL);
+    
+        if (anyOutside)
+            _modeCycleTimer++;
+        var cycleLife = _modeCycleTimer % (ScatterDuration + ChaseDuration);
         GhostHunterMode newMode = cycleLife < ScatterDuration ? GhostHunterMode.Scatter : GhostHunterMode.Chase;
 
         foreach (var ghost in Ghosts)
@@ -154,7 +150,6 @@ public partial class GhostViewModel :ObservableObject
     /// </summary>
     private void MoveGhosts()
     {
-        SyncGhostPositionsToBoard();
         var pacman = _pacmanModel;
         var blinky = Ghosts.FirstOrDefault(g => g.Type == EntityType.REDGHOST);
         if (pacman is null || blinky is null) return;
@@ -164,17 +159,43 @@ public partial class GhostViewModel :ObservableObject
             {
                 continue;
             }
+            if (ghost.State == GhostState.DEAD)
+            {
+                ghost.DeadTicksRemaining--;
+                if (ghost.Row < ghost.SpawnRow) ghost.Row++;
+                else if (ghost.Row > ghost.SpawnRow) ghost.Row--;
+            
+                if (ghost.Col < ghost.SpawnCol) ghost.Col++;
+                else if (ghost.Col > ghost.SpawnCol) ghost.Col--;
+
+                ghost.UpdateCanvasPosition();
+
+                // ¿Llegó a casa?
+                if (ghost.DeadTicksRemaining <= 0 || 
+                    (ghost.Row == ghost.SpawnRow && ghost.Col == ghost.SpawnCol))
+                {
+                    ghost.Row = ghost.SpawnRow;
+                    ghost.Col = ghost.SpawnCol;
+                    ghost.State = GhostState.INHOUSE;
+                    ghost.Direction = GhostDirection.Left;
+                    ghost.HunterMode = GhostHunterMode.Chase;
+                    int delay = ghost.GetRespawnDelay(ghost.Type);
+                    ghost.ExitDelayTicks = _modeTimer + delay;
+                    ghost.UpdateCanvasPosition();
+                }
+                continue;
+            }
             
             if (ghost.State is GhostState.INHOUSE)
             {
                 if (!ghost.CanExitHouse(_modeTimer)) { continue; }
-                var exited = _house.TryExit(ghost, _board);
+                _house.TryExit(ghost, _board);
                 continue;
             }
             GhostDirection nextDirection = ghost.AssignDirection(ghost,pacman,blinky,_board);
 
             ghost.ApplyGhostsMove(ghost, nextDirection, _board);
-            CollisionsToPacman(ghost, pacman);
+            _gameEngine.CollisionsToPacman(ghost, pacman,_modeTimer);// camibar al pacman esto
         }
             
     }
@@ -183,66 +204,15 @@ public partial class GhostViewModel :ObservableObject
     /// Synchronize  the position with the board
     /// and change the cell
     /// </summary>
-    private void SyncGhostPositionsToBoard()
-    {
-        foreach (var cell in _board)
-        {
-            if(cell is Ghost) continue;
-            if (cell is not Ghost && 
-                cell.Type is EntityType.REDGHOST or EntityType.PINKGHOST 
-                    or EntityType.CYANGHOST or EntityType.ORANGEGHOST)
-            {
-                cell.Type = EntityType.EMPTY;
-            }
-        }
-    }
-
-    private void CollisionsToPacman(Ghost ghost, Models.Pacman pacman)
-    {
-        if (ghost.Row == pacman.Row && ghost.Col == pacman.Col)
-        {
-            if (ghost.State is GhostState.FRIGHTENED)
-            {
-                RespawnGhost(ghost);
-                // Pacman come al fantasma
-                ghost.State = GhostState.INHOUSE;
-                ghost.Row = 14; // regresa a la casa
-                ghost.Col = 13;
-                ghost.UpdateCanvasPosition();
-                Console.WriteLine($"[Colisión] Pacman comió a {ghost.Type}");
-            }
-            else
-            {
-                //pacman.Die
-                Console.WriteLine($"[Colisión] {ghost.Type} mató a Pacman");
-                // Aquí disparas el evento de muerte de Pacman
-            }
-        }
-    }
-    private void RespawnGhost(Ghost ghost)
-    {
-        if (!_spawnPositions.TryGetValue(ghost.Type, out var spawn)) return;
     
-        ghost.Row = spawn.row;
-        ghost.Col = spawn.col;
-        ghost.State = GhostState.INHOUSE;
-        ghost.Direction = GhostDirection.Left;
-        ghost.UpdateCanvasPosition();
-    
-        // Resetear el delay para que espere antes de salir de nuevo
-        switch (ghost.Type)
-        {
-            case EntityType.REDGHOST:   ghost.ExitDelayTicks = _modeTimer + 0;  break;
-            case EntityType.PINKGHOST:  ghost.ExitDelayTicks = _modeTimer + 10; break;
-            case EntityType.CYANGHOST:  ghost.ExitDelayTicks = _modeTimer + 25; break;
-            case EntityType.ORANGEGHOST:ghost.ExitDelayTicks = _modeTimer + 45; break;
-        }
-    }
     public void SetFrightened()
     {
         foreach (var ghost in Ghosts)
         {
-            ghost.State = GhostState.FRIGHTENED;
+            if (ghost.State != GhostState.DEAD)
+            {
+                ghost.State = GhostState.FRIGHTENED;
+            }
         }
         UpdateAllSprites();    
     }
@@ -256,6 +226,9 @@ public partial class GhostViewModel :ObservableObject
     private void SetInHouse()
     {
         foreach (var ghost in Ghosts)
-            ghost.State = GhostState.INHOUSE;
+        {
+            if (ghost.State == GhostState.FRIGHTENED)
+            {ghost.State = GhostState.NORMAL; }
+        }
     }
 }
