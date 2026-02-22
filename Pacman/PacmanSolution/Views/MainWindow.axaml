@@ -120,7 +120,7 @@
                     </Button>
                     
                     <Button Classes="PacmanRetro" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                            Command="{Binding NavigateCommand}" 
+                            Command="{Binding ExitGameCommand}" 
                             CommandParameter ="ExitGame" BorderBrush="Yellow">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="🍒  Exit          " VerticalAlignment="Center" 
@@ -170,7 +170,7 @@
                     <DataTemplate DataType="vm:GameViewModel">
                         <views:GameView />
                     </DataTemplate>
-                    <DataTemplate DataType="vm:ScoreBoardPageViewModel">
+                    <DataTemplate DataType="vm:ScoreBoardViewModel">
                         <views:ScoreBoardPageView />
                     </DataTemplate>
                     <DataTemplate DataType="vm:MainWindowViewModel">

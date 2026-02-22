@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace PacmanSolution.ViewModels;
 
-public partial class ScoreBoardPageViewModel:ObservableObject
+public partial class ScoreBoardViewModel:ObservableObject
 {
     public event PropertyChangedEventHandler? PropertyChanged;
     [ObservableProperty]
@@ -15,7 +15,7 @@ public partial class ScoreBoardPageViewModel:ObservableObject
     private int _totalScoreCherry=1500;
     private int _scoreCherry=0;
 
-    public ScoreBoardPageViewModel()
+    public ScoreBoardViewModel()
     {
         Score = 0;
         HighScore = 0;

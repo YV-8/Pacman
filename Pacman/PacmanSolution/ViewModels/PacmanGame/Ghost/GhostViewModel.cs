@@ -4,8 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia;
 using Avalonia.Media;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using PacmanSolution.Model;
 using PacmanSolution.Models;
 using PacmanSolution.Models.Game;
 using PacmanSolution.Models.Ghosts;
@@ -23,25 +23,30 @@ public partial class GhostViewModel :ObservableObject
     private readonly GameBoardSyncService? _syncService;
     private readonly Models.Pacman _pacmanModel;
     private readonly Dictionary<EntityType, (int row, int col)> _spawnPositions = new();
-
-    private int _globalAnimationFrame = 0;
-    private int _modeTimer = 0;
-    private int _modeCycleTimer = 0;
+    private readonly ScoreBoardViewModel _score;
+    
+    private int _globalAnimationFrame;
+    private int _modeTimer;
+    private int _modeCycleTimer;
+    private int _ghostsEatenThisRound = 0;
+    private static readonly int[] GhostPoints = { 200, 400, 800, 1600 };
     private const int ScatterDuration = 45;
     private const int ChaseDuration = 80;
     private const int _size = 16;
     private GhostDirection _pacmanDirection = GhostDirection.Left;
     private GameEngine _gameEngine;
     private Ghost _ghostModel;
+    private DispatcherTimer _timerFrighten;
     public int GetModeTimer() => _modeTimer;
 
     public GhostViewModel(ObservableCollection<Entity> board,GameBoardSyncService? syncService, 
-        Models.Pacman pacmanModel,GameEngine engine)
+        Models.Pacman pacmanModel,GameEngine engine,ScoreBoardViewModel score)
     {
         _syncService = syncService;
         _board = board;
         _pacmanModel = pacmanModel;
         _gameEngine = engine;
+        _score = score;
         InitializeGhosts();
     }
     /*public void SetPacmanDirection(GhostDirection direction)
@@ -135,8 +140,7 @@ public partial class GhostViewModel :ObservableObject
 
         foreach (var ghost in Ghosts)
         {
-            if (ghost.State is not GhostState.INHOUSE && 
-                ghost.State is not GhostState.FRIGHTENED)
+            if (ghost.State == GhostState.NORMAL)
             {
                 ghost.HunterMode = newMode;
             }
@@ -189,24 +193,34 @@ public partial class GhostViewModel :ObservableObject
             if (ghost.State is GhostState.INHOUSE)
             {
                 if (!ghost.CanExitHouse(_modeTimer)) { continue; }
-                _house.TryExit(ghost, _board);
-                continue;
+                bool exited = _house.TryExit(ghost, _board);
+                if (!exited) continue;
+                ghost.ApplyGhostsMove(ghost, nextDirection, _board);
+                int collisionResult = _gameEngine.CollisionsToPacman(ghost, pacman, _modeTimer);
+                if (collisionResult == -1)
+                {
+                    int points = GetGhostPoints();
+                    _score.amount(points);
+                    Console.WriteLine($"THe pacman ate ghost{points}");
+                }
             }
             GhostDirection nextDirection = ghost.AssignDirection(ghost,pacman,blinky,_board);
 
             ghost.ApplyGhostsMove(ghost, nextDirection, _board);
-            _gameEngine.CollisionsToPacman(ghost, pacman,_modeTimer);// camibar al pacman esto
+            int collisionResult = _gameEngine.CollisionsToPacman(ghost, pacman, _modeTimer);
+            if (collisionResult == -1)
+            {
+                int points = GetGhostPoints();
+                _score.amount(points);
+                Console.WriteLine($"THe pacman ate ghost{points}");
+            }
         }
             
     }
     
-    /// <summary>
-    /// Synchronize  the position with the board
-    /// and change the cell
-    /// </summary>
-    
     public void SetFrightened()
     {
+        _ghostsEatenThisRound = 0;
         foreach (var ghost in Ghosts)
         {
             if (ghost.State != GhostState.DEAD)
@@ -217,10 +231,51 @@ public partial class GhostViewModel :ObservableObject
         UpdateAllSprites();    
     }
 
+    public void StartFrightenedMode()
+    {
+        _timerFrighten?.Stop();
+        foreach (var ghost in Ghosts)
+        {
+            if (ghost.State == GhostState.NORMAL)
+                ghost.State = GhostState.FRIGHTENED;
+        }
+        UpdateAllSprites();
+
+        _timerFrighten = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(8000)
+        };
+        _timerFrighten.Tick += (s, e) =>
+        {
+            _timerFrighten.Stop();
+            SetNormal();
+        };
+        _timerFrighten.Start();
+    }
+    
+    public int GetGhostPoints()
+    {
+        int index = Math.Min(_ghostsEatenThisRound, GhostPoints.Length - 1);
+        int points = GhostPoints[index];
+        _ghostsEatenThisRound++;
+        return points;
+    }
+
     public void SetNormal()
     {
         foreach (var ghost in Ghosts)
-            ghost.State = GhostState.NORMAL;
+        {
+            if (ghost.State == GhostState.FRIGHTENED)
+                ghost.State = GhostState.NORMAL;
+        }
+        
+        UpdateAllSprites();
+    }
+    public void PauseFrightenedTimer() => _timerFrighten?.Stop();
+    public void ResumeFrightenedTimer()
+    {
+        if (_timerFrighten is not null)
+            _timerFrighten.Start();
     }
 
     private void SetInHouse()

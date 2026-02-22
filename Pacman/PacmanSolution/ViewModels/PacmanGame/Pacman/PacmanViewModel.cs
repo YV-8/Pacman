@@ -5,7 +5,6 @@ using Avalonia;
 using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
 using PacmanSolution.Models.Game;
 
@@ -16,7 +15,7 @@ public partial class PacmanViewModel:ObservableObject
     [ObservableProperty] private double _canvasLeft;
     [ObservableProperty] private double _canvasTop;
     [ObservableProperty] private IImage? _currentSource;
-    [ObservableProperty] private ScoreBoardPageViewModel _score;
+    [ObservableProperty] private ScoreBoardViewModel _score;
     [ObservableProperty]
     private IImage? _pacmanCurrentSprite;
     [ObservableProperty] private Models.Pacman _pacmanModel;
@@ -39,7 +38,6 @@ public partial class PacmanViewModel:ObservableObject
     private DispatcherTimer? _deathTimer;
     private bool _isAutoMode = true;
     private const double PacmanImageSize = 40;
-    public event Action? OnEnergizerEaten;
     public event Action<int, int>? OnPacmanMoved;
     public event Action? OnDeathAnimationFinished;
 
@@ -57,7 +55,7 @@ public partial class PacmanViewModel:ObservableObject
             OnPropertyChanged(nameof(Col)); } 
     }
     public PacmanViewModel(GameEngine engine, ObservableCollection<Entity> board,
-        DispatcherTimer movementTimer, ScoreBoardPageViewModel score,
+        DispatcherTimer movementTimer, ScoreBoardViewModel score,
         GameBoardSyncService syncService)
     {
         _engine = engine;
@@ -102,18 +100,13 @@ public partial class PacmanViewModel:ObservableObject
         var targetEntity = _board.FirstOrDefault(c => c.Row == nextRow && c.Col == nextCol);
         if (targetEntity is null || _engine.CanMoveTo(targetEntity))
         {
-            if (targetEntity is not null)
+            if (targetEntity is not null && targetEntity.IsActive)
             {
                 var result = _engine.InteractionObjects(targetEntity);
                 if (result.PointsEarned > 0)
                 {
                     Score.amount(result.PointsEarned);
                     targetEntity.IsActive = false;
-                    if (targetEntity is Pellet { IsEnergizer: true })
-                    {
-                        // Disparar evento o llamar directamente
-                        OnEnergizerEaten?.Invoke();
-                    }
                 }
             }
             UpdatePacmanPosition(_animationFrame, nextRow, nextCol);
@@ -179,7 +172,6 @@ public partial class PacmanViewModel:ObservableObject
         PacmanModel.Row = newRow;
         PacmanModel.Col = newCol;
         _syncService.UpdatePacmanPosition(newRow, newCol);
-        //animationFrame = (animationFrame + 1) % 2;
     }
 
     public void DeathAnimation()

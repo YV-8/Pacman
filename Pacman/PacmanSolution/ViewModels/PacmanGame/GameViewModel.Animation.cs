@@ -23,6 +23,13 @@ public partial class GameViewModel
     
     private void StartGameLoop()
     {
+        subscribeEvents();
+        InitializePacmanPosition();
+        StartMovementTimer();
+    }
+
+    private void subscribeEvents()
+    {
         _gameTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromMilliseconds(150)
@@ -41,7 +48,11 @@ public partial class GameViewModel
             }
         };
         _gameTimer.Start();
-        Pacman.OnEnergizerEaten += () => Ghosts.SetFrightened();// suscribe por para el energizantes
+        _engine.OnEnergizerEaten += () =>
+        {
+            Ghosts.SetFrightened();
+            Ghosts.StartFrightenedMode();
+        };
         Pacman.OnPacmanMoved += (row, col) =>
         {
             foreach (var ghost in Ghosts.Ghosts)
@@ -52,6 +63,7 @@ public partial class GameViewModel
             _gameTimer.Stop();
             _movementTimer?.Stop();
             Pacman.DeathAnimation();
+            //poner en letras rojas y en el panel arriba de  mmi panel de ahora un mensaje de murio
         };
 
         Pacman.OnDeathAnimationFinished += () =>
@@ -60,9 +72,15 @@ public partial class GameViewModel
             _gameTimer.Start();
             _movementTimer?.Start();
         };
-        
-        InitializePacmanPosition();
-        StartMovementTimer();
+        _engine.InitPelletCount(Board);
+        _engine.LevelComplete += () =>
+        {
+            _gameTimer.Stop();
+            _movementTimer?.Stop();
+            Console.WriteLine("¡Nivel completado!");
+            // aquí navegas a pantalla de victoria
+            Navigation.ChangePage("WinScreen");
+        };
     }
     
     private void StartMovementTimer()

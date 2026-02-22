@@ -13,7 +13,7 @@ public partial class GameViewModel: ObservableObject
 {
     [ObservableProperty] private PacmanViewModel _pacman;
     [ObservableProperty] private GhostViewModel _ghosts;
-    [ObservableProperty] private ScoreBoardPageViewModel _score;
+    [ObservableProperty] private ScoreBoardViewModel _score;
     [ObservableProperty] private ManagePageChange _navigation;
     [ObservableProperty] private object _currentSubView;
     
@@ -21,11 +21,12 @@ public partial class GameViewModel: ObservableObject
     private readonly GameEngine _engine = new();
     private readonly EngineManager _engineManager;
     private readonly GameBoardSyncService _syncService;
+    private const string _nameSprite = null;
+    private int _countLivePacman=3;
     private DispatcherTimer _gameTimer;
     private DispatcherTimer? _gameLoopTimer;
     private DispatcherTimer _movementTimer;
-    private const string _nameSprite = null;
-    private int _countLivePacman=3;
+    private DispatcherTimer? _frightenedTimer;
     public ObservableCollection<GameObject> GameObjects => _engine.VisualObjects;
     private ObservableCollection<Entity> Board { get; set; } = new();
 
@@ -34,7 +35,7 @@ public partial class GameViewModel: ObservableObject
         _navigation = navigation;//navega en paginas
         Board.Clear();
         CurrentSubView = this;// esto es del navegador
-        Score = new ScoreBoardPageViewModel();// es el score board que luego me toca hacerlo 
+        Score = new ScoreBoardViewModel();// es el score board que luego me toca hacerlo 
         _engineManager = new EngineManager(28, 31);//pasa parametros
         _engineManager.BuildGameBoard(Board);// lo contruye
         
@@ -42,7 +43,7 @@ public partial class GameViewModel: ObservableObject
         _syncService.BuildFromBoard(Board);// locontruye para lo visual ahora
         
         Pacman = new PacmanViewModel(_engine, Board, _movementTimer, Score, _syncService);
-        Ghosts = new GhostViewModel(Board, _syncService,Pacman.PacmanModel, _engine);
+        Ghosts = new GhostViewModel(Board, _syncService,Pacman.PacmanModel, _engine, Score);
         _syncService.RegisterGhosts(Ghosts.Ghosts);
         StartGameLoop();// empieza el loop posiblement elo que tenga que urgar para las vidas
         // Asegurar sprite en UI cuando la vista ya esté cargada (por si el binding se actualiza después)
