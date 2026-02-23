@@ -33,6 +33,7 @@ public partial class GhostViewModel :ObservableObject
     private const int ScatterDuration = 45;
     private const int ChaseDuration = 80;
     private const int _size = 16;
+    private bool _frightenedModeActive = false;
     private GhostDirection _pacmanDirection = GhostDirection.Left;
     private GameEngine _gameEngine;
     private Ghost _ghostModel;
@@ -192,17 +193,14 @@ public partial class GhostViewModel :ObservableObject
             
             if (ghost.State is GhostState.INHOUSE)
             {
-                if (!ghost.CanExitHouse(_modeTimer)) { continue; }
+                bool shouldExit = _frightenedModeActive || ghost.CanExitHouse(_modeTimer);
+                if (!shouldExit) {continue;}
                 bool exited = _house.TryExit(ghost, _board);
                 if (!exited) continue;
-                ghost.ApplyGhostsMove(ghost, nextDirection, _board);
-                int collisionResult = _gameEngine.CollisionsToPacman(ghost, pacman, _modeTimer);
-                if (collisionResult == -1)
-                {
-                    int points = GetGhostPoints();
-                    _score.amount(points);
-                    Console.WriteLine($"THe pacman ate ghost{points}");
-                }
+                ghost.State = _frightenedModeActive ? GhostState.FRIGHTENED : GhostState.NORMAL;
+                ghost.Direction = GhostDirection.Left;
+                ghost.ApplyGhostsMove(ghost, GhostDirection.Left, _board);
+                continue;
             }
             GhostDirection nextDirection = ghost.AssignDirection(ghost,pacman,blinky,_board);
 
@@ -221,11 +219,15 @@ public partial class GhostViewModel :ObservableObject
     public void SetFrightened()
     {
         _ghostsEatenThisRound = 0;
+        _frightenedModeActive = true;
         foreach (var ghost in Ghosts)
         {
-            if (ghost.State != GhostState.DEAD)
+            if (ghost.State is not GhostState.DEAD)
             {
-                ghost.State = GhostState.FRIGHTENED;
+                if (ghost.State is GhostState.NORMAL)
+                {
+                    ghost.State = GhostState.FRIGHTENED;
+                }
             }
         }
         UpdateAllSprites();    
@@ -234,6 +236,7 @@ public partial class GhostViewModel :ObservableObject
     public void StartFrightenedMode()
     {
         _timerFrighten?.Stop();
+        _frightenedModeActive = true;
         foreach (var ghost in Ghosts)
         {
             if (ghost.State == GhostState.NORMAL)
@@ -263,12 +266,12 @@ public partial class GhostViewModel :ObservableObject
 
     public void SetNormal()
     {
+        _frightenedModeActive = false;
         foreach (var ghost in Ghosts)
         {
             if (ghost.State == GhostState.FRIGHTENED)
                 ghost.State = GhostState.NORMAL;
         }
-        
         UpdateAllSprites();
     }
     public void PauseFrightenedTimer() => _timerFrighten?.Stop();
