@@ -6,7 +6,7 @@ using Avalonia.Media.Imaging;
 
 namespace PacmanSolution.Models;
 
-public class GameObject : System.ComponentModel.INotifyPropertyChanged
+public class GameObject : INotifyPropertyChanged
 {
     private double _x, _y;
     private double _width, _height;
@@ -21,11 +21,11 @@ public class GameObject : System.ComponentModel.INotifyPropertyChanged
     public double Height      { get => _height;      set { _height = value;      OnPropertyChanged(); } }
     public int    Zindex      { get => _zIndex;      set { _zIndex = value;      OnPropertyChanged(); } }
     public IBrush? FillColor  { get => _fillColor;   set { _fillColor = value;   OnPropertyChanged(); } }
-    /// <summary>Bitmap o CroppedBitmap (p. ej. desde SpriteManager.GetSpriteSection).</summary>
+    /// <summary>Bitmap o CroppedBitmap </summary>
     public IImage? Sprite     { get => _sprite;      set { _sprite = value;      OnPropertyChanged(); } }
     public Rect   SourceRect  { get => _sourceRect;  set { _sourceRect = value;  OnPropertyChanged(); } }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string? name = null)
+    private void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

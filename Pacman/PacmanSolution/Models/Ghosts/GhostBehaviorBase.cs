@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using PacmanSolution.Models;
 
-namespace PacmanSolution.Model;
+namespace PacmanSolution.Models.Ghosts;
 
 public abstract class GhostBehaviorBase
 {
@@ -17,9 +16,9 @@ public abstract class GhostBehaviorBase
     }
 
     /// <summary>
-    /// Calculate  the distance  for each  type ghost's  movmient
+    /// Calculate  the distance  for each  type ghost's  moving
     /// </summary>
-    /// <param name="distance"></param>
+    /// <param name="distance"> it's depend on type ghost </param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public static (int distanceRow, int distanceCol) DistanceDelta(GhostDirection distance)
@@ -39,12 +38,12 @@ public abstract class GhostBehaviorBase
         }
     }
 
-    private static bool IsOpposite(GhostDirection current, GhostDirection otherDirectioni)
+    private static bool IsOpposite(GhostDirection current, GhostDirection otherDirection)
     {
-        return (current == GhostDirection.Up    && otherDirectioni == GhostDirection.Down)
-               || (current == GhostDirection.Down  && otherDirectioni == GhostDirection.Up)
-               || (current == GhostDirection.Left  && otherDirectioni == GhostDirection.Right)
-               || (current == GhostDirection.Right && otherDirectioni == GhostDirection.Left);
+        return (current == GhostDirection.Up    && otherDirection == GhostDirection.Down)
+               || (current == GhostDirection.Down  && otherDirection == GhostDirection.Up)
+               || (current == GhostDirection.Left  && otherDirection == GhostDirection.Right)
+               || (current == GhostDirection.Right && otherDirection == GhostDirection.Left);
     }
 
     /// <summary>
@@ -55,7 +54,7 @@ public abstract class GhostBehaviorBase
     /// <param name="targetCol"></param>
     /// <param name="board"></param>
     /// <returns></returns>
-    public GhostDirection GetBestDirectionToTarget(
+    protected GhostDirection GetBestDirectionToTarget(
         Ghost ghost, int targetRow, int targetCol,
         ObservableCollection<Entity> board)
     {

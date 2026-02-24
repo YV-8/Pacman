@@ -1,6 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
-using PacmanSolution.Model;
+using PacmanSolution.Models.Entities;
 
 namespace PacmanSolution.Models.Ghosts;
 

@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.Linq;
-using PacmanSolution.Model;
 
 namespace PacmanSolution.Models.Ghosts;
 

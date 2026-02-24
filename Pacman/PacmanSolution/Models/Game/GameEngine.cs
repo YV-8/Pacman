@@ -2,40 +2,51 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using PacmanSolution.Models.Entities;
+using PacmanSolution.Models.Ghosts;
 
 namespace PacmanSolution.Models;
 
 public class GameEngine
-{
-    private const int TargetFPS = 60;
-    //public const int TargetFrameMS = 1000 / TargetFPS;
+{ 
     private double TotalTime { get; set; }
     public int CurrentFPS { get; set; }
-    private List<Entity> GameObjects { get; set; } = new List<Entity>();
-    private int _frameCount;
-    private double _fpsTimer;
-    private DateTime _lastUpdateTime;
+    private List<Entity> GameObjects { get; set; } = new ();
     private const int DotPoints = 10;
     private const int EnergizerPoints = 50;
     private const int cherryPoints = 100;
     private const int GhostPoints = 200;
-    public event Action? PacmanDied;
-    public event Action? OnEnergizerEaten;
-    public ObservableCollection<GameObject> VisualObjects { get; } = new();
     private int TotalPellets { get; set; } = 0;
     private int EatenPellets { get; set; } = 0;
+    private int _frameCount;
+    private double _fpsTimer;
+    private DateTime _lastUpdateTime;
+    
+    public event Action? PacmanDied;
+    public event Action? OnEnergizerEaten;
     public event Action? LevelComplete;
     public event Action<int>? GhostEaten;
+    public ObservableCollection<GameObject> VisualObjects { get; } = new();
 
     public GameEngine()
     {
         _lastUpdateTime = DateTime.Now;
     }
+    /// <summary>
+    /// Counts and stores the total number of pellets on the board
+    /// so the engine knows when all have been eaten 
+    /// </summary>
     public void InitPelletCount(ObservableCollection<Entity> board)
     {
         TotalPellets = board.OfType<Pellet>().Count();
         EatenPellets = 0;
     }
+    
+    /// <summary>
+    /// Main game loop tick; calculates delta time, updates FPS counter
+    /// and calls Update() on every active game object
+    /// Removes inactive objects from the list automatically
+    /// </summary>
     public void Update()
     {
         DateTime now = DateTime.Now;
@@ -69,14 +80,24 @@ public class GameEngine
 
         }
     }
+    /// <summary>
+    /// Registers an entity into the game loop so it receives Update() calls
+    /// </summary>
     public void AddGameObject(Entity obj)
     {
         GameObjects.Add(obj);
     }
+    /// <summary>
+    /// Removes an entity from the game loop immediately
+    /// </summary>
     public void RemoveGameObject(Entity obj)
     {
         GameObjects.Remove(obj); 
     }
+    
+    /// <summary>
+    /// Clears all game objects and resets all timers and counters
+    /// </summary>
     public void Reset()
     {
         GameObjects.Clear();
@@ -101,7 +122,7 @@ public class GameEngine
     /// </summary>
     /// <param name="targetEntity"></param>
     /// <returns></returns>
-    public bool CanMoveTo(Entity targetEntity)
+    public bool CanMoveTo(Entity? targetEntity)
     {
         if (targetEntity is null) {return false;}
         if (targetEntity is Ghost) {return true;}
@@ -134,8 +155,19 @@ public class GameEngine
 
         return result;
     }
+    /// <summary>
+    /// Checks if a ghost and Pacman share the same cell and resolves the collision:
+    /// Ghost FRIGHTENED → ghost dies, GhostEaten event fires with points.
+    /// Ghost NORMAL → Pacman dies, all ghosts respawn, PacmanDied event fires.
+    /// Ghost DEAD or IN HOUSE → no effect.
+    /// Returns -1 if the ghost was eaten, 0 otherwise.
+    /// </summary>
+    /// <param name="ghost"></param>
+    /// <param name="pacman"></param>
+    /// <param name="_board"></param>
+    /// <returns></returns>
     
-    public int CollisionsToPacman(Ghost ghost, Models.Pacman pacman,ObservableCollection<Entity> _board)
+    public int CollisionsToPacman(Ghost ghost, Pacman pacman,ObservableCollection<Entity> _board)
     {
         if (ghost.Row == pacman.Row && ghost.Col == pacman.Col)
         {
