@@ -239,7 +239,7 @@ public partial class PacmanViewModel:ObservableObject
         Col = PacmanModel.Col;
         _currentSpriteRow = 0;
         var spawnEntity = _board.FirstOrDefault(c => c.Row == Row && c.Col == Col);
-        if (spawnEntity != null)
+        if (spawnEntity is not null)
             spawnEntity.Type = EntityType.PACMAN;
         UpdatePacmanSprites();
         _syncService.UpdatePacmanPosition(Row, Col);

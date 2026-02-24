@@ -21,7 +21,7 @@ public class ClydeBehavior:GhostBehaviorBase
 
             if (distanceToPacman < _feardistance)
             {
-                // Está cerca — huir a esquina inferior izquierda
+                // Está cerca  huir a esquina inferior izquierda
                 targetRow = ScatterRow;
                 targetCol = ScatterCol;
             }

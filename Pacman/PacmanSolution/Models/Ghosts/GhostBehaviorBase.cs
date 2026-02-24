@@ -47,7 +47,10 @@ public abstract class GhostBehaviorBase
     }
 
     /// <summary>
-    /// 
+    /// get the candidates list then go for each  in ghost
+    /// verificate then direction is opposite
+    /// then give the next position it
+    /// verificate the space is not wall or ghost state dead in house o is door and cotinue
     /// </summary>
     /// <param name="ghost"></param>
     /// <param name="targetRow"></param>
@@ -70,8 +73,7 @@ public abstract class GhostBehaviorBase
 
             var entity = board.FirstOrDefault(e => e.Row == testRow && e.Col == testCol);
             if (entity is null || entity.Type is EntityType.WALL) continue;
-
-            //if (entity.Type is EntityType.DOOR && ghost.State == GhostState.NORMAL) continue;
+            
             if (entity.Type is EntityType.DOOR && 
                 ghost.State != GhostState.INHOUSE && 
                 ghost.State != GhostState.DEAD) continue;
