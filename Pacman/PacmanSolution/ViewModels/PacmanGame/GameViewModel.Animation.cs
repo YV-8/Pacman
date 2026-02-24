@@ -46,7 +46,7 @@ public partial class GameViewModel
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[GameTimer] EXCEPCIÓN: {ex.Message}\n{ex.StackTrace}");
+                Console.WriteLine($"[GameTimer] EXCEPTION: {ex.Message}\n{ex.StackTrace}");
             }
         };
         _gameTimer.Start();
@@ -56,7 +56,7 @@ public partial class GameViewModel
             Ghosts.SetFrightened();
             Ghosts.StartFrightenedMode();
         };
-
+        _engine.GhostEaten += points => Score.Score += points;
         _engine.LevelComplete += () =>
         {
             _gameTimer.Stop();

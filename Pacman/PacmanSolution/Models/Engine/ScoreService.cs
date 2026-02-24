@@ -5,13 +5,18 @@ using System.Text.Json;
 
 namespace PacmanSolution.Models.Engine;
 
-public class ScoreService
+public abstract class ScoreService
 {
     private static readonly string FilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "PacmanSolution",
         "scores.json"
     );
+    /// <summary>
+    /// Loads the list of scores from the JSON file
+    /// Returns an empty list if the file does not exist or an error occurs
+    /// </summary>
+    /// <returns></returns>
     public static List<Score> LoadScores()
     {
         try
@@ -28,6 +33,12 @@ public class ScoreService
         }
     }
 
+    /// <summary>
+    /// Saves the provided list of scores to the JSON file
+    /// Creates the directory if it does not exist
+    /// Logs an error message to the console if saving fails
+    /// </summary>
+    /// <param name="scores"></param>
     public static void SaveScore(List<Score> scores)
     {
         try

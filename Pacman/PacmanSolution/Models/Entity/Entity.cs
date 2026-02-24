@@ -56,7 +56,7 @@ public abstract partial class Entity:ObservableObject
     /// <param name="row"/>
     /// <param name="col"/>
     /// <returns></returns>
-    public static (double x, double y) GetCellCenter(double row, double col)
+    protected static (double x, double y) GetCellCenter(double row, double col)
     {
         var x = GameConfig.OffsetX + (col * GameConfig.CellWidth) + (GameConfig.CellWidth / 2);
         var y = GameConfig.OffsetY + (row * GameConfig.CellHeight) + (GameConfig.CellHeight / 2);

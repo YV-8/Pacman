@@ -9,6 +9,11 @@ public partial class ManagePageChange: ObservableObject
     [ObservableProperty]
     private object? _currentPage;
     
+    /// <summary>
+    /// choose the page with the initialsPage
+    /// </summary>
+    /// <param name="initialsPage"></param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void ChangePage(string initialsPage)
     {
         switch (initialsPage)
@@ -33,10 +38,4 @@ public partial class ManagePageChange: ObservableObject
                 throw new ArgumentOutOfRangeException(nameof(initialsPage), initialsPage, null);
         }
     }
-    
-    /*public MainWindowViewModel()
-    {
-        CurrentPage = new SettingPageViewModel();
-
-    }*/
 }

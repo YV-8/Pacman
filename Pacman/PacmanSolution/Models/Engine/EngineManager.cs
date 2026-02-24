@@ -6,10 +6,6 @@ namespace PacmanSolution.Models;
 
 public class EngineManager
 {
-    /// <summary>
-    /// Row ---- horizontal
-    /// Col | vertical
-    /// </summary>
     private int _boardCol;
     private int _boardRow;
     private int _ghostCount = 0;
@@ -18,24 +14,12 @@ public class EngineManager
     private EntityType _entityType;
     private Board _boardLayout;
     private EntityType _ghostEntityType;
-    public int BoardCol
-    {
-        get => _boardCol;
-        set => _boardCol = value;
-    }
 
-    public int BoardRow
-    {
-        get => _boardRow;
-        set => _boardRow = value;
-    }
-
-    public EntityType EntityType
-    {
-        get => _entityType;
-        set => _entityType = value;
-    }
-
+    /// <summary>
+    /// Pass row and col the board for build the size
+    /// </summary>
+    /// <param name="boardCol"></param>
+    /// <param name="boardRow"></param>
     public EngineManager(int boardCol, int boardRow)
     {
         _boardCol = boardCol;
@@ -43,8 +27,13 @@ public class EngineManager
         _boardLayout = new Board(0, 0, EntityType.EMPTY);
     }
     
-    
-
+    /// <summary>
+    /// Build the type entity in the board with layout
+    /// and configure the structure
+    /// </summary>
+    /// <param name="board"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
     public void BuildGameBoard(ObservableCollection<Entity> board)
     {
         if (board == null)
@@ -75,13 +64,13 @@ public class EngineManager
 
     private Entity CreateCellFromChar(int row, int col, char symbol)
     {
-        double EntityWidth = GameConfig.CellWidth;
-        double EntityHeight = GameConfig.CellHeight;
-        int ghostCount = 0;
+        var entityWidth = GameConfig.CellWidth;
+        var entityHeight = GameConfig.CellHeight;
+        var ghostCount = 0;
         switch (symbol)
         {
             case 'W':
-                return new Board(row, col, EntityType.WALL){ Width = EntityWidth, Height = EntityHeight };;
+                return new Board(row, col, EntityType.WALL){ Width = entityWidth, Height = entityHeight };;
             
             case '-':
                 return new Board(row, col, EntityType.DOOR);

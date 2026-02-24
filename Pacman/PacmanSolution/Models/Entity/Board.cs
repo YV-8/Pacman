@@ -8,10 +8,18 @@ public class Board:Entity
         : base(row, col, type, GameConfig.CellWidth, GameConfig.CellHeight, 1) 
     { }
 
+    
+    /// <summary>
+    /// Modification the Update the board
+    /// </summary>
+    /// <param name="deltaTime"></param>
     public override void Update(double deltaTime) 
     { 
-        // Las celdas del tablero normalmente no cambian cada frame
     }
+    /// <summary>
+    /// Is the structure the board but in string
+    /// it's that use for create my board
+    /// </summary>
     public readonly string[] Layout = {
         "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
         "W............WW............W",

@@ -9,6 +9,17 @@ namespace PacmanSolution.Models.Engine;
 
 public class SpriteCropConverter : IMultiValueConverter
 {
+    /// <summary>
+    /// Converts a bitmap and a source rectangle into a cropped portion of that bitmap
+    /// Expects exactly two values: a <see cref="Bitmap"/> and an <see cref="Avalonia.Rect"/>
+    /// Returns null if inputs are invalid, the full bitmap if no valid rect is provided,
+    /// or a <see cref="CroppedBitmap"/> with the specified region
+    /// </summary>
+    /// <param name="values">A list containing the source bitmap and the crop rectangle.</param>
+    /// <param name="targetType">The target type of the binding.</param>
+    /// <param name="parameter">Optional converter parameter (not used).</param>
+    /// <param name="culture">The culture info for the conversion.</param>
+    /// <returns>A cropped bitmap, the original bitmap, or null.</returns>
     public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
     {
         if (values.Count != 2)
@@ -37,6 +48,10 @@ public class SpriteCropConverter : IMultiValueConverter
 
         return bitmap;
     }
+    
+    /// <summary>
+    /// Not implemented. Reverse conversion from cropped bitmap back to source values is not supported
+    /// </summary>
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();

@@ -54,16 +54,4 @@ public class SpriteManager
          if (fullBitmap == null) return null;
          return new CroppedBitmap(fullBitmap, region);
      }
-     
-     /// <summary>
-     /// clean all
-     /// </summary>
-     public void ClearCache()
-     {
-         foreach (Bitmap bitmap in _spriteCache.Values)
-         {
-             bitmap.Dispose();
-         }
-         _spriteCache.Clear(); 
-     }
 }

@@ -14,9 +14,7 @@ public class SoundManager
     private Process? _currentProcess;
 
     public SoundManager()
-    {
-        
-    }
+    { }
     /// <summary>
     /// the method use  the name isLooping which to open
     /// the resource Avalonia's asstes

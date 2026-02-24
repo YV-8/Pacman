@@ -18,11 +18,12 @@ public class GameEngine
     private const int DotPoints = 10;
     private const int EnergizerPoints = 50;
     private const int cherryPoints = 100;
+    private const int GhostPoints = 200;
     public event Action? PacmanDied;
     public event Action? OnEnergizerEaten;
     public ObservableCollection<GameObject> VisualObjects { get; } = new();
-    public int TotalPellets { get; private set; } = 0;
-    public int EatenPellets { get; private set; } = 0;
+    private int TotalPellets { get; set; } = 0;
+    private int EatenPellets { get; set; } = 0;
     public event Action? LevelComplete;
     public event Action<int>? GhostEaten;
 
@@ -141,6 +142,7 @@ public class GameEngine
             if (ghost.State is GhostState.DEAD || ghost.State is GhostState.INHOUSE) return 0; 
             if (ghost.State == GhostState.FRIGHTENED)
             {
+                GhostEaten?.Invoke(GhostPoints);
                 ghost.RespawnGhost(ghost);
                 if (ghost.State == GhostState.DEAD) ;
                 return -1;
@@ -149,7 +151,7 @@ public class GameEngine
             {
                 pacman.RespawnPacman();
                 ghost.RespawnAllGhost(_board);
-                Console.WriteLine($"[Muerte Pacman] por {ghost.Type}");
+                Console.WriteLine($"[Death Pacman] por {ghost.Type}");
                 PacmanDied?.Invoke();
             }
         }
@@ -162,7 +164,7 @@ public class GameEngine
         {
             result.PointsEarned = EnergizerPoints;
             result.RemovedElementType = "energizer";
-            OnEnergizerEaten?.Invoke();//evento para el pacman pero podria usar lo que uso para que los fantasmas sean comidos
+            OnEnergizerEaten?.Invoke();
         }
         else
         {
@@ -172,20 +174,5 @@ public class GameEngine
         EatenPellets++;
         if (EatenPellets >= TotalPellets)
             LevelComplete?.Invoke();
-    }
-    
-    /// <summary>
-    /// verify the point had the score
-    /// </summary>
-    public void ScoreStateValidate(int Score, int _totalScore, int HighScore)
-    {
-        if (Score < _totalScore)
-        {
-            Console.WriteLine("Winner");
-        }else if (Score > HighScore)
-        {
-            HighScore = Score;
-            Console.WriteLine("Continue game");
-        }
     }
 }
