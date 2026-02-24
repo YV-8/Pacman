@@ -8,7 +8,6 @@ namespace PacmanSolution.Views;
 
 public partial class PacmanView : UserControl
 {
-    private GameViewModel? _gamePageViewModel;
     private PacmanViewModel? _pacmanViewModel;
     public PacmanView()
     {
@@ -40,10 +39,9 @@ public partial class PacmanView : UserControl
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
         this.Focus();
-        if (DataContext is GameViewModel gamevm)
+        if (DataContext is GameViewModel gameViewModel)
         {
-            _gamePageViewModel = gamevm;
-            _pacmanViewModel = gamevm.Pacman;
+            _pacmanViewModel = gameViewModel.Pacman;
             _pacmanViewModel.UpdatePacmanSprites();
         }
         Unloaded += (_, _) =>

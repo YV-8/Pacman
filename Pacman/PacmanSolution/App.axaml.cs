@@ -6,6 +6,7 @@ using System.Linq;
 using Avalonia.Markup.Xaml;
 using PacmanSolution.ViewModels;
 using PacmanSolution.Views;
+using MainWindowViewModel = PacmanSolution.ViewModels.Menu.MainWindowViewModel;
 
 namespace PacmanSolution;
 

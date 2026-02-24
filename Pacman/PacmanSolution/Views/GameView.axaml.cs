@@ -11,17 +11,23 @@ public partial class GameView : UserControl
     private GhostViewModel? _ghostViewModel;
     private PacmanViewModel? _pacmanViewModel;
     private double _horizontalSpeed = 10;
-
+    
+    /// <summary>
+    /// Initialize the game and components
+    /// </summary>
     public GameView()
     {
         InitializeComponent();
-        //KeyDown += OnKeyDown;
         Loaded += OnLoaded;
     }
 
+    /// <summary>
+    /// load the data context and pause the game 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
-        // Cuando la página se cierra (Unloaded), pausamos los timers
         this.Unloaded += (s, ev) =>
         {
             if (DataContext is GameViewModel viewModel)

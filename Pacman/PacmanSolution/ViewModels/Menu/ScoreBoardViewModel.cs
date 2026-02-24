@@ -49,7 +49,6 @@ public partial class ScoreBoardViewModel:ObservableObject
         if (Score > HighScore)
         {
             HighScore = Score;
-            Console.WriteLine($"{result} Score: {Score}");
         }
     }
     private void LoadHighScores()
@@ -77,6 +76,12 @@ public partial class ScoreBoardViewModel:ObservableObject
         SaveMessage = string.Empty;
     }
 
+    /// <summary>
+    /// Ask insert the name and validated if is min 3 and only letters
+    /// then put the score and name in values for json and load
+    /// add score and name and send the message to UI
+    /// and load the high Score
+    /// </summary>
     [RelayCommand]
     private void SaveData()
     {
@@ -89,7 +94,7 @@ public partial class ScoreBoardViewModel:ObservableObject
 
         string initials = PlayerName.ToUpper().Trim();
 
-        if (initials.Length != 3)
+        if (initials.Length is not 3)
         {
             SaveMessage = "Must be exactly 3 letters";
             IsSaveSuccess = false;

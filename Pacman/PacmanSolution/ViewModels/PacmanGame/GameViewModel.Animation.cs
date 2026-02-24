@@ -3,7 +3,6 @@ using System.Linq;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
-using PacmanSolution.Models.Engine;
 
 namespace PacmanSolution.ViewModels;
 
@@ -41,7 +40,7 @@ public partial class GameViewModel
             try
             {
                 Console.WriteLine($"[GameTimer] Tick {Ghosts.GetModeTimer()}");
-                _pacman.UpdatePacmanSprites();
+                Pacman.UpdatePacmanSprites();
                 Ghosts.GhostsTimer();
             }
             catch (Exception ex)
@@ -68,8 +67,6 @@ public partial class GameViewModel
         {
             PauseAllTimers();
             Pacman.DeathAnimation();
-            //poner en letras rojas y en el panel
-            //arriba de  mmi panel de ahora un mensaje de murio
         };
 
         Pacman.OnDeathAnimationFinished += () =>
@@ -130,61 +127,5 @@ public partial class GameViewModel
         ShowWinOverlay = false;
         ShowGameOverOverlay = false;
         Navigation.ChangePage("GamePage");
-    }
-    
-    [RelayCommand]
-    private void ShowSaveInput()
-    {
-        PlayerName    = string.Empty;
-        SaveMessage   = string.Empty;
-        IsSaveInputVisible = true;
-    }
-    
-    [RelayCommand]
-    private void CancelSave()
-    {
-        IsSaveInputVisible = false;
-        SaveMessage        = string.Empty;
-    }
-
-    [RelayCommand]
-    private void SaveScore()
-    {
-        // Validación
-        if (string.IsNullOrWhiteSpace(PlayerName))
-        {
-            SaveMessage = "Ingresa 3 iniciales";
-            return;
-        }
-
-        string initials = PlayerName.ToUpper().Trim();
-
-        if (initials.Length != 3)
-        {
-            SaveMessage = "Deben ser exactamente 3 letras";
-            return;
-        }
-
-        if (!initials.All(char.IsLetter))
-        {
-            SaveMessage = "Solo se permiten letras";
-            return;
-        }
-
-        // Toma la puntuación actual del ScoreBoardViewModel
-        // Score.Score es el int que ya tienes enlazado en el AXAML
-        var newScore = new Score
-        {
-            Name   = initials,
-            Points = Score.Score   // <-- usa la propiedad que ya tienes
-        };
-
-        var scores = ScoreService.LoadScores();
-        scores.Add(newScore);
-        ScoreService.SaveScore(scores);
-
-        // Ocultar panel y limpiar
-        IsSaveInputVisible = false;
-        SaveMessage        = string.Empty;
     }
 }

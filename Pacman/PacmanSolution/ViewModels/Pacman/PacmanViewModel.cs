@@ -175,6 +175,9 @@ public partial class PacmanViewModel:ObservableObject
         _syncService.UpdatePacmanPosition(newRow, newCol);
     }
 
+    /// <summary>
+    /// the animation
+    /// </summary>
     public void DeathAnimation()
     {
         _deathFrame = 0;
@@ -220,18 +223,24 @@ public partial class PacmanViewModel:ObservableObject
         }
     }
 
-    public void ResetPacman()
+    
+    /// <summary>
+    /// Reset the pacman where first a position pacman
+    /// then use RespawnPacman for reset and give the row and col the parameter
+    /// Change the cell and position pacman the cell change for empty
+    /// </summary>
+    private void ResetPacman()
     {
-        var currentCell = _board.FirstOrDefault(c => c.Row == Row && c.Col == Col);
-        if (currentCell != null && currentCell.Type == EntityType.PACMAN)
-            currentCell.Type = EntityType.EMPTY;
+        var currentEntity = _board.FirstOrDefault(c => c.Row == Row && c.Col == Col);
+        if (currentEntity != null && currentEntity.Type == EntityType.PACMAN)
+            currentEntity.Type = EntityType.EMPTY;
         PacmanModel.RespawnPacman();
         Row = PacmanModel.Row;
         Col = PacmanModel.Col;
         _currentSpriteRow = 0;
-        var spawnCell = _board.FirstOrDefault(c => c.Row == Row && c.Col == Col);
-        if (spawnCell != null)
-            spawnCell.Type = EntityType.PACMAN;
+        var spawnEntity = _board.FirstOrDefault(c => c.Row == Row && c.Col == Col);
+        if (spawnEntity != null)
+            spawnEntity.Type = EntityType.PACMAN;
         UpdatePacmanSprites();
         _syncService.UpdatePacmanPosition(Row, Col);
     }

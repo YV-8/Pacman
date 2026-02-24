@@ -7,7 +7,6 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PacmanSolution.Models;
-using PacmanSolution.Models.Game;
 using PacmanSolution.Models.Ghosts;
 
 namespace PacmanSolution.ViewModels;
@@ -20,7 +19,6 @@ public partial class GhostViewModel :ObservableObject
     private readonly HouseBehavior  _house  = new();
     private readonly ObservableCollection<Entity> _board;
     private readonly SpriteManager _spriteManager = new();
-    private readonly GameBoardSyncService? _syncService;
     private readonly Models.Entities.Pacman _pacmanModel;
     private readonly Dictionary<EntityType, (int row, int col)> _spawnPositions = new();
     private readonly ScoreBoardViewModel _score;
@@ -35,28 +33,30 @@ public partial class GhostViewModel :ObservableObject
     private const int _size = 16;
     private bool _frightenedModeActive = false;
     private GhostDirection _pacmanDirection = GhostDirection.Left;
-    private GameEngine _gameEngine;
+    private readonly GameEngine _gameEngine;
     private Ghost _ghostModel;
     private DispatcherTimer _timerFrighten;
     public int GetModeTimer() => _modeTimer;
 
-    public GhostViewModel(ObservableCollection<Entity> board,GameBoardSyncService? syncService, 
-        Models.Entities.Pacman pacmanModel,GameEngine engine,ScoreBoardViewModel score)
+    public GhostViewModel(ObservableCollection<Entity> board, Models.Entities.Pacman pacmanModel,
+        GameEngine engine,ScoreBoardViewModel score)
     {
-        _syncService = syncService;
         _board = board;
         _pacmanModel = pacmanModel;
         _gameEngine = engine;
         _score = score;
         InitializeGhosts();
     }
+    
+    /// <summary>
+    /// Save in the dictionary
+    /// </summary>
     private void InitializeGhosts()
     {
         Ghosts.Clear();
         foreach (var entity in _board.OfType<Ghost>())
         {
             entity.SetupInitialState(entity.Row, entity.Col);
-            // Guardamos en el diccionario por si lo necesitas para otras lógicas
             _spawnPositions[entity.Type] = (entity.Row, entity.Col);
         
             Ghosts.Add(entity);
@@ -170,8 +170,7 @@ public partial class GhostViewModel :ObservableObject
                 else if (ghost.Col > ghost.SpawnCol) ghost.Col--;
 
                 ghost.UpdateCanvasPosition();
-
-                // ¿Llegó a casa?
+                
                 if (ghost.DeadTicksRemaining <= 0 || 
                     (ghost.Row == ghost.SpawnRow && ghost.Col == ghost.SpawnCol))
                 {
@@ -209,9 +208,11 @@ public partial class GhostViewModel :ObservableObject
                 Console.WriteLine($"THe pacman ate ghost{points}");
             }
         }
-            
     }
     
+    /// <summary>
+    /// Modification the state ghost  only ghost dead and is normal not house 
+    /// </summary>
     public void SetFrightened()
     {
         _ghostsEatenThisRound = 0;
@@ -229,6 +230,9 @@ public partial class GhostViewModel :ObservableObject
         UpdateAllSprites();    
     }
 
+    /// <summary>
+    /// had a timer 
+    /// </summary>
     public void StartFrightenedMode()
     {
         _timerFrighten?.Stop();
@@ -270,19 +274,18 @@ public partial class GhostViewModel :ObservableObject
         }
         UpdateAllSprites();
     }
+    
+    /// <summary>
+    /// Pause the fright timer is  the timer
+    /// </summary>
     public void PauseFrightenedTimer() => _timerFrighten?.Stop();
+    
+    /// <summary>
+    /// Resumes the timer in "scared mode" if it was paused
+    /// </summary>
     public void ResumeFrightenedTimer()
     {
         if (_timerFrighten is not null)
             _timerFrighten.Start();
-    }
-
-    private void SetInHouse()
-    {
-        foreach (var ghost in Ghosts)
-        {
-            if (ghost.State == GhostState.FRIGHTENED)
-            {ghost.State = GhostState.NORMAL; }
-        }
     }
 }

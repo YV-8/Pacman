@@ -1,6 +1,4 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -40,21 +38,20 @@ public partial class GameViewModel: ObservableObject
 
     public GameViewModel(ManagePageChange navigation)
     {
-        _navigation = navigation;//navega en paginas
+        _navigation = navigation;
         Board.Clear();
-        CurrentSubView = this;// esto es del navegador
-        Score = new ScoreBoardViewModel(navigation);// es el score board que luego me toca hacerlo 
-        _engineManager = new EngineManager(28, 31);//pasa parametros
-        _engineManager.BuildGameBoard(Board);// lo contruye
+        CurrentSubView = this;
+        Score = new ScoreBoardViewModel(navigation); 
+        _engineManager = new EngineManager(28, 31);
+        _engineManager.BuildGameBoard(Board);
         
-        _syncService = new GameBoardSyncService(_engine.VisualObjects);// hace visual los objectos
-        _syncService.BuildFromBoard(Board);// locontruye para lo visual ahora
+        _syncService = new GameBoardSyncService(_engine.VisualObjects);
+        _syncService.BuildFromBoard(Board);
         
         Pacman = new PacmanViewModel(_engine, Board, _movementTimer, Score, _syncService);
-        Ghosts = new GhostViewModel(Board, _syncService,Pacman.PacmanModel, _engine, Score);
+        Ghosts = new GhostViewModel(Board, Pacman.PacmanModel, _engine, Score);
         _syncService.RegisterGhosts(Ghosts.Ghosts);
-        StartGameLoop();// empieza el loop posiblement elo que tenga que urgar para las vidas
-        // Asegurar sprite en UI cuando la vista ya esté cargada (por si el binding se actualiza después)
+        StartGameLoop();
         Dispatcher.UIThread.Post(() => Pacman.UpdatePacmanSprites(), DispatcherPriority.Loaded);
     }
     
@@ -67,28 +64,12 @@ public partial class GameViewModel: ObservableObject
     private void ToggleAudio()
     {
         var path = "PacManGameSound";
-        if (_isMusicEnabled)
+        if (IsMusicEnabled)
         {
             soundManager.PlaySound(path, true);
         }
         else
             soundManager.StopSound();
-    }
-    /// <summary>
-    /// stop and clean the timers
-    /// </summary>
-    public void CleanupTimers()
-    {
-        //_animationTimer?.Stop();
-        _movementTimer?.Stop();
-        _gameTimer?.Stop();
-    }
-    /// <summary>
-    /// Resume game with time 
-    /// </summary>
-    public void ResumeGame()
-    {
-        ResumeAllTimers();
     }
     
     /// <summary>

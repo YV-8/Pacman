@@ -1,9 +1,8 @@
-using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
 
-namespace PacmanSolution.ViewModels;
+namespace PacmanSolution.ViewModels.Menu;
 
 public partial class MainWindowViewModel:ObservableObject
 {
@@ -11,8 +10,7 @@ public partial class MainWindowViewModel:ObservableObject
     private ManagePageChange _navigation;
     [ObservableProperty]
     private bool _isMusicEnabled;
-    private readonly SoundManager soundManager =new();    
-
+    private readonly SoundManager _soundManager =new();    
 
     public MainWindowViewModel()
     {
@@ -23,9 +21,9 @@ public partial class MainWindowViewModel:ObservableObject
     {
         Navigation.ChangePage(target);
     }
-
+    
     [RelayCommand]
-    public void ExitGame()
+    private void ExitGame()
     {
         if (Avalonia.Application.Current?.ApplicationLifetime 
             is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
@@ -42,9 +40,9 @@ public partial class MainWindowViewModel:ObservableObject
         var path = "PacManGameSound";
         if (_isMusicEnabled)
         {
-            soundManager.PlaySound(path, true);
+            _soundManager.PlaySound(path, true);
         }
         else
-            soundManager.StopSound();
+            _soundManager.StopSound();
     }
 }
