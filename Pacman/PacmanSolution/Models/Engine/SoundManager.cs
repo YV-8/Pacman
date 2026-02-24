@@ -1,16 +1,22 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using Avalonia.Platform;
 
 namespace PacmanSolution.Models;
 
 public class SoundManager
 {
-    private Process? _currentProcess;
     private string? _tempFilePath;
     private bool _shouldLoop;
+    private static SoundManager? _instance;
+    private Process? _currentProcess;
 
+    public SoundManager()
+    {
+        
+    }
     /// <summary>
     /// the method use  the name isLooping which to open
     /// the resource Avalonia's asstes
@@ -22,22 +28,29 @@ public class SoundManager
     {
         StopSound();
         _shouldLoop = isLooping;
-        try
+        Task.Run(() =>
         {
-            var assetUri = new Uri($"avares://PacmanSolution/Assets/Media/{nameSong}.wav");
-            using var stream = AssetLoader.Open(assetUri);
-            _tempFilePath = Path.Combine(Path.GetTempPath(), "pacman_temp_sound.wav");
-            using (var fileStream = File.Create(_tempFilePath))
+            try
             {
-                stream.CopyTo(fileStream);
-            }
+                var assetUri = new Uri($"avares://PacmanSolution/Assets/Media/{nameSong}.wav");
+                using var stream = AssetLoader.Open(assetUri);
+                _tempFilePath = Path.Combine(Path.GetTempPath(), "pacman_current_audio.wav");
+                using (var fileStream = new FileStream(_tempFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    stream.CopyTo(fileStream);
+                    fileStream.Flush();
+                }
 
-            PlayWithSystemPlayer();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error cargando audio: {ex.Message}");
-        }
+                if (File.Exists(_tempFilePath))
+                {
+                    PlayWithSystemPlayer();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error load audio {nameSong}: {ex.Message}");
+            }
+        });
     }
 
     /// <summary>
@@ -46,25 +59,36 @@ public class SoundManager
     private void PlayWithSystemPlayer()
     {
         if (string.IsNullOrEmpty(_tempFilePath)) return;
-
-        _currentProcess = new Process
+        try
         {
-            StartInfo = new ProcessStartInfo
+            _currentProcess = new Process
             {
-                FileName = "paplay",
-                Arguments = _tempFilePath,
-                CreateNoWindow = true,
-                UseShellExecute = false
-            },
-            EnableRaisingEvents = true
-        };
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "paplay",
+                    Arguments = $"--client-name=PacmanGame \"{_tempFilePath}\"",
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardError = true
+                },
+                EnableRaisingEvents = true
+            };
+        
+            _currentProcess.Exited += (s, e) =>
+            {
+                if (_shouldLoop) 
+                {
+                    System.Threading.Thread.Sleep(100); 
+                    PlayWithSystemPlayer();
+                }
+            };
 
-        _currentProcess.Exited += (s, e) =>
+            _currentProcess.Start();
+        }
+        catch (Exception ex)
         {
-            if (_shouldLoop) PlayWithSystemPlayer();
-        };
-
-        _currentProcess.Start();
+            Debug.WriteLine($"Error playing audio {_tempFilePath}: {ex.Message}");
+        }
     }
 
     /// <summary>
