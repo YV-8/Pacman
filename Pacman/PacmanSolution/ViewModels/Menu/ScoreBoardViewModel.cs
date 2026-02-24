@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
 using PacmanSolution.Models.Engine;
+using PacmanSolution.Models.Entities;
 
 namespace PacmanSolution.ViewModels;
 

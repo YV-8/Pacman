@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PacmanSolution.Models;
+using PacmanSolution.Models.Entities;
 using PacmanSolution.Models.Game;
 
 namespace PacmanSolution.ViewModels.Pacman;
@@ -18,7 +19,7 @@ public partial class PacmanViewModel:ObservableObject
     [ObservableProperty] private ScoreBoardViewModel _score;
     [ObservableProperty]
     private IImage? _pacmanCurrentSprite;
-    [ObservableProperty] private Models.Pacman _pacmanModel;
+    [ObservableProperty] private Models.Entities.Pacman _pacmanModel;
     private readonly GameEngine _engine;
     private readonly ObservableCollection<Entity> _board;
     private readonly GameBoardSyncService _syncService;
@@ -70,7 +71,7 @@ public partial class PacmanViewModel:ObservableObject
         _colInitial = pacmanCell?.Col ?? 0;
         _row = _rowInitial;
         _col = _colInitial;
-        PacmanModel = new Models.Pacman(_rowInitial, _colInitial, EntityType.PACMAN, PacmanImageSize, PacmanImageSize, 10);
+        PacmanModel = new Models.Entities.Pacman(_rowInitial, _colInitial, EntityType.PACMAN, PacmanImageSize, PacmanImageSize, 10);
     }
     
     public void GetDirection(string direction)

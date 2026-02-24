@@ -1,10 +1,12 @@
-using System;
 using System.Collections.ObjectModel;
 using Avalonia;
-using Avalonia.Media.Imaging;
 
 namespace PacmanSolution.Models;
-
+public enum PacmanState
+{
+    NORMAL,
+    DIEDING
+}
 public class Pacman: Entity
 {
     public int SpawnRow { get; set; }
@@ -91,16 +93,17 @@ public class Pacman: Entity
         return (nextRow, nextCol);
     }
     
+    /// <summary>
+    /// Respawn of the pacman the initial position with spawnRow and spawnCol
+    /// user the update position
+    /// </summary>
     public void RespawnPacman()
     {
-        //pacman.State = PacmanState.DIEDING;
-        //pacman.DeadTicksRemaining = 48;
         this.Row = SpawnRow;
         this.Col = SpawnCol;
         this.State = PacmanState.NORMAL;
         this._currentDirection = "RIGHT";
-        this.DeadTicksRemaining = DeadDuration;
+        //this.DeadTicksRemaining = DeadDuration;
         this.UpdateCanvasPosition();
-        Console.WriteLine($"[Comido] {this.Type}");
     }
 }

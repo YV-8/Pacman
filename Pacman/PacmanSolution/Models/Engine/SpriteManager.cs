@@ -41,9 +41,9 @@ public class SpriteManager
          return new Rect(x, y, width, height);
      }
      /// <summary>
-     ///  check si el bitmap update con el path es null o no
-     /// si no lo es retoramos un croppedBitmap y la region que need
-     /// para heredared
+     ///  check the bitmap update with the  path is null or no
+     /// It's not return a croppedBitmap and the region sprite
+     /// for inherit
      /// </summary>
      /// <param name="path"></param>
      /// <param name="region"></param>

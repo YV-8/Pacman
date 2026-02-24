@@ -85,7 +85,7 @@ public class SoundManager
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error playing audio {_tempFilePath}: {ex.Message}");
+            Console.WriteLine($"Error playing audio {_tempFilePath}: {ex.Message}");
         }
     }
 
@@ -103,9 +103,9 @@ public class SoundManager
                 _currentProcess.Dispose();
             }
         }
-        catch
+        catch (Exception ex)
         {
-            /* Ignorar errores al cerrar */
+            Console.WriteLine($"Error with stop audio {_tempFilePath}: {ex.Message}");
         }
     }
 }

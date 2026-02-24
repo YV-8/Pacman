@@ -7,8 +7,6 @@ public class Board:Entity
     public Board(int row, int col, EntityType type) 
         : base(row, col, type, GameConfig.CellWidth, GameConfig.CellHeight, 1) 
     { }
-
-    
     /// <summary>
     /// Modification the Update the board
     /// </summary>

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using PacmanSolution.Models.Entities;
+using PacmanSolution.Models.Game;
 using PacmanSolution.ViewModels;
 
 namespace PacmanSolution.Models;

@@ -210,10 +210,6 @@ public class Ghost:Entity
         ghost.State = GhostState.DEAD;
         ghost.DeadTicksRemaining = DeadDuration;
         ghost.UpdateCanvasPosition();
-        Console.WriteLine($"[Comido] {ghost.Type}");
-        //ghost.Row = 14; 
-        //ghost.Col = 13;
-        
     }
 
     public void RespawnAllGhost(ObservableCollection<Entity> board)

@@ -41,7 +41,7 @@ public abstract partial class Entity:ObservableObject
         ZIndex = zIndex;
         UpdateCanvasPosition();
     }// <summary>
-    /// Actualiza las coordenadas del canvas basándose en row/col
+    /// Update the pixel position and based current position with row/col
     /// </summary>
     public void UpdateCanvasPosition()
     {
@@ -62,13 +62,10 @@ public abstract partial class Entity:ObservableObject
         var y = GameConfig.OffsetY + (row * GameConfig.CellHeight) + (GameConfig.CellHeight / 2);
         return (x, y);
     }
-
-
+    
+    /// <summary>
+    /// Updates the entity state every game tick
+    /// Must be implemented by each entity of different form
+    /// </summary>
     public abstract void Update(double deltaTime);
-
-    public virtual void Move(int dr, int dc)
-    {
-        Row += dr;
-        Col += dc;
-    }
 }

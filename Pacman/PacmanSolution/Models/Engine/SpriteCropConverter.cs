@@ -48,12 +48,4 @@ public class SpriteCropConverter : IMultiValueConverter
 
         return bitmap;
     }
-    
-    /// <summary>
-    /// Not implemented. Reverse conversion from cropped bitmap back to source values is not supported
-    /// </summary>
-    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
 }

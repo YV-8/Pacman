@@ -1,6 +1,7 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PacmanSolution.ViewModels;
+using MainWindowViewModel = PacmanSolution.ViewModels.Menu.MainWindowViewModel;
 
 namespace PacmanSolution.Models;
 
@@ -23,9 +24,6 @@ public partial class ManagePageChange: ObservableObject
                 break;
             case"GoScoreBoard":
                 CurrentPage = new ScoreBoardViewModel(this);
-                break;
-            case"GoSettingsMenu":
-                CurrentPage = new GoSettingViewModel();
                 break;
             case"Menu":
                 CurrentPage = new MainWindowViewModel();

@@ -21,7 +21,7 @@ public partial class GhostViewModel :ObservableObject
     private readonly ObservableCollection<Entity> _board;
     private readonly SpriteManager _spriteManager = new();
     private readonly GameBoardSyncService? _syncService;
-    private readonly Models.Pacman _pacmanModel;
+    private readonly Models.Entities.Pacman _pacmanModel;
     private readonly Dictionary<EntityType, (int row, int col)> _spawnPositions = new();
     private readonly ScoreBoardViewModel _score;
     
@@ -41,7 +41,7 @@ public partial class GhostViewModel :ObservableObject
     public int GetModeTimer() => _modeTimer;
 
     public GhostViewModel(ObservableCollection<Entity> board,GameBoardSyncService? syncService, 
-        Models.Pacman pacmanModel,GameEngine engine,ScoreBoardViewModel score)
+        Models.Entities.Pacman pacmanModel,GameEngine engine,ScoreBoardViewModel score)
     {
         _syncService = syncService;
         _board = board;

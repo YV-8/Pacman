@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using PacmanSolution.Models.Entities;
 
 namespace PacmanSolution.Models.Engine;
 
