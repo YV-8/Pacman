@@ -84,8 +84,8 @@ public class Ghost:Entity
     {
         UpdateCanvasPosition();
     }
-    
-    public void ApplyGhostsMove(Ghost ghost, GhostDirection dir,ObservableCollection<Entity> _board)
+
+    public void ApplyGhostsMove(Ghost ghost, GhostDirection dir, ObservableCollection<Entity> _board)
     {
         var (rowChange, colChange) = GhostBehaviorBase.DistanceDelta(dir);
         int newRow = ghost.Row + rowChange;
@@ -93,9 +93,13 @@ public class Ghost:Entity
 
         var cell = _board.FirstOrDefault(e => e.Row == newRow && e.Col == newCol);
         if (cell is null || cell.Type is EntityType.WALL) return;
-        if (cell.Type is EntityType.DOOR && 
-            ghost.State is not GhostState.INHOUSE && 
-            ghost.State is not GhostState.DEAD) return;
+        if (cell.Type is EntityType.DOOR)
+        {
+            if (ghost.State is not GhostState.INHOUSE || ghost.State is not GhostState.DEAD)
+            {
+                return;
+            }
+        }
 
         ghost.Direction = dir;
         ghost.Row = newRow;
@@ -204,13 +208,24 @@ public class Ghost:Entity
     public void RespawnGhost(Ghost ghost )
     {
         ghost.State = GhostState.DEAD;
-        ghost.DeadTicksRemaining = 14;
         ghost.DeadTicksRemaining = DeadDuration;
         ghost.UpdateCanvasPosition();
         Console.WriteLine($"[Comido] {ghost.Type}");
         //ghost.Row = 14; 
         //ghost.Col = 13;
         
+    }
+
+    public void RespawnAllGhost(ObservableCollection<Entity> board)
+    {
+        var Ghost = board.OfType<Ghost>();
+        foreach (var ghost in Ghost)
+        {
+            ghost.Row = ghost.SpawnRow;
+            ghost.Col = ghost.SpawnCol;
+            ghost.State = GhostState.INHOUSE;
+            ghost.UpdateCanvasPosition();
+        }
     }
     public int GetRespawnDelay(EntityType type)
     {

@@ -7,36 +7,21 @@ namespace PacmanSolution.Models;
 
 public class Pacman: Entity
 {
+    public int SpawnRow { get; set; }
+    public int SpawnCol { get; set; }
     private GameObject? _pacmanVisual;
     private string _currentDirection = "RIGHT";
     public int DeadTicksRemaining { get; set; } = 0;
     private const int DeadDuration = 84; 
     public PacmanState State { get; set; } = PacmanState.NORMAL;
+    
     private ObservableCollection<GameObject> VisualObjects { get; } = new();
 
     public Pacman(int row, int col, EntityType entityType, double width, double height, int zindex) 
         : base(row, col, entityType, width, height, zindex)
     {
-    }
-    // normal, imbencible, muerto, muriendo es el periodo de tiempo
-    /// <summary>
-    /// Initialize the objet pacman visual in canvas
-    /// </summary>
-    public GameObject CreatePacmanVisual(double x, double y, Bitmap sprite, Rect sourceRect)
-    {
-        var visual = new GameObject
-        {
-            X          = x,
-            Y          = y,
-            Width      = 40,
-            Height     = 40,
-            Zindex     = 10,
-            Sprite     = sprite,
-            SourceRect = sourceRect
-        };
-        _pacmanVisual = visual;
-        VisualObjects.Add(visual);
-        return visual;
+        SpawnRow = row;
+        SpawnCol = col;
     }
     
     /// <summary>
@@ -49,7 +34,6 @@ public class Pacman: Entity
         _pacmanVisual.Y          = y;
         _pacmanVisual.SourceRect = newSourceRect;
     }
-
     public override void Update(double deltaTime)
     {
         var (centerX, centerY) = GetCellCenter(Row, Col);
@@ -107,13 +91,16 @@ public class Pacman: Entity
         return (nextRow, nextCol);
     }
     
-    public void RespawnPacman(Pacman pacman )
+    public void RespawnPacman()
     {
-        pacman.State = PacmanState.DIEDING;
-        pacman.DeadTicksRemaining = 48;
-        pacman.DeadTicksRemaining = DeadDuration;
-        pacman.UpdateCanvasPosition();
-        Console.WriteLine($"[Comido] {pacman.Type}");
-        
+        //pacman.State = PacmanState.DIEDING;
+        //pacman.DeadTicksRemaining = 48;
+        this.Row = SpawnRow;
+        this.Col = SpawnCol;
+        this.State = PacmanState.NORMAL;
+        this._currentDirection = "RIGHT";
+        this.DeadTicksRemaining = DeadDuration;
+        this.UpdateCanvasPosition();
+        Console.WriteLine($"[Comido] {this.Type}");
     }
 }
