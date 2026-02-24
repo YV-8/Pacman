@@ -1,4 +1,4 @@
-using Avalonia;
+using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PacmanSolution.Models;
@@ -9,7 +9,10 @@ public partial class MainWindowViewModel:ObservableObject
 {
     [ObservableProperty]
     private ManagePageChange _navigation;
-    private SoundManager soundManager = new();
+    [ObservableProperty]
+    private bool _isMusicEnabled;
+    private readonly SoundManager soundManager =new();    
+
 
     public MainWindowViewModel()
     {
@@ -34,16 +37,14 @@ public partial class MainWindowViewModel:ObservableObject
     /// audio
     /// </summary>
     [RelayCommand]
-    public void ToggleAudioCommand( bool isChecked)
+    private void ToggleAudio()
     {
-        string path = "PacmanTheme";
-        if (isChecked)
+        var path = "PacManGameSound";
+        if (_isMusicEnabled)
         {
-            soundManager.PlaySound(path,true);
+            soundManager.PlaySound(path, true);
         }
         else
-        {
             soundManager.StopSound();
-        }
     }
 }
