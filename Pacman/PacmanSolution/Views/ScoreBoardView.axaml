@@ -2,8 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:PacmanSolution.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="PacmanSolution.Views.ScoreBoardPageView">
+             x:Class="PacmanSolution.Views.ScoreBoardView"
+             x:DataType="vm:ScoreBoardViewModel"
+             Background="#0D0D1A">
     <UserControl.Styles>
     <Style Selector="TextBlock.title">
       <Setter Property="FontSize" Value="30"/>
@@ -50,24 +53,13 @@
 
     <!-- Header -->
     <StackPanel Grid.Row="0" Spacing="2" Margin="0,30,0,16">
-      <TextBlock Classes="title" Text="🕹  SCOREBOARD"/>
+      <TextBlock Classes="title" Text="SCOREBOARD"/>
     </StackPanel>
 
-    <!-- Contenido central -->
+    <!-- content central -->
     <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
       <StackPanel Spacing="16" MaxWidth="360" HorizontalAlignment="Center" Margin="20,0">
-
-        <!-- Scores actuales del juego -->
-        <Border Background="#1A1A2E" CornerRadius="10" Padding="18,14">
-          <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="10">
-            <TextBlock Classes="label" Grid.Row="0" Grid.Column="0" Text="SCORE"/>
-            <TextBlock Classes="value" Grid.Row="0" Grid.Column="1" Text="{Binding Score}"/>
-            <TextBlock Classes="label" Grid.Row="1" Grid.Column="0" Text="HIGH SCORE"/>
-            <TextBlock Classes="value" Grid.Row="1" Grid.Column="1" Text="{Binding HighScore}"/>
-          </Grid>
-        </Border>
-
-        <!-- Top 5 -->
+        
         <TextBlock Foreground="#888888"
                    FontSize="11"
                    FontWeight="Bold"
@@ -76,71 +68,46 @@
                    LetterSpacing="3"/>
 
         <Border Background="#1A1A2E" CornerRadius="10" Padding="18,14">
-          <ItemsControl ItemsSource="{Binding HighScores}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Grid ColumnDefinitions="28,*,Auto" Margin="0,5">
-                  <!-- Posición -->
-                  <TextBlock Foreground="#555577" FontSize="12"
-                             Text="{Binding $index}" Grid.Column="0"
-                             VerticalAlignment="Center"/>
-                  <!-- Nombre -->
-                  <TextBlock Foreground="White" FontWeight="Bold" FontSize="15"
-                             Text="{Binding Name}" Grid.Column="1"
-                             VerticalAlignment="Center"/>
-                  <!-- Puntos -->
-                  <TextBlock Foreground="#FFD700" FontWeight="Bold" FontSize="15"
-                             Text="{Binding Points}" Grid.Column="2"
-                             VerticalAlignment="Center"/>
-                </Grid>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
+          <StackPanel Spacing="10">
+
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="label" Grid.Column="0" Text="NAME"/>
+              <TextBlock Classes="label" Grid.Column="1" Text="SCORE"/>
+            </Grid>
+            <Rectangle Height="1" Fill="#333355"/>
+            <ItemsControl ItemsSource="{Binding HighScores}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                    <TextBlock Classes="label" Grid.Column="0" Text="{Binding Name}"/>
+                    <TextBlock Classes="value" Grid.Column="1" Text="{Binding Points}"/>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
         </Border>
+        
+        <Border Background="#1A1A2E" CornerRadius="10" Padding="18,14">
+          <StackPanel Spacing="10">
 
-        <!-- Botón Save (oculto si el panel ya está abierto) -->
-        <Button Classes="gold"
-                Content="💾  Save My Score"
-                Command="{Binding ShowSavePanelCommand}"
-                HorizontalAlignment="Center"
-                IsVisible="{Binding !IsSavePanelVisible}"/>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="label" Grid.Column="0" Text="NAME"/>
+              <TextBlock Classes="label" Grid.Column="1" Text="SCORE"/>
+            </Grid>
+            <Rectangle Height="1" Fill="#333355"/>
 
-        <!-- Panel de guardado -->
-        <Border Background="#1A1A2E" CornerRadius="10" Padding="20,16"
-                IsVisible="{Binding IsSavePanelVisible}">
-          <StackPanel Spacing="14">
-
-            <TextBlock Text="Enter your 3-letter initials"
-                       Foreground="White" FontSize="14" FontWeight="Bold"
-                       HorizontalAlignment="Center"/>
-
-            <TextBox Text="{Binding PlayerName}"
-                     MaxLength="3"
-                     FontSize="28"
-                     FontWeight="Bold"
-                     TextAlignment="Center"
-                     Foreground="#FFD700"
-                     Background="#0D0D1A"
-                     BorderBrush="#FFD700"
-                     BorderThickness="2"
-                     CornerRadius="6"
-                     HorizontalAlignment="Center"
-                     Width="90"
-                     Height="56"
-                     Watermark="AAA"/>
-
-            <!-- Mensaje de error -->
-            <TextBlock Text="{Binding SaveMessage}"
-                       Foreground="#FF5555"
-                       FontSize="12"
-                       HorizontalAlignment="Center"
-                       IsVisible="{Binding SaveMessage,
-                           Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
-              <Button Classes="gold" Content="✔  Save" Command="{Binding SaveDataCommand}"/>
-              <Button Classes="red"  Content="✖  Cancel" Command="{Binding CancelSaveCommand}"/>
-            </StackPanel>
+            <!-- Cambia HighScores por AllScores para ver todos -->
+            <ItemsControl ItemsSource="{Binding HighScores}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto" Margin="0,6">
+                    <TextBlock Classes="label" Grid.Column="0" Text="{Binding Name}"/>
+                    <TextBlock Classes="value" Grid.Column="1" Text="{Binding Points}"/>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
           </StackPanel>
         </Border>
@@ -151,8 +118,9 @@
     <!-- Footer: botón volver -->
     <Button Grid.Row="2"
             Classes="ghost"
-            Content="← Back to Menu"
+            Content="Menun"
             Command="{Binding NavigateCommand}"
+            CommandParameter="Menu"
             HorizontalAlignment="Center"
             Margin="0,10,0,24"/>
 

@@ -23,31 +23,13 @@
 
             <TextBlock Classes="ButtonOptGame" Text="PACMAN" FontSize="45"
                        Grid.Column="2"  HorizontalAlignment="Center"/>
-            <Button Classes="PacmanRetroGame" Content="PAUSE" Padding="20,5"
-                    Grid.Column="3"  HorizontalAlignment="Center" />
             
             <Button Grid.Column="4" Classes="PacmanRetroGame" Content="Menu" 
                     Padding="20,5" VerticalAlignment="Center"
                     HorizontalAlignment="Center"
                     Command="{Binding NavigateCommand}" 
                     CommandParameter ="Menu"/>
-                <!-- <Button.Flyout>
-                    <MenuFlyout Placement="Bottom">
-                        <MenuItem Header="Music" Command="{Binding ToggleMusicCommand}"/>
-                        <MenuItem Header="Settings" Command="{Binding OpenSettingsCommand}"/>
-                        <MenuItem Header="Score" Command="{Binding ViewScoresCommand}"/>
-                    </MenuFlyout>
-                </Button.Flyout> -->
         </Grid>
-
-        <Panel DockPanel.Dock="Bottom" Margin="10">
-            <Button HorizontalAlignment="Right" Classes="PacmanRetroGame" Width="50" Height="50" CornerRadius="25">
-                <PathIcon Data="M12,3V13.55C11.41,13.21 10.73,13 10,13C7.79,13 6,14.79 6,17C6,19.21 7.79,21 10,21C12.21,21 14,19.21 14,17V7H18V3H12Z" 
-                          Foreground="SkyBlue"/>
-            </Button>
-        </Panel>
-        <!-- Área de juego: PacmanView tiene tamaño fijo (840×620) para que el mapa completo quepa.
-             Viewbox escala para que quepa en el espacio restante sin cortar la parte de abajo. -->
         <Viewbox Stretch="Uniform">
             <ContentControl Content="{Binding CurrentSubView}">
                 <ContentControl.DataTemplates>
@@ -57,5 +39,186 @@
                 </ContentControl.DataTemplates>
             </ContentControl>
         </Viewbox>
+        <Panel>
+            <Border IsVisible="{Binding ShowWinOverlay}" Background="#CC000000" ZIndex="100">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+
+                    <TextBlock Text="WINNER!" FontSize="48" FontWeight="Bold"
+                               Foreground="Yellow" HorizontalAlignment="Center"/>
+
+                    <!-- Score actual -->
+                    <TextBlock Text="{Binding Score.Score, StringFormat='Puntuación: {0}'}"
+                               FontSize="24" Foreground="White" HorizontalAlignment="Center"/>
+
+                    <!-- Panel guardar -->
+                    <Border Background="#1A1A2E" CornerRadius="10" Padding="20,16">
+                        <StackPanel Spacing="14">
+
+                            <TextBlock Text="{Binding Score.PlayerName, StringFormat='player: {0}'}"
+                                       Foreground="#FFD700" FontSize="16" FontWeight="Bold"
+                                       HorizontalAlignment="Center"/>
+
+                            <TextBlock Text="{Binding Score.Score, StringFormat='Save score: {0}'}"
+                                       Foreground="White" FontSize="14"
+                                       HorizontalAlignment="Center"/>
+
+                            <TextBlock Text="Insert 3 letters"
+                                       Foreground="White" FontSize="14" FontWeight="Bold"
+                                       HorizontalAlignment="Center"/>
+
+                            <TextBox Text="{Binding Score.PlayerName}"
+                                     MaxLength="3"
+                                     FontSize="28"
+                                     FontWeight="Bold"
+                                     TextAlignment="Center"
+                                     Foreground="#FFD700"
+                                     Background="#0D0D1A"
+                                     BorderBrush="#FFD700"
+                                     BorderThickness="2"
+                                     CornerRadius="6"
+                                     HorizontalAlignment="Center"
+                                     Width="90"
+                                     Height="56"
+                                     Watermark="AAA"/>
+
+                            <TextBlock Text="{Binding Score.SaveMessage}"
+                                       Foreground="#FF5555" FontSize="12"
+                                       HorizontalAlignment="Center">
+                                <TextBlock.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="Score.SaveMessage" 
+                                                 Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+                                        <Binding Path="Score.IsSaveSuccess" 
+                                                 Converter="{x:Static BoolConverters.Not}"/>
+                                    </MultiBinding>
+                                </TextBlock.IsVisible>
+                            </TextBlock>
+
+                            <TextBlock Text="{Binding Score.SaveMessage}"
+                                       Foreground="#FFD700" FontSize="15" FontWeight="Bold"
+                                       HorizontalAlignment="Center"
+                                       IsVisible="{Binding Score.IsSaveSuccess}"/>
+
+                            <TextBlock Text="— Top 5 —" Foreground="#FFD700" FontSize="13"
+                                       HorizontalAlignment="Center" Margin="0,8,0,0"
+                                       IsVisible="{Binding Score.IsSaveSuccess}"/>
+                            <ItemsControl ItemsSource="{Binding Score.HighScores}"
+                                          IsVisible="{Binding Score.IsSaveSuccess}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" 
+                                                    HorizontalAlignment="Center" Spacing="20">
+                                            <TextBlock Text="{Binding Name}" 
+                                                       Foreground="White" FontSize="14"/>
+                                            <TextBlock Text="{Binding Points}" 
+                                                       Foreground="#FFD700" FontSize="14"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+                                <Button Classes="gold" Content="Guardar" Command="{Binding Score.SaveDataCommand}"/>
+                                <Button Classes="red"  Content="Cancelar" Command="{Binding Score.CancelSaveCommand}"/>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </Border>
+
+            <!-- GAME OVER -->
+            <Border IsVisible="{Binding ShowGameOverOverlay}" Background="#CC000000" ZIndex="100">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+
+                    <TextBlock Text="GAME OVER" FontSize="48" FontWeight="Bold"
+                               Foreground="Red" HorizontalAlignment="Center"/>
+
+                    <!-- Score actual -->
+                    <TextBlock Text="{Binding Score.Score, StringFormat='Puntuación: {0}'}"
+                               FontSize="24" Foreground="White" HorizontalAlignment="Center"/>
+
+                    <!-- Panel guardar -->
+                    <Border Background="#1A1A2E" CornerRadius="10" Padding="20,16">
+                        <StackPanel Spacing="14">
+
+                            <!-- Nombre que el jugador está escribiendo -->
+                            <TextBlock Text="{Binding Score.PlayerName, StringFormat='Jugador: {0}'}"
+                                       Foreground="#FFD700" FontSize="16" FontWeight="Bold"
+                                       HorizontalAlignment="Center"/>
+
+                            <!-- Score que se va a guardar -->
+                            <TextBlock Text="{Binding Score.Score, StringFormat='Score a guardar: {0}'}"
+                                       Foreground="White" FontSize="14"
+                                       HorizontalAlignment="Center"/>
+
+                            <TextBlock Text="Ingresa tus 3 iniciales"
+                                       Foreground="White" FontSize="14" FontWeight="Bold"
+                                       HorizontalAlignment="Center"/>
+
+                            <!-- TextBox enlazado a Score.PlayerName -->
+                            <TextBox Text="{Binding Score.PlayerName}"
+                                     MaxLength="3"
+                                     FontSize="28"
+                                     FontWeight="Bold"
+                                     TextAlignment="Center"
+                                     Foreground="#FFD700"
+                                     Background="#0D0D1A"
+                                     BorderBrush="#FFD700"
+                                     BorderThickness="2"
+                                     CornerRadius="6"
+                                     HorizontalAlignment="Center"
+                                     Width="90"
+                                     Height="56"
+                                     Watermark="AAA"/>
+
+                            <!-- Mensaje de error -->
+                            <TextBlock Text="{Binding Score.SaveMessage}"
+                                       Foreground="#FF5555" FontSize="12"
+                                       HorizontalAlignment="Center">
+                                <TextBlock.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="Score.SaveMessage" 
+                                                 Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+                                        <Binding Path="Score.IsSaveSuccess" 
+                                                 Converter="{x:Static BoolConverters.Not}"/>
+                                    </MultiBinding>
+                                </TextBlock.IsVisible>
+                            </TextBlock>
+
+                            <TextBlock Text="{Binding Score.SaveMessage}"
+                                       Foreground="#FFD700" FontSize="15" FontWeight="Bold"
+                                       HorizontalAlignment="Center"
+                                       IsVisible="{Binding Score.IsSaveSuccess}"/>
+
+                            <!-- Top 5 actualizado -->
+                            <TextBlock Text="— Top 5 —" Foreground="#FFD700" FontSize="13"
+                                       HorizontalAlignment="Center" Margin="0,8,0,0"
+                                       IsVisible="{Binding Score.IsSaveSuccess}"/>
+                            <ItemsControl ItemsSource="{Binding Score.HighScores}"
+                                          IsVisible="{Binding Score.IsSaveSuccess}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" 
+                                                    HorizontalAlignment="Center" Spacing="20">
+                                            <TextBlock Text="{Binding Name}" 
+                                                       Foreground="White" FontSize="14"/>
+                                            <TextBlock Text="{Binding Points}" 
+                                                       Foreground="#FFD700" FontSize="14"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+                                <Button Classes="gold" Content="Guardar" Command="{Binding Score.SaveDataCommand}"/>
+                                <Button Classes="red"  Content="Cancelar" Command="{Binding Score.CancelSaveCommand}"/>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </Border>
+        </Panel>
     </DockPanel>
 </UserControl>

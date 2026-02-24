@@ -102,10 +102,8 @@ public class GameEngine
     /// <returns></returns>
     public bool CanMoveTo(Entity targetEntity)
     {
-        if (targetEntity is null) return false;
-        if (targetEntity is Ghost) return true;
-        if (targetEntity.Type is EntityType.REDGHOST or EntityType.PINKGHOST
-            or EntityType.CYANGHOST or EntityType.ORANGEGHOST) return true;
+        if (targetEntity is null) {return false;}
+        if (targetEntity is Ghost) {return true;}
         if (targetEntity.Type is EntityType.WALL || targetEntity.Type is EntityType.DOOR)
         {
             return false;
@@ -136,7 +134,7 @@ public class GameEngine
         return result;
     }
     
-    public int CollisionsToPacman(Ghost ghost, Models.Pacman pacman, int _modeTimer)
+    public int CollisionsToPacman(Ghost ghost, Models.Pacman pacman,ObservableCollection<Entity> _board)
     {
         if (ghost.Row == pacman.Row && ghost.Col == pacman.Col)
         {
@@ -149,8 +147,8 @@ public class GameEngine
             }
             else if (ghost.State == GhostState.NORMAL)
             {
-                
-                pacman.RespawnPacman(pacman);
+                pacman.RespawnPacman();
+                ghost.RespawnAllGhost(_board);
                 Console.WriteLine($"[Muerte Pacman] por {ghost.Type}");
                 PacmanDied?.Invoke();
             }
@@ -174,16 +172,6 @@ public class GameEngine
         EatenPellets++;
         if (EatenPellets >= TotalPellets)
             LevelComplete?.Invoke();
-    }
-
-    private void EffectDotPoints(Entity newEntity, InteractionResultObject result)
-    {
-        
-        if (newEntity.Type == EntityType.CHERRY)
-        {
-            result.PointsEarned = cherryPoints;
-            result.RemovedElementType = "cherry";
-        }
     }
     
     /// <summary>
