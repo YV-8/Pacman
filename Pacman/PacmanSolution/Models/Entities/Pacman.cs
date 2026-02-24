@@ -1,20 +1,17 @@
 using System.Collections.ObjectModel;
 using Avalonia;
 
-namespace PacmanSolution.Models;
+namespace PacmanSolution.Models.Entities;
 public enum PacmanState
 {
-    NORMAL,
-    DIEDING
+    NORMAL, DIEDING
 }
 public class Pacman: Entity
 {
-    public int SpawnRow { get; set; }
-    public int SpawnCol { get; set; }
+    private int SpawnRow { get; set; }
+    private int SpawnCol { get; set; }
     private GameObject? _pacmanVisual;
     private string _currentDirection = "RIGHT";
-    public int DeadTicksRemaining { get; set; } = 0;
-    private const int DeadDuration = 84; 
     public PacmanState State { get; set; } = PacmanState.NORMAL;
     
     private ObservableCollection<GameObject> VisualObjects { get; } = new();
@@ -25,17 +22,11 @@ public class Pacman: Entity
         SpawnRow = row;
         SpawnCol = col;
     }
-    
     /// <summary>
-    /// Update the visual position pacman in the canvas
+    /// update the central position
+    /// divide in the middle the width and height for get the center
     /// </summary>
-    public void UpdatePacmanVisual(double x, double y, Rect newSourceRect)
-    {
-        if (_pacmanVisual is null) return;
-        _pacmanVisual.X          = x;
-        _pacmanVisual.Y          = y;
-        _pacmanVisual.SourceRect = newSourceRect;
-    }
+    /// <param name="deltaTime"></param>
     public override void Update(double deltaTime)
     {
         var (centerX, centerY) = GetCellCenter(Row, Col);
@@ -103,7 +94,6 @@ public class Pacman: Entity
         this.Col = SpawnCol;
         this.State = PacmanState.NORMAL;
         this._currentDirection = "RIGHT";
-        //this.DeadTicksRemaining = DeadDuration;
         this.UpdateCanvasPosition();
     }
 }

@@ -1,4 +1,4 @@
-namespace PacmanSolution.Models;
+namespace PacmanSolution.Models.Entities;
 
 public class Score
 {

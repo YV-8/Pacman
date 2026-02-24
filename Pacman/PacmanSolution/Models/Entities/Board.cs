@@ -1,3 +1,4 @@
+using PacmanSolution.Models.Game;
 using PacmanSolution.ViewModels;
 
 namespace PacmanSolution.Models;

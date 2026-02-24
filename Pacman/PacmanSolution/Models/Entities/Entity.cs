@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
+using PacmanSolution.Models.Game;
 using PacmanSolution.ViewModels;
 
 namespace PacmanSolution.Models;
