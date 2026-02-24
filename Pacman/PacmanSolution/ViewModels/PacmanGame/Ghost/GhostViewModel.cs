@@ -50,10 +50,6 @@ public partial class GhostViewModel :ObservableObject
         _score = score;
         InitializeGhosts();
     }
-    /*public void SetPacmanDirection(GhostDirection direction)
-    {
-        _pacmanDirection = direction;
-    }*/
     private void InitializeGhosts()
     {
         Ghosts.Clear();
@@ -99,7 +95,7 @@ public partial class GhostViewModel :ObservableObject
     /// <summary>
     /// each ghost take the entity en animation  and current sprite
     /// </summary>
-    public void UpdateAllSprites()
+    private void UpdateAllSprites()
     {
         foreach (var ghost in Ghosts)
         {
@@ -205,11 +201,11 @@ public partial class GhostViewModel :ObservableObject
             GhostDirection nextDirection = ghost.AssignDirection(ghost,pacman,blinky,_board);
 
             ghost.ApplyGhostsMove(ghost, nextDirection, _board);
-            int collisionResult = _gameEngine.CollisionsToPacman(ghost, pacman, _modeTimer);
+            int collisionResult = _gameEngine.CollisionsToPacman(ghost, pacman, _board);
             if (collisionResult == -1)
             {
                 int points = GetGhostPoints();
-                _score.amount(points);
+                _score.Amount(points);
                 Console.WriteLine($"THe pacman ate ghost{points}");
             }
         }
@@ -256,7 +252,7 @@ public partial class GhostViewModel :ObservableObject
         _timerFrighten.Start();
     }
     
-    public int GetGhostPoints()
+    private int GetGhostPoints()
     {
         int index = Math.Min(_ghostsEatenThisRound, GhostPoints.Length - 1);
         int points = GhostPoints[index];
@@ -264,7 +260,7 @@ public partial class GhostViewModel :ObservableObject
         return points;
     }
 
-    public void SetNormal()
+    private void SetNormal()
     {
         _frightenedModeActive = false;
         foreach (var ghost in Ghosts)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -16,8 +17,15 @@ public partial class GameViewModel: ObservableObject
     [ObservableProperty] private ScoreBoardViewModel _score;
     [ObservableProperty] private ManagePageChange _navigation;
     [ObservableProperty] private object _currentSubView;
+    [ObservableProperty] private bool _showWinOverlay = false;
+    [ObservableProperty] private bool _showGameOverOverlay = false;
+    [ObservableProperty] private string _finalScoreText = "";
+    [ObservableProperty] private bool _isMusicEnabled;
+    [ObservableProperty] private string _playerName = string.Empty;
+    [ObservableProperty] private string _saveMessage = string.Empty;
+    [ObservableProperty] private bool _isSaveInputVisible = false;
     
-    private readonly SoundManager _soundManager = new ();
+    private readonly SoundManager soundManager =new();    
     private readonly GameEngine _engine = new();
     private readonly EngineManager _engineManager;
     private readonly GameBoardSyncService _syncService;
@@ -35,7 +43,7 @@ public partial class GameViewModel: ObservableObject
         _navigation = navigation;//navega en paginas
         Board.Clear();
         CurrentSubView = this;// esto es del navegador
-        Score = new ScoreBoardViewModel();// es el score board que luego me toca hacerlo 
+        Score = new ScoreBoardViewModel(navigation);// es el score board que luego me toca hacerlo 
         _engineManager = new EngineManager(28, 31);//pasa parametros
         _engineManager.BuildGameBoard(Board);// lo contruye
         
@@ -56,17 +64,15 @@ public partial class GameViewModel: ObservableObject
         Navigation.ChangePage(target);
     }
     [RelayCommand]
-    private void ToggleAudioCommand( bool isChecked)
+    private void ToggleAudio()
     {
         var path = "PacManGameSound";
-        if (isChecked)
+        if (_isMusicEnabled)
         {
-            _soundManager.PlaySound(path,true);
+            soundManager.PlaySound(path, true);
         }
         else
-        {
-            _soundManager.StopSound();
-        }
+            soundManager.StopSound();
     }
     /// <summary>
     /// stop and clean the timers
@@ -82,8 +88,7 @@ public partial class GameViewModel: ObservableObject
     /// </summary>
     public void ResumeGame()
     {
-        _gameTimer?.Start();
-        _movementTimer?.Start();
+        ResumeAllTimers();
     }
     
     /// <summary>
@@ -91,7 +96,6 @@ public partial class GameViewModel: ObservableObject
     /// </summary>
     public void PauseGame()
     {
-        _gameTimer?.Stop();
-        _movementTimer?.Stop();
+        PauseAllTimers();
     }
 }

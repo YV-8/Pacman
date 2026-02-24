@@ -23,15 +23,17 @@ public partial class PacmanViewModel:ObservableObject
     private readonly ObservableCollection<Entity> _board;
     private readonly GameBoardSyncService _syncService;
     private readonly SpriteManager _spriteManager = new ();
-    private readonly SoundManager _soundManager = new ();
+    private readonly SoundManager _soundManager =new();
+    private readonly int _rowInitial;
+    private readonly int _colInitial;
     
     private int _row;
     private int _col;
     private int _currentSpriteRow = 0;
     private int _animationFrame = 0;
     private int _deathFrame = 0;
-    private const int DeathTotalFrames = 12; // ajusta según tu spritesheet
-    private const int DeathSpriteRow = 2;    // fila de muerte en tu PNG, ajusta
+    private const int DeathTotalFrames = 12;
+    private const int DeathSpriteRow = 2;
     
     private DispatcherTimer? _animationTimer;
     private readonly DispatcherTimer? _movementTimer;
@@ -64,14 +66,12 @@ public partial class PacmanViewModel:ObservableObject
         _syncService = syncService;
         Score = score;
         var pacmanCell = board.FirstOrDefault(e => e.Type == EntityType.PACMAN);
-        int startRow = pacmanCell?.Row ?? 0;
-        int startCol = pacmanCell?.Col ?? 0;
-        _row = startRow;
-        _col = startCol;
-        PacmanModel = new Models.Pacman(startRow, startCol, EntityType.PACMAN, PacmanImageSize, PacmanImageSize, 10);
+        _rowInitial = pacmanCell?.Row ?? 0;
+        _colInitial = pacmanCell?.Col ?? 0;
+        _row = _rowInitial;
+        _col = _colInitial;
+        PacmanModel = new Models.Pacman(_rowInitial, _colInitial, EntityType.PACMAN, PacmanImageSize, PacmanImageSize, 10);
     }
-    
-    
     
     public void GetDirection(string direction)
     {
@@ -105,7 +105,7 @@ public partial class PacmanViewModel:ObservableObject
                 var result = _engine.InteractionObjects(targetEntity);
                 if (result.PointsEarned > 0)
                 {
-                    Score.amount(result.PointsEarned);
+                    Score.Amount(result.PointsEarned);
                     targetEntity.IsActive = false;
                 }
             }
@@ -199,10 +199,10 @@ public partial class PacmanViewModel:ObservableObject
             {
                 _deathTimer.Stop();
                 DeathAudioCommand(false);
+                ResetPacman();
                 OnDeathAnimationFinished.Invoke();
                 return;
             }
-            
         };
         _deathTimer.Start();
     }
@@ -211,12 +211,27 @@ public partial class PacmanViewModel:ObservableObject
         var path = "PacmanDeathSound";
         if (isChecked)
         {
-            _soundManager.PlaySound(path,true);
+            _soundManager.PlaySound(path,isLooping: false);
         }
         else
         {
             _soundManager.StopSound();
         }
     }
-    
+
+    public void ResetPacman()
+    {
+        var currentCell = _board.FirstOrDefault(c => c.Row == Row && c.Col == Col);
+        if (currentCell != null && currentCell.Type == EntityType.PACMAN)
+            currentCell.Type = EntityType.EMPTY;
+        PacmanModel.RespawnPacman();
+        Row = PacmanModel.Row;
+        Col = PacmanModel.Col;
+        _currentSpriteRow = 0;
+        var spawnCell = _board.FirstOrDefault(c => c.Row == Row && c.Col == Col);
+        if (spawnCell != null)
+            spawnCell.Type = EntityType.PACMAN;
+        UpdatePacmanSprites();
+        _syncService.UpdatePacmanPosition(Row, Col);
+    }
 }
